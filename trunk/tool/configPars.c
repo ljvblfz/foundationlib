@@ -7,7 +7,7 @@
 *	Based on SDK5.RC16, Linux 2.6.20, ARM Host CPU.
 *	
 *	MG3500 (MAXIM, mobilygen, Inc.) HD project
-*  Copyright (c) 1992-2009,Zhejiang Dahua Technology Stock Co. Ltd.
+*   Copyright (c) Artificial Intelligence Infinity.
 *
 *	2009.07.24 Solution designed by shaobin, Programmed by shaobin.
 */

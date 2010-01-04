@@ -437,7 +437,7 @@ OSI_LIB_HANDLE mutex_create(
 }
 void mutex_lock(
 				OSI_LIB_HANDLE mutex_handle,
-				DWORD timeout	/* non useful  */
+				DWORD timeout	/* non useful */
 			   )
 {
 #ifdef WINDOWS_OS

@@ -52,7 +52,8 @@ int FindSW(
            void** KeyWordPtrArray,	/* The keyword array [in] */
            int CmpFcnIndex,		/* Compare function tag [in] */
            LIST_HANDLE NodeHandle, /* The handle of matched node [out] */
-           int PermissionTag /* Permission Tag [in] */
+           int PermissionTag, /* Permission Tag [in] */
+		   void* UserData	/* User data [in/out] */
            );
 
 /* Find a specific node with multiple keyword match */
@@ -61,7 +62,8 @@ int FindMW(
            void** KeyWordPtrArray, /* The keyword array [in] */
            int CmpFcnIndex, /* Compare function tag [in] */
            LIST_HANDLE NodeHandle, /* The handle of matched node [out] */
-           int PermissionTag /* Permission Tag [in] */
+           int PermissionTag, /* Permission Tag [in] */
+		   void* UserData	/* User data [out/in] */
            );
 
 int InsertNode(

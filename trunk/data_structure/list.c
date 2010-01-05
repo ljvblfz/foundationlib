@@ -26,7 +26,7 @@ typedef struct
 
 typedef struct  
 {
-	OSI_LIB_HANDLE	CriticalSectionHandle;
+	OSI_LIB_HANDLE	MutexHandle;
 	int				CmpFcnAmount;
 	void**			CmpFcnArray;
 	unsigned int	EntryAmount;
@@ -142,7 +142,7 @@ int Initialize(
 	ListHeadPtr->EntryAmount=0;
 	ListHeadPtr->EntriesList=LIST_NULL;
     opt=MG_SEM_Q_PRIORITY | MG_SEM_DELETE_SAFE | MG_SEM_INVERSION_SAFE;
-	ListHeadPtr->CriticalSectionHandle=mutex_create(opt);
+	ListHeadPtr->MutexHandle=mutex_create(opt);
 
 	DSHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
 	DSHandleEntryPtr->EntryPtr=(void*)ListHeadPtr;
@@ -186,9 +186,9 @@ int Count(LIST_HANDLE handle)
         return LIST_ERROR;
     }
 
-	mutex_lock(ListHeadPtr->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(ListHeadPtr->MutexHandle, MG_WAIT_FOREVER);
 	amount=ListHeadPtr->EntryAmount;
-	mutex_unlock(ListHeadPtr->CriticalSectionHandle);
+	mutex_unlock(ListHeadPtr->MutexHandle);
 	
 	return amount;
 }
@@ -233,9 +233,9 @@ int IsEmpty(LIST_HANDLE HeadHandle)
         return LIST_ERROR;
     }
 
-	mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 	logi=(list->EntryAmount==0)?True:False;
-	mutex_unlock(list->CriticalSectionHandle);
+	mutex_unlock(list->MutexHandle);
 	
 	return logi;
 }
@@ -263,7 +263,8 @@ int FindSW(
 		   void** KeyWordPtrArray,
 		   int CmpFcnIndex,
 		   LIST_HANDLE NodeHandle,
-		   int PermissionTag
+		   int PermissionTag,
+		   void* UserData
 		   )
 {
 	LIST_NODE_PTR CurrentNodePtr;
@@ -305,7 +306,7 @@ int FindSW(
         return LIST_ERROR;
     }
 
-	mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 
     if (list->EntriesList)
     {
@@ -313,13 +314,13 @@ int FindSW(
     } 
     else
     {
-		mutex_unlock(list->CriticalSectionHandle);
+		mutex_unlock(list->MutexHandle);
         return LIST_ERROR;
     }
 	
     /* Get a temporary read permission */
 	CurrentNodePtr->ReadPermission++;
-	mutex_unlock(list->CriticalSectionHandle);
+	mutex_unlock(list->MutexHandle);
 
 	while (CurrentNodePtr)
 	{
@@ -330,9 +331,9 @@ int FindSW(
 			if ((MaskTmp & 0x1) && KeyWordPtrArray[i])
 			{
 				CmpFcnPtr=CmpFcnArray[i];
-				if (((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]))==0)
+				if (((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),UserData)==0)
 				{
-					mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+					mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 					CurrentNodePtr->ReadPermission--;	/* Release temporary permission */
 					DSNodeHandleEntryPtr->HandleType=LIST_NODE_TYPE;
 					DSNodeHandleEntryPtr->EntryPtr=(void*)CurrentNodePtr;
@@ -342,7 +343,7 @@ int FindSW(
 					case READ_PERMISSION_TAG:
 						if (CurrentNodePtr->WritePermission>0)
 						{
-							mutex_unlock(list->CriticalSectionHandle);
+							mutex_unlock(list->MutexHandle);
 							return PERMISSION_DENY;
 						}
 
@@ -351,7 +352,7 @@ int FindSW(
 					case WRITE_PERMISSION_TAG:
 						if (CurrentNodePtr->ReadPermission>0 || CurrentNodePtr->WritePermission>0)
 						{
-							mutex_unlock(list->CriticalSectionHandle);
+							mutex_unlock(list->MutexHandle);
 							return PERMISSION_DENY;
 						}
 
@@ -360,14 +361,14 @@ int FindSW(
 					default:
 					    break;
 					}
-					mutex_unlock(list->CriticalSectionHandle);
+					mutex_unlock(list->MutexHandle);
 					return LIST_OK;
 				}
 			}
 			MaskTmp>>=1;
 		}
 
-		mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+		mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 		/* Release temporary read permission of previous node */
 		CurrentNodePtr->ReadPermission--;
 		CurrentNodePtr=CurrentNodePtr->NextNode;
@@ -376,7 +377,7 @@ int FindSW(
 		{
 			CurrentNodePtr->ReadPermission++;
 		}
-		mutex_unlock(list->CriticalSectionHandle);
+		mutex_unlock(list->MutexHandle);
 	}
 
 	return LIST_ERROR;
@@ -405,7 +406,8 @@ int FindMW(
 		   void** KeyWordPtrArray,
 		   int CmpFcnIndex,
 		   LIST_HANDLE NodeHandle,
-		   int PermissionTag
+		   int PermissionTag,
+		   void* UserData
 		   )
 {
 	LIST_NODE_PTR CurrentNodePtr;
@@ -451,19 +453,19 @@ int FindMW(
         return LIST_ERROR;
     }
 
-	mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
     if (list->EntriesList)
     {
         CurrentNodePtr=(LIST_NODE_PTR)list->EntriesList;
     } 
     else
     {
-		mutex_unlock(list->CriticalSectionHandle);
+		mutex_unlock(list->MutexHandle);
         return LIST_ERROR;
     }
 	/* Get a temporary read permission */
 	CurrentNodePtr->ReadPermission++;
-	mutex_unlock(list->CriticalSectionHandle);
+	mutex_unlock(list->MutexHandle);
                                                                                                                                                                                                                                          
 	while (CurrentNodePtr)
 	{
@@ -476,7 +478,7 @@ int FindMW(
 			if ((MaskTmp & 0x1) && KeyWordPtrArray[i])
 			{
 				CmpFcnPtr=CmpFcnArray[i];
-				logi+=(((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]))==0);
+				logi+=(((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),UserData)==0);
 				CompareCnt++;
 			}
 			MaskTmp>>=1;
@@ -484,7 +486,7 @@ int FindMW(
 
 		if (logi==CompareCnt)
 		{
-			mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+			mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 			CurrentNodePtr->ReadPermission--;	/* Release temporary permission */
 			DSNodeHandleEntryPtr->EntryPtr=(void*)CurrentNodePtr;
 			DSNodeHandleEntryPtr->HandleType=LIST_NODE_TYPE;
@@ -494,7 +496,7 @@ int FindMW(
 			case READ_PERMISSION_TAG:
 				if (CurrentNodePtr->WritePermission>0)
 				{
-					mutex_unlock(list->CriticalSectionHandle);
+					mutex_unlock(list->MutexHandle);
 					return PERMISSION_DENY;
 				}
 				CurrentNodePtr->ReadPermission++;
@@ -502,7 +504,7 @@ int FindMW(
 			case WRITE_PERMISSION_TAG:
 				if (CurrentNodePtr->ReadPermission>0 || CurrentNodePtr->WritePermission>0)
 				{
-					mutex_unlock(list->CriticalSectionHandle);
+					mutex_unlock(list->MutexHandle);
 					return PERMISSION_DENY;
 				}
 				CurrentNodePtr->WritePermission++;
@@ -510,11 +512,11 @@ int FindMW(
 			default:
 				break;
 			}
-			mutex_unlock(list->CriticalSectionHandle);
+			mutex_unlock(list->MutexHandle);
 			return LIST_OK;
 		}
 
-		mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+		mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 		/* Release the temporary permission of previous node */
 		CurrentNodePtr->ReadPermission--;
 		CurrentNodePtr=CurrentNodePtr->NextNode;
@@ -523,7 +525,7 @@ int FindMW(
 		{
 			CurrentNodePtr->ReadPermission++;
 		}
-		mutex_unlock(list->CriticalSectionHandle);
+		mutex_unlock(list->MutexHandle);
 	}
 	return LIST_ERROR;
 }
@@ -563,7 +565,7 @@ int InsertNode(LIST_HANDLE handle,int length,void* DataPtr)
 	InsertionNodePtr->HeadPtr=DSHandleEntryPtr->EntryPtr;
 
     list=(LIST_HEAD_PTR)DSHandleEntryPtr->EntryPtr;
-	mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 	CurrentNodePtr=(LIST_NODE_PTR)list->EntriesList;
 	if (CurrentNodePtr==0)	/* The first node of the list */
 	{
@@ -582,7 +584,7 @@ int InsertNode(LIST_HANDLE handle,int length,void* DataPtr)
 	}
 	/* write back */
 	list->EntryAmount++;
-	mutex_unlock(list->CriticalSectionHandle);
+	mutex_unlock(list->MutexHandle);
 
 	return LIST_OK;
 }
@@ -628,17 +630,17 @@ int DeleteNodeSW(
 		return retval;
 	}
     
-	mutex_lock(ListHeadPtr->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(ListHeadPtr->MutexHandle, MG_WAIT_FOREVER);
 	CurrentNodePtr=(LIST_NODE_PTR)HandleEntry.EntryPtr;
 	if (CurrentNodePtr==0)
 	{
-		mutex_unlock(ListHeadPtr->CriticalSectionHandle);
+		mutex_unlock(ListHeadPtr->MutexHandle);
 		return LIST_ERROR;
 	}
 	CurrentNodePtr->WritePermission--;	/* Release write permission */
 	if (CurrentNodePtr->ReadPermission>0 || CurrentNodePtr->WritePermission>0)
 	{
-		mutex_unlock(ListHeadPtr->CriticalSectionHandle);
+		mutex_unlock(ListHeadPtr->MutexHandle);
 		return LIST_ERROR;
 	}
 	PreviousNodePtr=CurrentNodePtr->PreviousNode;
@@ -662,7 +664,7 @@ int DeleteNodeSW(
 	}
 	DataPtr=CurrentNodePtr->data;
 	ListHeadPtr->EntryAmount--;
-	mutex_unlock(ListHeadPtr->CriticalSectionHandle);
+	mutex_unlock(ListHeadPtr->MutexHandle);
 	if (CurrentNodePtr!=LIST_NULL)
 	{
 		free(CurrentNodePtr);
@@ -718,18 +720,18 @@ int DeleteNodeMW(
 
 	ListHeadPtr=HandleEntryPtr->EntryPtr;
     
-	mutex_lock(ListHeadPtr->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(ListHeadPtr->MutexHandle, MG_WAIT_FOREVER);
 	CurrentNodePtr=(LIST_NODE_PTR)HandleEntry.EntryPtr;
 	if (CurrentNodePtr==LIST_NULL)
 	{
-		mutex_unlock(ListHeadPtr->CriticalSectionHandle);
+		mutex_unlock(ListHeadPtr->MutexHandle);
 		return LIST_ERROR;
 	}
 	CurrentNodePtr->WritePermission--;	/* Release write permission */
 
 	if (CurrentNodePtr->ReadPermission>0 || CurrentNodePtr->WritePermission>0)
 	{
-		mutex_unlock(ListHeadPtr->CriticalSectionHandle);
+		mutex_unlock(ListHeadPtr->MutexHandle);
 		return LIST_ERROR;
 	}
 	PreviousNodePtr=CurrentNodePtr->PreviousNode;
@@ -754,7 +756,7 @@ int DeleteNodeMW(
 
 	DataPtr=CurrentNodePtr->data;
 	ListHeadPtr->EntryAmount--;
-	mutex_unlock(ListHeadPtr->CriticalSectionHandle);
+	mutex_unlock(ListHeadPtr->MutexHandle);
 	
 	if (CurrentNodePtr!=LIST_NULL)
 	{
@@ -796,7 +798,7 @@ int DeleteNodes( LIST_HANDLE handle )
         return LIST_ERROR;
     }
 
-	mutex_lock(list->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 	CurrentNodePtr=PreviousNodePtr=(LIST_NODE_PTR)list->EntriesList;
 	while (CurrentNodePtr)
 	{
@@ -835,7 +837,7 @@ int DeleteNodes( LIST_HANDLE handle )
 	}
 
     EntryAmount=list->EntryAmount;
-	mutex_unlock(list->CriticalSectionHandle);
+	mutex_unlock(list->MutexHandle);
 
 	return EntryAmount;
 }
@@ -855,10 +857,10 @@ int Delete(LIST_HANDLE handle)
     
     list=(LIST_HEAD_PTR)DSHandleEntryPtr->EntryPtr;
     
-    if (list->CriticalSectionHandle)
+    if (list->MutexHandle)
     {
-        mutex_delete(list->CriticalSectionHandle);
-        list->CriticalSectionHandle=LIST_NULL;
+        mutex_delete(list->MutexHandle);
+        list->MutexHandle=LIST_NULL;
     }
 
     if (list->CmpFcnArray)
@@ -902,7 +904,7 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag)
 		return LIST_ERROR;
 	}
 
-	mutex_lock(NodePtr->HeadPtr->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(NodePtr->HeadPtr->MutexHandle, MG_WAIT_FOREVER);
 	switch(PermissionTag)
 	{
 	case READ_PERMISSION_TAG:
@@ -920,7 +922,7 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag)
 	default:
 	    break;
 	}
-	mutex_unlock(NodePtr->HeadPtr->CriticalSectionHandle);
+	mutex_unlock(NodePtr->HeadPtr->MutexHandle);
 	return LIST_OK;
 }
 
@@ -944,7 +946,7 @@ int PrintPermission(LIST_HANDLE NodeHandle,int PermissionTag)
 	}
 	NodePtr=(LIST_NODE_PTR)HandleEntryPtr->EntryPtr;
 	
-	mutex_lock(NodePtr->HeadPtr->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(NodePtr->HeadPtr->MutexHandle, MG_WAIT_FOREVER);
 	switch(PermissionTag)
 	{
 	case READ_PERMISSION_TAG:
@@ -956,7 +958,7 @@ int PrintPermission(LIST_HANDLE NodeHandle,int PermissionTag)
 	default:
 		break;
 	}
-	mutex_unlock(NodePtr->HeadPtr->CriticalSectionHandle);
+	mutex_unlock(NodePtr->HeadPtr->MutexHandle);
 	return LIST_OK;
 }
 
@@ -980,13 +982,13 @@ int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag)
 	}
 	NodePtr=(LIST_NODE_PTR)HandleEntryPtr->EntryPtr;
 
-    mutex_lock(NodePtr->HeadPtr->CriticalSectionHandle, MG_WAIT_FOREVER);
+    mutex_lock(NodePtr->HeadPtr->MutexHandle, MG_WAIT_FOREVER);
 	switch(PermissionTag)
 	{
 	case READ_PERMISSION_TAG:
 		if (NodePtr->WritePermission>0)
 		{
-			mutex_unlock(NodePtr->HeadPtr->CriticalSectionHandle);
+			mutex_unlock(NodePtr->HeadPtr->MutexHandle);
 			return PERMISSION_DENY;
 		}
 		else
@@ -997,7 +999,7 @@ int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag)
 	case WRITE_PERMISSION_TAG:
 		if (NodePtr->ReadPermission>0 || NodePtr->WritePermission>0)
 		{
-			mutex_unlock(NodePtr->HeadPtr->CriticalSectionHandle);
+			mutex_unlock(NodePtr->HeadPtr->MutexHandle);
 			return PERMISSION_DENY;
 		}
 		else
@@ -1008,7 +1010,7 @@ int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag)
 	default:
 		break;
 	}
-	mutex_unlock(NodePtr->HeadPtr->CriticalSectionHandle);
+	mutex_unlock(NodePtr->HeadPtr->MutexHandle);
 	
 	return LIST_OK;
 }
@@ -1077,7 +1079,7 @@ int GetNextNode(
 	
 	HeadPtr=HeadHandleEntryPtr->EntryPtr;
     
-	mutex_lock(HeadPtr->CriticalSectionHandle, MG_WAIT_FOREVER);
+	mutex_lock(HeadPtr->MutexHandle, MG_WAIT_FOREVER);
 	if (HandleEntryPtr->HandleType==LIST_HEAD_TYPE)
 	{
 		HeadPtr=(LIST_HEAD_PTR)HandleEntryPtr->EntryPtr;
@@ -1087,7 +1089,7 @@ int GetNextNode(
 		
 		if (NodePtr==LIST_NULL)
 		{
-			mutex_unlock(HeadPtr->CriticalSectionHandle);
+			mutex_unlock(HeadPtr->MutexHandle);
 			return LIST_ERROR;
 		}
 
@@ -1096,7 +1098,7 @@ int GetNextNode(
 		case READ_PERMISSION_TAG:
 			if (NodePtr->WritePermission>0)
 			{
-				mutex_unlock(HeadPtr->CriticalSectionHandle);
+				mutex_unlock(HeadPtr->MutexHandle);
 				return PERMISSION_DENY;
 			}
 			NodePtr->ReadPermission++;
@@ -1105,7 +1107,7 @@ int GetNextNode(
 		case WRITE_PERMISSION_TAG:
 			if (NodePtr->ReadPermission>0 || NodePtr->WritePermission>0)
 			{
-				mutex_unlock(HeadPtr->CriticalSectionHandle);
+				mutex_unlock(HeadPtr->MutexHandle);
 				return PERMISSION_DENY;
 			}
 			NodePtr->WritePermission++;
@@ -1120,7 +1122,7 @@ int GetNextNode(
 		NextNodePtr=NodePtr->NextNode;
 		if (NextNodePtr==LIST_NULL)
 		{
-			mutex_unlock(HeadPtr->CriticalSectionHandle);
+			mutex_unlock(HeadPtr->MutexHandle);
 			return LIST_ERROR;
 		}
 		NextHandleEntryPtr->HandleType=LIST_NODE_TYPE;
@@ -1130,7 +1132,7 @@ int GetNextNode(
 		case READ_PERMISSION_TAG:
 			if (NextNodePtr->WritePermission>0)
 			{
-				mutex_unlock(HeadPtr->CriticalSectionHandle);
+				mutex_unlock(HeadPtr->MutexHandle);
 				return PERMISSION_DENY;
 			}
 			NextNodePtr->ReadPermission++;
@@ -1138,7 +1140,7 @@ int GetNextNode(
 		case WRITE_PERMISSION_TAG:
 			if (NextNodePtr->ReadPermission>0 || NextNodePtr->WritePermission>0)
 			{
-				mutex_unlock(HeadPtr->CriticalSectionHandle);
+				mutex_unlock(HeadPtr->MutexHandle);
 				return PERMISSION_DENY;
 			}
 			NextNodePtr->WritePermission++;
@@ -1147,7 +1149,7 @@ int GetNextNode(
 		    break;
 		}
 	}
-	mutex_unlock(HeadPtr->CriticalSectionHandle);
+	mutex_unlock(HeadPtr->MutexHandle);
 	return LIST_OK;
 }
 
@@ -1182,11 +1184,11 @@ int GetPreviousNode(
 	PreHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)PreviousHandle;
 
 	HeadPtr=HeadHandleEntryPtr->EntryPtr;
-    mutex_lock(HeadPtr->CriticalSectionHandle, MG_WAIT_FOREVER);
+    mutex_lock(HeadPtr->MutexHandle, MG_WAIT_FOREVER);
 
 	if (HandleEntryPtr->HandleType==LIST_HEAD_TYPE)
 	{
-		mutex_unlock(HeadPtr->CriticalSectionHandle);
+		mutex_unlock(HeadPtr->MutexHandle);
 		return LIST_ERROR;
 	}
 	else if (HandleEntryPtr->HandleType==LIST_NODE_TYPE)
@@ -1195,7 +1197,7 @@ int GetPreviousNode(
 		PreviousNodePtr=NodePtr->PreviousNode;
 		if (PreviousNodePtr==LIST_NULL)
 		{
-			mutex_unlock(HeadPtr->CriticalSectionHandle);
+			mutex_unlock(HeadPtr->MutexHandle);
 			return LIST_ERROR;
 		}
 		PreHandleEntryPtr->HandleType=LIST_NODE_TYPE;
@@ -1205,7 +1207,7 @@ int GetPreviousNode(
 		case READ_PERMISSION_TAG:
 			if (PreviousNodePtr->WritePermission>0)
 			{
-				mutex_unlock(HeadPtr->CriticalSectionHandle);
+				mutex_unlock(HeadPtr->MutexHandle);
 				return PERMISSION_DENY;
 			}
 			PreviousNodePtr->ReadPermission++;
@@ -1213,7 +1215,7 @@ int GetPreviousNode(
 		case WRITE_PERMISSION_TAG:
 			if (PreviousNodePtr->ReadPermission>0 || PreviousNodePtr->WritePermission>0)
 			{
-				mutex_unlock(HeadPtr->CriticalSectionHandle);
+				mutex_unlock(HeadPtr->MutexHandle);
 				return PERMISSION_DENY;
 			}
 			PreviousNodePtr->WritePermission++;
@@ -1222,7 +1224,7 @@ int GetPreviousNode(
 			break;
 		}
 	}
-	mutex_unlock(HeadPtr->CriticalSectionHandle);
+	mutex_unlock(HeadPtr->MutexHandle);
 	return LIST_OK;
 }
 

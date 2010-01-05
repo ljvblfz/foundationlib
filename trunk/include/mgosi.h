@@ -97,8 +97,8 @@ UINT32 msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle);
 *	Use critical section
 */
 OSI_LIB_HANDLE mutex_create(
-									  int option	/* non useful in windows platform */
-									  );
+							int option	/* non useful in windows platform */
+						   );
 void mutex_lock(
 							OSI_LIB_HANDLE MgCriticalSectionHandle,
 							DWORD timeout	/* non useful  */

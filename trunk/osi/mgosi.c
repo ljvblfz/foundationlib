@@ -566,7 +566,7 @@ OSI_LIB_HANDLE task_create(
 #endif
 
 #ifdef LINUX_OS
-
+	
 #endif
 
 }

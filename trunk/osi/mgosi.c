@@ -77,7 +77,8 @@ err:
 #endif
 
 #ifdef LINUX_OS
-	
+	printf("This function is not yet available Linux!\n");
+	return ERROR;
 #endif
 }
 
@@ -96,7 +97,8 @@ LOGICAL mgIsQEmpty(OSI_LIB_HANDLE MgMsgHandle)
 #endif
 	
 #ifdef LINUX_OS
-	
+	printf("This function is not yet available Linux!\n");
+	return ERROR;
 #endif
 
 }
@@ -121,7 +123,8 @@ LOGICAL is_msg_queue_full(OSI_LIB_HANDLE MgMsgHandle)
 #endif
 	
 #ifdef LINUX_OS
-
+	printf("This function is not yet available Linux!\n");
+	return ERROR;
 #endif
 }
 
@@ -152,7 +155,8 @@ UINT32 msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle)
 #endif
 
 #ifdef LINUX_OS
-
+	printf("This function is not yet available Linux!\n");
+	return ERROR;
 #endif
 
 }
@@ -180,11 +184,13 @@ UINT32 msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle)
 #endif
 
 #ifdef VXWORKS_OS
-	
+	printf("This function is not yet available Linux!\n");
+	return ERROR;
 #endif
 
 #ifdef LINUX_OS
-
+	printf("This function is not yet available Linux!\n");
+	return ERROR;
 #endif
 	
 }
@@ -284,7 +290,8 @@ int msg_send(
 #endif
 
 #ifdef LINUX_OS
-
+	printf("This function is not yet available Linux!\n");
+	return ERROR;
 #endif
 }
 
@@ -379,7 +386,8 @@ int msg_receive(
 #endif
 
 #ifdef LINUX_OS
-
+	printf("This function is not yet available Linux!\n");
+	return ERROR;
 #endif
 }
 
@@ -470,18 +478,18 @@ void mutex_unlock(OSI_LIB_HANDLE mutex_handle)
 }
 
 
-void mutex_delete(OSI_LIB_HANDLE MgCriticalSectionHandle)
+void mutex_delete(OSI_LIB_HANDLE mutex_handle)
 {
 #ifdef WINDOWS_OS
-	DeleteCriticalSection((LPCRITICAL_SECTION)MgCriticalSectionHandle);
+	DeleteCriticalSection((LPCRITICAL_SECTION)mutex_handle);
 #endif
 
 #ifdef VXWORKS_OS
-	semDelete((SEM_ID)MgCriticalSectionHandle);
+	semDelete((SEM_ID)mutex_handle);
 #endif
 
 #ifdef LINUX_OS
-	
+	pthread_mutex_destroy((pthread_mutex_t*)mutex_handle);
 #endif
 
 }

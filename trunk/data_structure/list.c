@@ -331,7 +331,7 @@ int FindSW(
 			if ((MaskTmp & 0x1) && KeyWordPtrArray[i])
 			{
 				CmpFcnPtr=CmpFcnArray[i];
-				if (((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),UserData)==0)
+				if (((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),UserData)==LIST_OK)
 				{
 					mutex_lock(list->MutexHandle, MG_WAIT_FOREVER);
 					CurrentNodePtr->ReadPermission--;	/* Release temporary permission */
@@ -478,7 +478,7 @@ int FindMW(
 			if ((MaskTmp & 0x1) && KeyWordPtrArray[i])
 			{
 				CmpFcnPtr=CmpFcnArray[i];
-				logi+=(((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),UserData)==0);
+				logi+=(((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),UserData)==LIST_OK);
 				CompareCnt++;
 			}
 			MaskTmp>>=1;
@@ -530,6 +530,14 @@ int FindMW(
 	return LIST_ERROR;
 }
 
+int FindNodeNum(
+                LIST_HANDLE HeadHandle,
+                int IndexNum,
+                LIST_HANDLE NodeHandle
+                )
+{
+
+}
 
 int InsertNode(LIST_HANDLE handle,int length,void* DataPtr)
 {

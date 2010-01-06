@@ -141,9 +141,22 @@ static config_parameter_cmp(void* node_data_ptr, void* key_word_ptr, void* userd
 {
 	LINUX_CONFIG_ENTRY_PTR cfentry_ptr;
 	STRING param_str;
+	int deli_index,*deli_index_ptr;
 
 	cfentry_ptr=(LINUX_CONFIG_ENTRY_PTR)node_data_ptr;
 	param_str=(STRING)key_word_ptr;
+	deli_index_ptr=(int*)userdata;
 
-	return strcmplow(cfentry_ptr->config_parameter,param_str);
+	deli_index=findstr(cfentry_ptr->config_parameter,param_str);
+	if (deli_index==ERROR)
+	{
+		return ERROR;
+	}
+
+	*deli_index_ptr=deli_index;
+
+	return OK;
+
 }
+
+

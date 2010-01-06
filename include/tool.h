@@ -16,12 +16,22 @@
 #include "libtype.h"
 
 /*
-*	Function: mg_getline
-*	Description: Get line function special for MG project.
-*					Unlike standard function "getline", this similar function
-*					will not allocate any buffer internally, this will be more
-*					easily to use and more safe for huge system distribution.
-*	Input:	
+*	Function: getline_all
+*	Description: 
+*	getline()  reads an entire line includes delimiters from stream, storing 
+*	the address of the buffer containing the text into *lineptr.  The  buffer  
+*	is  null-terminated and includes the newline character includes delimiters.
+
+*  If  *lineptr is NULL, then getline() will allocate a buffer for storing
+*  the line, which should be freed by the  user  program.   Alternatively,
+*  before  calling  getline(),  *lineptr  can  contain a pointer to a mal-
+*  loc()-allocated buffer *n bytes in size. If the  buffer  is  not  large
+*  enough  to hold the line, getline() resizes it with realloc(), updating
+*  *lineptr and *n as necessary. In either case,  on  a  successful  call,
+*  *lineptr and *n will be updated to reflect the buffer address and allo-
+*  cated size respectively.
+*	
+*  Input:	
 *			n:	character string buffer size.
 *			fp: File pointer to text stream file.
 *	Output:
@@ -31,7 +41,8 @@
 *	Note: the real character number that stored in lineptr always 1 less than
 *			n because of the delimiter character '\0'
 */
-int mg_getline(STRING* lineptr, int* n, FILE* fp);
+int getline_all(STRING* lineptr, int* n, FILE* fp);
+
 /*
 *	Function: findstr
 *	Description: find a matched string from a original string.

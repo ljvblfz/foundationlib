@@ -22,75 +22,18 @@
 
 #define MAX_CONFIG_CHAR_NUM		128
 
-typedef struct  
-{
-	int		line_num;
-	char	config_parameter[MAX_CONFIG_CHAR_NUM];
-	char	config_value[MAX_CONFIG_CHAR_NUM];
-}LINUX_CONFIG_ENTRY,*LINUX_CONFIG_ENTRY_PTR;
-
 static config_parameter_cmp(void* node_data_ptr, void* key_word_ptr);
 
 
-LIST_HANDLE read_config_file(FILE* rfp)
+LIST_HANDLE read_config_file(STRING filename)
 {
 	char* line_ptr;
 	size_t line_len;
 	int nread,count,i;
-	LINUX_CONFIG_ENTRY config_entry;
 	LIST_HANDLE handle;
-	void* cmp_funs[1];
-
-	if (rfp==NULL)
-	{
-		return NULL;
-	}
-	/* Create data base */
-	if ((handle=CreateHandle(LIST_HEAD_TYPE))==NULL)
-	{
-		return NULL;
-	}
-
-	cmp_funs[0]=(void*)config_parameter_cmp;
-	if (Initialize(1,cmp_funs,handle)==ERROR)
-	{
-		DeleteHandle(handle);
-		return NULL;
-	}
-
-	fseek(rfp,0,SEEK_SET);
-	line_ptr=NULL;
-	line_len=0;
-	count=1;
-	while ((nread=getline(&line_ptr,&line_len,rfp)) != ERROR)
-	{
-		i=0;
-		
-		while (line_ptr[i]==' ' || line_ptr[i]=='\t' && i++ < line_len);
-		
-		if (line_ptr[i]=='\n' || line_ptr[i]=='#')
-		{
-			free(line_ptr);
-			continue;
-		}
-
-		if (pars_line(line_ptr,"=",&config_entry)==ERROR)
-		{
-			printf("Warning: line %d configure format error!\n")
-		}
-		
-		if (InsertNode(handle,sizeof(config_entry),&config_entry)==ERROR)
-		{
-			printf("Insert text line error, maybe memory limited!\n");
-			free(line_ptr);
-			return handle;
-		}
-
-		free(line_ptr);
-		line_ptr=NULL;
-		line_len=0;
-	}
-
+    
+    
+    
 	return handle;
 }
 

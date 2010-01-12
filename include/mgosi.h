@@ -6,8 +6,8 @@
 	$Reversion 1.1 $ $Date: 2009/12/31 $
 */
 /************************************************************************/
-#ifndef _MGOSI_HEADFILE
-#define _MGOSI_HEADFILE
+#ifndef _OSI_HEAD_FILE
+#define _OSI_HEAD_FILE
 
 #include "libtype.h"
 
@@ -16,19 +16,19 @@ typedef void*	OSI_LIB_HANDLE;
 *	MicroGUI Message Queue ID Data Structure
 */
 
-#define MG_SEM_Q_PRIORITY				(0x1)
-#define MG_SEM_Q_FIFO					(0x0)
-#define MG_SEM_DELETE_SAFE				(0x4)
-#define MG_SEM_INVERSION_SAFE			(0x8)
-#define MG_SEM_EVENTSEND_ERR_NOTIFY		(0x10)
-#define MG_WAIT_FOREVER					(-1)
+#define OSI_SEM_Q_PRIORITY				(0x1)
+#define OSI_SEM_Q_FIFO					(0x0)
+#define OSI_SEM_DELETE_SAFE				(0x4)
+#define OSI_SEM_INVERSION_SAFE			(0x8)
+#define OSI_SEM_EVENTSEND_ERR_NOTIFY	(0x10)
+#define OSI_WAIT_FOREVER				(-1)
 
-#define MG_MSG_Q_FIFO					(0x00)
-#define MG_MSG_Q_PRIORITY				(0x01)
-#define MG_MSG_Q_EVENTSEND_ERR_NOTIFY	(0x02) 
-#define MG_NO_WAIT						(0) 
-#define MG_MSG_PRI_NORMAL				(0)
-#define MG_MSG_PRI_URGENT				(1)
+#define OSI_MSG_Q_FIFO					(0x00)
+#define OSI_MSG_Q_PRIORITY				(0x01)
+#define OSI_MSG_Q_EVENTSEND_ERR_NOTIFY	(0x02) 
+#define OSI_NO_WAIT						(0) 
+#define OSI_MSG_PRI_NORMAL				(0)
+#define OSI_MSG_PRI_URGENT				(1)
 
 #ifdef WINDOWS_OS
 #include <Windows.h>

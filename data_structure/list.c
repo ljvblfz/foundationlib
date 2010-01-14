@@ -260,12 +260,12 @@ int IsEmpty(LIST_HANDLE HeadHandle)
  *  6. void* UserData [output] (valid pointer), a pointer points to extra user data. In some cases
  *      user may want to transfer some extra information during finding action.
  *	Return:
- *	ERROR: When a error occur
- *	OK: Successfully return a matched node with the desired access permission.
- *	LIST_PERMISSION_DENY: The matched node refuses to endow the expected permission, 
+ *	1. ERROR: When a error occur
+ *	2. LIST_PERMISSION_DENY: The matched node refuses to endow the expected permission, 
  *	for example, the matched node is being writing by another process when the current process
  *	want to read or write it, or the matched node is being read by another process when the current
  *	process want to write it.
+ *  3. >0 Successfully find specific node and return the index of node.
  */
 int FindSW(
 		   LIST_HANDLE HeadHandle,
@@ -282,7 +282,7 @@ int FindSW(
 	LIST_HEAD_PTR list;
 	DS_HANDLE_ENTRY_PTR DSHeadHandleEntryPtr;
 	DS_HANDLE_ENTRY_PTR DSNodeHandleEntryPtr;
-	int logi,i,MaskTmp;
+	int logi,i,MaskTmp,NodeIndex;
 
     CurrentNodePtr = NULL;
     CmpFcnArray = NULL;
@@ -330,7 +330,7 @@ int FindSW(
     /* Get a temporary read permission */
 	CurrentNodePtr->ReadPermission++;
 	mutex_unlock(list->MutexHandle);
-
+    NodeIndex=0;
 	while (1)
 	{
 		MaskTmp=CmpFcnIndex;
@@ -371,7 +371,7 @@ int FindSW(
 					    break;
 					}
 					mutex_unlock(list->MutexHandle);
-					return OK;
+					return NodeIndex;
 				}
 			}
 			MaskTmp>>=1;
@@ -381,6 +381,7 @@ int FindSW(
 		/* Release temporary read permission of previous node */
 		CurrentNodePtr->ReadPermission--;
 		CurrentNodePtr=CurrentNodePtr->NextNode;
+        NodeIndex++;
 		/* List rear judgment */
         if (CurrentNodePtr == list->EntriesList)
 		{
@@ -412,12 +413,12 @@ int FindSW(
  *      keywords matching, user can define user data for each keyword matching.
  *
  *	Return:
- *	ERROR: When an error occur
- *	OK: Successfully return a matched node with the desired access permission.
- *	PERMISSION_DENY: The matched node refuses to endow the expected permission, 
+ *	1. ERROR: When an error occur
+ *	2. PERMISSION_DENY: The matched node refuses to endow the expected permission, 
  *	for example, the matched node is being writing by another process when the current process
  *	want to read or write it, or the matched node is being read by another process when the current
  *	process want to write it.
+ *  3. >0 Successfully find specific node and return the index of node.
  */
 int FindMW(
 		   LIST_HANDLE HeadHandle,
@@ -434,7 +435,7 @@ int FindMW(
 	LIST_HEAD_PTR list;
 	DS_HANDLE_ENTRY_PTR DSHeadHandleEntryPtr;
 	DS_HANDLE_ENTRY_PTR DSNodeHandleEntryPtr;
-	int logi,i,MaskTmp,CompareCnt;
+	int logi,i,MaskTmp,CompareCnt, NodeIndex;
 
     CurrentNodePtr = NULL;
     CmpFcnArray = NULL;
@@ -482,7 +483,7 @@ int FindMW(
 	/* Get a temporary read permission */
 	CurrentNodePtr->ReadPermission++;
 	mutex_unlock(list->MutexHandle);
-                                                                                                                                                                                                                                         
+    NodeIndex=0;                                                                                                                                                                                                           
 	while (1)
 	{
 		MaskTmp=CmpFcnIndex;
@@ -529,13 +530,14 @@ int FindMW(
 				break;
 			}
 			mutex_unlock(list->MutexHandle);
-			return OK;
+			return NodeIndex;
 		}
 
 		mutex_lock(list->MutexHandle, OSI_WAIT_FOREVER);
 		/* Release the temporary permission of previous node */
 		CurrentNodePtr->ReadPermission--;
 		CurrentNodePtr=CurrentNodePtr->NextNode;
+        NodeIndex++;
 		/* list rear judgment */
         if (CurrentNodePtr == list->EntriesList)
 		{
@@ -834,14 +836,11 @@ int InsertNodeHandle(
             InsertNodePtr->PreviousNode=ListNodePtr;
             InsertNodePtr->NextNode=ListNodePtr->NextNode;
             InsertNodePtr->NextNode->PreviousNode=InsertNodePtr;
-
             ListNodePtr->NextNode=InsertNodePtr;
-            
         }
         else /* Normal position */
         {
             CurrentNodePtr=ListNodePtr->NextNode;
-
             ListNodePtr->NextNode=InsertNodePtr;
             InsertNodePtr->PreviousNode=ListNodePtr;
             InsertNodePtr->NextNode=CurrentNodePtr;

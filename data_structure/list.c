@@ -1112,7 +1112,7 @@ int DeleteNodeMW(
  */
 int DeleteNodes( LIST_HANDLE handle )
 {
-	LIST_NODE_PTR	CurrentNodePtr,PreviousNodePtr;
+	LIST_NODE_PTR	CurrentNodePtr,PreviousNodePtr,LastNodePtr;
 	LIST_HEAD_PTR list;
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
     int EntryAmount;
@@ -1135,43 +1135,68 @@ int DeleteNodes( LIST_HANDLE handle )
 	list=(LIST_HEAD_PTR)DSHandleEntryPtr->EntryPtr;
 
 	mutex_lock(list->MutexHandle, OSI_WAIT_FOREVER);
+
+    if (list->EntriesList == NULL || list->EntryAmount <=0 )    /* Empty or invalid list */
+    {
+        mutex_unlock(list->MutexHandle);
+        return list->EntryAmount;
+    }
+
 	CurrentNodePtr=PreviousNodePtr=(LIST_NODE_PTR)list->EntriesList;
+    LastNodePtr=CurrentNodePtr->PreviousNode;
+
 	while (1)
 	{
-		if (CurrentNodePtr->ReadPermission>0 || CurrentNodePtr->WritePermission>0)	/* Jump to next node */
-		{
-			PreviousNodePtr=CurrentNodePtr;
-			CurrentNodePtr=CurrentNodePtr->NextNode;
-		}
-		else
-		{
-			if (CurrentNodePtr==list->EntriesList)	/* First node */
-			{
-                if (CurrentNodePtr != NULL)
-                {
-                    
-                    free(CurrentNodePtr);
-                    CurrentNodePtr = NULL;
-                }
-				list->EntryAmount--;
-				CurrentNodePtr=PreviousNodePtr=(LIST_NODE_PTR)list->EntriesList;
-				CurrentNodePtr->PreviousNode=NULL;
-			}	
-			else									/* Normal node */
-			{
-				PreviousNodePtr->NextNode=CurrentNodePtr->NextNode;
-				CurrentNodePtr->NextNode->PreviousNode=PreviousNodePtr;
-                if (CurrentNodePtr != NULL)
+        if (CurrentNodePtr==LastNodePtr)    /* Last node */
+        {
+            if (CurrentNodePtr->ReadPermission==0 && CurrentNodePtr->WritePermission==0) /* Delete last node */
+            {
+                if (CurrentNodePtr->NextNode == CurrentNodePtr) /* Last unique node */
                 {
                     free(CurrentNodePtr);
-                    CurrentNodePtr = NULL;               
+                    list->EntriesList=NULL;
+                    list->EntryAmount--;
                 }
-				list->EntryAmount--;
-				CurrentNodePtr=PreviousNodePtr->NextNode;
-			}
-		}
-	}
+                else
+                {
+                    CurrentNodePtr->PreviousNode->NextNode=CurrentNodePtr->NextNode;
+                    CurrentNodePtr->NextNode->PreviousNode=CurrentNodePtr->PreviousNode;
+                    free(CurrentNodePtr);
+                    list->EntryAmount--;
+                }
+            }
+            break;
+        }
 
+        if (CurrentNodePtr->ReadPermission>0 || CurrentNodePtr->WritePermission>0)	/* Jump to next node */
+        {
+            PreviousNodePtr=CurrentNodePtr;
+            CurrentNodePtr=CurrentNodePtr->NextNode;
+        }
+        else /* Delete current node */ 
+        {
+            if (CurrentNodePtr==list->EntriesList)	/* First node */
+            {
+                list->EntriesList=CurrentNodePtr->NextNode;
+                CurrentNodePtr->NextNode->PreviousNode=CurrentNodePtr->PreviousNode;
+                CurrentNodePtr->PreviousNode->NextNode=CurrentNodePtr->NextNode;
+                free(CurrentNodePtr);
+                list->EntryAmount--;
+                CurrentNodePtr=PreviousNodePtr=list->EntriesList; /* Reset pointers */
+            }	
+            else									/* Normal node */
+            {
+
+                PreviousNodePtr->NextNode=CurrentNodePtr->NextNode;
+                CurrentNodePtr->NextNode->PreviousNode=PreviousNodePtr;
+                free(CurrentNodePtr);
+                list->EntryAmount--;
+                PreviousNodePtr=CurrentNodePtr;
+                CurrentNodePtr=PreviousNodePtr->NextNode;
+            }
+        }
+	}
+    
     EntryAmount=list->EntryAmount;
 	mutex_unlock(list->MutexHandle);
 
@@ -1450,15 +1475,18 @@ void* GetData( LIST_HANDLE NodeHandle )
  *  freely access the returned next node with specific permission. 
  *	
  *	Parameters:
- *	LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list.
- *  LIST_HANDLE CurrentHandle [input] (non-empty handle), handle of current node.
- *  LIST_HANDLE NextHandle [output] (valid empty handle), handle of next node.
- *	int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
+ *	1. LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list.
+ *  2. LIST_HANDLE CurrentHandle [input] (non-empty handle), handle of current node.
+ *  3. LIST_HANDLE NextHandle [output] (valid empty handle), handle of next node.
+ *  4. int SkipTag [input] (0, 1), Skip tag, "0" indicates routine will return permission deny when
+ *      the next node's permission failed to be obtained, "1" indicates routine will skip to the next node when
+ *      permission deny happen.
+ *	5. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
  *
  *	Return:
- *  ERROR: When an error occurs.
- *  OK: successfully get next node with specific permission.
- *  LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
+ *  1. ERROR: When an error occurs.
+ *  2. OK: successfully get next node with specific permission.
+ *  3. LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
  *	For example, the next node is being writing by another process when the current process
  *	want to get read or write permission, or the next node is being read 
  *  by another process when the current process want to get write permission.
@@ -1470,14 +1498,15 @@ int GetNextNode(
 				LIST_HANDLE HeadHandle,
 				LIST_HANDLE CurrentHandle, 
 				LIST_HANDLE NextHandle,
+                int SkipTag,
 				int PermissionTag
 				)
 {
-	LIST_NODE_PTR		NodePtr,NextNodePtr;
+	LIST_NODE_PTR		NextNodePtr, CurrentNodePtr;
 	LIST_HEAD_PTR		HeadPtr;
-	DS_HANDLE_ENTRY_PTR	HeadHandleEntryPtr,HandleEntryPtr,NextHandleEntryPtr;
+	DS_HANDLE_ENTRY_PTR	HeadHandleEntryPtr,CurrentHandleEntryPtr,NextHandleEntryPtr;
 
-    NodePtr=NextNodePtr=NULL;
+    CurrentNodePtr=NextNodePtr=NULL;
     HeadPtr = NULL;
     HeadHandleEntryPtr=NULL;
     HeadHandleEntryPtr=NULL;
@@ -1494,83 +1523,88 @@ int GetNextNode(
 		return ERROR;
 	}
 
-	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)CurrentHandle;
+    HeadPtr= (LIST_HEAD_PTR) HeadHandleEntryPtr->EntryPtr;
+    mutex_lock(HeadPtr->MutexHandle, OSI_WAIT_FOREVER);
+    if (HeadPtr->EntriesList == NULL) /* Empty list */
+    {
+        mutex_unlock(HeadPtr->MutexHandle);
+        return ERROR;
+    }
+
+	CurrentHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)CurrentHandle;
 	NextHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)NextHandle;
-	
-	HeadPtr=HeadHandleEntryPtr->EntryPtr;
+    /* Get Next node */
+    if (CurrentHandleEntryPtr->HandleType == LIST_HEAD_TYPE && 
+        CurrentHandleEntryPtr->EntryPtr == HeadHandleEntryPtr->EntryPtr) /* Current node is the head of the list */
+    {
+        CurrentNodePtr=(LIST_NODE_PTR)HeadPtr->EntriesList;
+        NextNodePtr=(LIST_NODE_PTR)HeadPtr->EntriesList;
+    }
+    else if (CurrentHandleEntryPtr->HandleType == LIST_NODE_TYPE)
+    {
+        CurrentNodePtr=(LIST_NODE_PTR)CurrentHandleEntryPtr->EntryPtr;
+        NextNodePtr=CurrentNodePtr->NextNode;
+    }
     
-	mutex_lock(HeadPtr->MutexHandle, OSI_WAIT_FOREVER);
-	if (HandleEntryPtr->HandleType==LIST_HEAD_TYPE)
-	{
-		HeadPtr=(LIST_HEAD_PTR)HandleEntryPtr->EntryPtr;
-		NextHandleEntryPtr->HandleType=LIST_NODE_TYPE;
-		NextHandleEntryPtr->EntryPtr=HeadPtr->EntriesList;
-		NodePtr=(LIST_NODE_PTR)NextHandleEntryPtr->EntryPtr;
-		
-		if (NodePtr==NULL)
-		{
-			mutex_unlock(HeadPtr->MutexHandle);
-			return ERROR;
-		}
+    do
+    {
+        if (PermissionTag == READ_PERMISSION_TAG)
+        {
+            if (NextNodePtr->WritePermission == 0) /* Successfully obtained next node permission */
+            {
+                NextNodePtr->ReadPermission++;
+                NextHandleEntryPtr->HandleType=LIST_NODE_TYPE;
+                NextHandleEntryPtr->EntryPtr=NextNodePtr;
+                mutex_unlock(HeadPtr->MutexHandle);
+                return OK;
+            }
+            else /* Pointer to next node */
+            {
+                if (SkipTag == 1)
+                {
+                    NextNodePtr=NextNodePtr->NextNode;
+                }
+                else
+                {
+                    mutex_unlock(HeadPtr->MutexHandle);
+                    return LIST_PERMISSION_DENY;
+                }
+            }
+        }
+        else if (PermissionTag == WRITE_PERMISSION_TAG)
+        {
+            if (NextNodePtr->ReadPermission == 0 && NextNodePtr->WritePermission == 0)
+            {
+                NextNodePtr->WritePermission++;
+                NextHandleEntryPtr->HandleType=LIST_NODE_TYPE;
+                NextHandleEntryPtr->EntryPtr=NextNodePtr;
+                mutex_unlock(HeadPtr->MutexHandle);
+                return OK;
+            }
+            else
+            {
+                if (SkipTag==1)
+                {
+                    NextNodePtr=NextNodePtr->NextNode; /* Jump to the next node */
+                }
+                else
+                {
+                    mutex_unlock(HeadPtr->MutexHandle);
+                    return LIST_PERMISSION_DENY;
+                }
+            }
+        }
+        else
+        {
+            printf("Permission tag error!\n");
+            mutex_unlock(HeadPtr->MutexHandle);
+            return ERROR;
+        }
 
-		switch(PermissionTag)
-		{
-		case READ_PERMISSION_TAG:
-			if (NodePtr->WritePermission>0)
-			{
-				mutex_unlock(HeadPtr->MutexHandle);
-				return LIST_PERMISSION_DENY;
-			}
-			NodePtr->ReadPermission++;
-
-			break;
-		case WRITE_PERMISSION_TAG:
-			if (NodePtr->ReadPermission>0 || NodePtr->WritePermission>0)
-			{
-				mutex_unlock(HeadPtr->MutexHandle);
-				return LIST_PERMISSION_DENY;
-			}
-			NodePtr->WritePermission++;
-		    break;
-		default:
-		    break;
-		}
-	}
-	else if (HandleEntryPtr->HandleType==LIST_NODE_TYPE)
-	{
-		NodePtr=HandleEntryPtr->EntryPtr;
-		NextNodePtr=NodePtr->NextNode;
-		if (NextNodePtr==NULL)
-		{
-			mutex_unlock(HeadPtr->MutexHandle);
-			return ERROR;
-		}
-		NextHandleEntryPtr->HandleType=LIST_NODE_TYPE;
-		NextHandleEntryPtr->EntryPtr=NextNodePtr;
-		switch(PermissionTag)
-		{
-		case READ_PERMISSION_TAG:
-			if (NextNodePtr->WritePermission>0)
-			{
-				mutex_unlock(HeadPtr->MutexHandle);
-				return LIST_PERMISSION_DENY;
-			}
-			NextNodePtr->ReadPermission++;
-			break;
-		case WRITE_PERMISSION_TAG:
-			if (NextNodePtr->ReadPermission>0 || NextNodePtr->WritePermission>0)
-			{
-				mutex_unlock(HeadPtr->MutexHandle);
-				return LIST_PERMISSION_DENY;
-			}
-			NextNodePtr->WritePermission++;
-		    break;
-		default:
-		    break;
-		}
-	}
+    }while (NextNodePtr != CurrentNodePtr);
+	
 	mutex_unlock(HeadPtr->MutexHandle);
-	return OK;
+	return ERROR;
 }
 
 /*
@@ -1581,15 +1615,18 @@ int GetNextNode(
  *  freely access the returned previous node with specific permission. 
  *	
  *	Parameters:
- *	LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list.
- *  LIST_HANDLE CurrentHandle [input] (non-empty handle), handle of current node.
- *  LIST_HANDLE NextHandle [output] (valid empty handle), handle of next node.
- *	int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
+ *	1. LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list.
+ *  2. LIST_HANDLE CurrentHandle [input] (non-empty handle), handle of current node.
+ *  3. LIST_HANDLE PreviousHandle [output] (valid empty handle), handle of next node.
+ *  4. int SkipTag [input] (0, 1), Skip tag, "0" indicates routine will return permission deny when
+ *      the previous node's permission failed to be obtained, "1" indicates routine will skip to the previous node when
+ *      permission deny happen.
+ *	5. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
  *
  *	Return:
- *  ERROR: When an error occurs.
- *  OK: successfully get previous node with specific permission.
- *  LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
+ *  1. ERROR: When an error occurs.
+ *  2. OK: successfully get previous node with specific permission.
+ *  3. LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
  *	For example, the previous node is being writing by another process when the current process
  *	want to get read or write permission, or the previous node is being read 
  *  by another process when the current process want to get write permission.
@@ -1599,77 +1636,115 @@ int GetNextNode(
  */
 int GetPreviousNode(
 				LIST_HANDLE HeadHandle,
-				LIST_HANDLE handle, 
+				LIST_HANDLE CurrentHandle, 
 				LIST_HANDLE PreviousHandle,
+                int SkipTag,
 				int PermissionTag
 				)
 {
-	LIST_NODE_PTR		NodePtr,PreviousNodePtr;
-	LIST_HEAD_PTR		HeadPtr;
-	DS_HANDLE_ENTRY_PTR	HeadHandleEntryPtr,HandleEntryPtr,PreHandleEntryPtr;
+    LIST_NODE_PTR		PreviousNodePtr, CurrentNodePtr;
+    LIST_HEAD_PTR		HeadPtr;
+    DS_HANDLE_ENTRY_PTR	HeadHandleEntryPtr,CurrentHandleEntryPtr,PreviousHandleEntryPtr;
 
-    NodePtr=PreviousNodePtr=NULL;
+    CurrentNodePtr=PreviousNodePtr=NULL;
     HeadPtr = NULL;
     HeadHandleEntryPtr=NULL;
     HeadHandleEntryPtr=NULL;
-    PreHandleEntryPtr=NULL;
+    PreviousHandleEntryPtr=NULL;
 
-	if (IsHandleEmpty(HeadHandle) || IsHandleEmpty(handle) || PreviousHandle==NULL)
-	{
-		return ERROR;
-	}
+    if (IsHandleEmpty(HeadHandle) || IsHandleEmpty(CurrentHandle) || PreviousHandle==NULL)
+    {
+        return ERROR;
+    }
 
-	HeadHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
-	if (HeadHandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
-	{
-		return ERROR;
-	}
-	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
-	PreHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)PreviousHandle;
-
-	HeadPtr=HeadHandleEntryPtr->EntryPtr;
+    HeadHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
+    if (HeadHandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
+    {
+        return ERROR;
+    }
+    
+    HeadPtr= (LIST_HEAD_PTR) HeadHandleEntryPtr->EntryPtr;
     mutex_lock(HeadPtr->MutexHandle, OSI_WAIT_FOREVER);
+    if (HeadPtr->EntriesList == NULL) /* Empty list */
+    {
+        mutex_unlock(HeadPtr->MutexHandle);
+        return ERROR;
+    }
+    
+    CurrentHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)CurrentHandle;
+    PreviousHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)PreviousHandle;
+    /* Get previous node */
+    if (CurrentHandleEntryPtr->HandleType == LIST_HEAD_TYPE && 
+        CurrentHandleEntryPtr->EntryPtr == HeadHandleEntryPtr->EntryPtr) /* Current node is the head of the list */
+    {
+        CurrentNodePtr=(LIST_NODE_PTR)HeadPtr->EntriesList;
+        PreviousNodePtr=(LIST_NODE_PTR)HeadPtr->EntriesList;
+    }
+    else if (CurrentHandleEntryPtr->HandleType == LIST_NODE_TYPE)
+    {
+        CurrentNodePtr=(LIST_NODE_PTR)CurrentHandleEntryPtr->EntryPtr;
+        PreviousNodePtr=CurrentNodePtr->PreviousNode;
+    }
 
-	if (HandleEntryPtr->HandleType==LIST_HEAD_TYPE)
-	{
-		mutex_unlock(HeadPtr->MutexHandle);
-		return ERROR;
-	}
-	else if (HandleEntryPtr->HandleType==LIST_NODE_TYPE)
-	{
-		NodePtr=HandleEntryPtr->EntryPtr;
-		PreviousNodePtr=NodePtr->PreviousNode;
-		if (PreviousNodePtr==NULL)
-		{
-			mutex_unlock(HeadPtr->MutexHandle);
-			return ERROR;
-		}
-		PreHandleEntryPtr->HandleType=LIST_NODE_TYPE;
-		PreHandleEntryPtr->EntryPtr=PreviousNodePtr;
-		switch(PermissionTag)
-		{
-		case READ_PERMISSION_TAG:
-			if (PreviousNodePtr->WritePermission>0)
-			{
-				mutex_unlock(HeadPtr->MutexHandle);
-				return LIST_PERMISSION_DENY;
-			}
-			PreviousNodePtr->ReadPermission++;
-			break;
-		case WRITE_PERMISSION_TAG:
-			if (PreviousNodePtr->ReadPermission>0 || PreviousNodePtr->WritePermission>0)
-			{
-				mutex_unlock(HeadPtr->MutexHandle);
-				return LIST_PERMISSION_DENY;
-			}
-			PreviousNodePtr->WritePermission++;
-			break;
-		default:
-			break;
-		}
-	}
-	mutex_unlock(HeadPtr->MutexHandle);
-	return OK;
+    do
+    {
+        if (PermissionTag == READ_PERMISSION_TAG)
+        {
+            if (PreviousNodePtr->WritePermission == 0) /* Successfully obtained previous node permission */
+            {
+                PreviousNodePtr->ReadPermission++;
+                PreviousHandleEntryPtr->HandleType=LIST_NODE_TYPE;
+                PreviousHandleEntryPtr->EntryPtr=PreviousNodePtr;
+                mutex_unlock(HeadPtr->MutexHandle);
+                return OK;
+            }
+            else /* Pointer to previous node */
+            {
+                if (SkipTag == 1)
+                {
+                    PreviousNodePtr=PreviousNodePtr->PreviousNode;
+                }
+                else
+                {
+                    mutex_unlock(HeadPtr->MutexHandle);
+                    return LIST_PERMISSION_DENY;
+                }
+            }
+        }
+        else if (PermissionTag == WRITE_PERMISSION_TAG)
+        {
+            if (PreviousNodePtr->ReadPermission == 0 && PreviousNodePtr->WritePermission == 0)
+            {
+                PreviousNodePtr->WritePermission++;
+                PreviousHandleEntryPtr->HandleType=LIST_NODE_TYPE;
+                PreviousHandleEntryPtr->EntryPtr=PreviousNodePtr;
+                mutex_unlock(HeadPtr->MutexHandle);
+                return OK;
+            }
+            else
+            {
+                if (SkipTag==1)
+                {
+                    PreviousNodePtr=PreviousNodePtr->PreviousNode; /* Jump to the previous node */
+                }
+                else
+                {
+                    mutex_unlock(HeadPtr->MutexHandle);
+                    return LIST_PERMISSION_DENY;
+                }
+            }
+        }
+        else
+        {
+            printf("Permission tag error!\n");
+            mutex_unlock(HeadPtr->MutexHandle);
+            return ERROR;
+        }
+
+    }while (PreviousNodePtr != CurrentNodePtr);
+
+    mutex_unlock(HeadPtr->MutexHandle);
+    return ERROR;
 }
 
 

@@ -44,7 +44,6 @@ typedef void*   LIST_HANDLE;
  *  handle pointer, a valid pointer or NULL when memory limits
  */
 LIST_HANDLE CreateHandle(int HandleType);
-
 /*
  *  Description:
  *	Function "DeleteHandle" deletes a handle. Note: It just deletes the handle descriptor.
@@ -57,7 +56,6 @@ LIST_HANDLE CreateHandle(int HandleType);
  *  No expected return value.
  */
 void DeleteHandle(LIST_HANDLE handle);
-
 /*
 *	Description:
 *	Function "Initialize" initializes all the members of the head structure. 
@@ -77,7 +75,6 @@ int Initialize(
                int	CmpFcnAmount,
                void** CmpFcnArray
                );
-
 /*
 *	Description:
 *	Function "Count" returns the entry amount of list.
@@ -88,7 +85,6 @@ int Initialize(
 *	Function Execution Status, (ERROR, OK).
 */
 int Count(LIST_HANDLE handle);
-
 
 /*
 *	Description:
@@ -190,20 +186,20 @@ int FindNodeNum(
                 );
 
 /*
-*	Description:
-*	Insert a node to the list.
-*	
-*  Parameters:
-*	1. LIST_HANDLE handle [input] (non-empty handle), handle of list.
-*  2. int length [input] (>0), length of node data.
-*  3. void* DataPtr [input] (valid pointer), pointer to node data.
-* 
-*	Return:
-*  ERROR: When an error occur.
-*  OK: Successfully inserted.
-*  
-*/
-int InsertNodeHead(LIST_HANDLE handle,int length,void* DataPtr);
+ *	Description:
+ *	Insert a node to the list.
+ *	
+ *  Parameters:
+ *	1. LIST_HANDLE handle [input] (non-empty handle), handle of list.
+ *  2. int DataLength [input] (>0), length of node data.
+ *  3. void* DataPtr [input] (valid pointer), pointer to node data.
+ * 
+ *	Return:
+ *  ERROR: When an error occur.
+ *  OK: Successfully inserted.
+ *  
+ */
+int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr);
 
 /*
 *	Description:
@@ -227,7 +223,6 @@ int InsertNodeHandle( LIST_HANDLE HeadHandle,
                      LIST_HANDLE PosiNodeHandle, 
                      int InsertPosition, 
                      int DataLength, void* DataPtr );
-
 /*
 *	Description:
 *	Delete a node from list with single word matching.
@@ -253,7 +248,6 @@ int DeleteNodeSW(
                  int CmpFcnIndex,
                  void** DelNodeDataPtr
                  );
-
 
 /*
 *	Description:
@@ -281,7 +275,6 @@ int DeleteNodeMW(
                  void** DelNodeDataPtr
                  );
 
-
 /*
 *	Description:
 *	Delete all the free nodes of the list. When the routine meets a permission obtained
@@ -296,6 +289,7 @@ int DeleteNodeMW(
 *  EntryAmount: left nodes amount.
 */
 int DeleteNodes( LIST_HANDLE handle );
+
 /*
 *	Description:
 *	This routine attempts to delete entire list including list head. It will
@@ -385,15 +379,18 @@ void* GetData( LIST_HANDLE NodeHandle );
 *  freely access the returned next node with specific permission. 
 *	
 *	Parameters:
-*	LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list.
-*  LIST_HANDLE CurrentHandle [input] (non-empty handle), handle of current node.
-*  LIST_HANDLE NextHandle [output] (valid empty handle), handle of next node.
-*	int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
+*	1. LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list.
+*  2. LIST_HANDLE CurrentHandle [input] (non-empty handle), handle of current node.
+*  3. LIST_HANDLE NextHandle [output] (valid empty handle), handle of next node.
+*  4. int SkipTag [input] (0, 1), Skip tag, "0" indicates routine will return permission deny when
+*      the next node's permission failed to be obtained, "1" indicates routine will skip to the next node when
+*      permission deny happen.
+*	5. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
 *
 *	Return:
-*  ERROR: When an error occurs.
-*  OK: successfully get next node with specific permission.
-*  LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
+*  1. ERROR: When an error occurs.
+*  2. OK: successfully get next node with specific permission.
+*  3. LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
 *	For example, the next node is being writing by another process when the current process
 *	want to get read or write permission, or the next node is being read 
 *  by another process when the current process want to get write permission.
@@ -401,13 +398,13 @@ void* GetData( LIST_HANDLE NodeHandle );
 *  has been obtained read permission by another process.
 *		
 */
-int GetNextNode(
-                LIST_HANDLE HeadHandle,
+int GetNextNode( 
+                LIST_HANDLE HeadHandle, 
                 LIST_HANDLE CurrentHandle, 
-                LIST_HANDLE NextHandle,
-                int PermissionTag
+                LIST_HANDLE NextHandle, 
+                int SkipTag, 
+                int PermissionTag 
                 );
-
 /*
 *	Description:
 *	Get previous node from current node. Currently if the previous node's critical permission
@@ -416,15 +413,18 @@ int GetNextNode(
 *  freely access the returned previous node with specific permission. 
 *	
 *	Parameters:
-*	LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list.
-*  LIST_HANDLE CurrentHandle [input] (non-empty handle), handle of current node.
-*  LIST_HANDLE NextHandle [output] (valid empty handle), handle of next node.
-*	int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
+*	1. LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list.
+*  2. LIST_HANDLE CurrentHandle [input] (non-empty handle), handle of current node.
+*  3. LIST_HANDLE PreviousHandle [output] (valid empty handle), handle of next node.
+*  4. int SkipTag [input] (0, 1), Skip tag, "0" indicates routine will return permission deny when
+*      the previous node's permission failed to be obtained, "1" indicates routine will skip to the previous node when
+*      permission deny happen.
+*	5. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
 *
 *	Return:
-*  ERROR: When an error occurs.
-*  OK: successfully get previous node with specific permission.
-*  LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
+*  1. ERROR: When an error occurs.
+*  2. OK: successfully get previous node with specific permission.
+*  3. LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
 *	For example, the previous node is being writing by another process when the current process
 *	want to get read or write permission, or the previous node is being read 
 *  by another process when the current process want to get write permission.
@@ -432,11 +432,12 @@ int GetNextNode(
 *  has been obtained read permission by another process.
 * 		
 */
-int GetPreviousNode(
-                    LIST_HANDLE HeadHandle,
-                    LIST_HANDLE handle, 
-                    LIST_HANDLE PreviousHandle,
-                    int PermissionTag
+int GetPreviousNode( 
+                    LIST_HANDLE HeadHandle, 
+                    LIST_HANDLE CurrentHandle, 
+                    LIST_HANDLE PreviousHandle, 
+                    int SkipTag, 
+                    int PermissionTag 
                     );
 /*
 *	Description:

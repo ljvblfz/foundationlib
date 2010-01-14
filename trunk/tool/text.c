@@ -292,7 +292,7 @@ int text_save(FILE* fp, LIST_HANDLE text_handle)
 
     while (amount>0)
     {
-        retval=GetNextNode(text_handle,handle1,handle2,READ_PERMISSION_TAG);
+        retval=GetNextNode(text_handle,handle1,handle2,0,READ_PERMISSION_TAG);
         if (retval == ERROR || retval == LIST_PERMISSION_DENY)
         {
             break;

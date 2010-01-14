@@ -1,8 +1,12 @@
 /************************************************************************/
-/*	Copyright to HIKVISION.Inc
-Solution designed by Ben Shaw.
-Programmed by Ben Shaw.
-$Reversion 1.0 $ $Data: 2007/6/19 $ 
+/*	
+Copyright to AI INFINITY, Inc.
+Solution designed by shaobin.
+Programmed by shaobin, wangxian.chen.
+
+$ Reversion 1.0 $ $Data: 2007/09/07 $
+$ Reversion 1.1 $ $Data: 2007/09/30 $
+$ Reversion 1.2 $ $Date: 2009/11/18 $
 */
 /************************************************************************/
 
@@ -100,25 +104,25 @@ int Count(LIST_HANDLE handle);
 int IsEmpty(LIST_HANDLE HeadHandle);
 
 /*
- *	Description:
- *	Find a specific node with single keyword match.	
- *	Parameters:
- *	1. LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list
- *	2. void** KeyWordPtrArray [input] (valid pointer), a pointer points to keyword pointer array
- *	3. int CmpFcnIndex [input] (none zero integer), compare keyword mark bits.
- *	4. LIST_HANDLE NodeHandle [output] (non-empty handle), a handle for returning the matched node.
- *	5. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), 
- * 		set the access permission for obtained node.
- *  6. void* UserData [output] (valid pointer), a pointer points to extra user data. In some cases
- *      user may want to transfer some extra information during finding action.
- *	Return:
- *	ERROR: When a error occur
- *	OK: Successfully return a matched node with the desired access permission.
- *	LIST_PERMISSION_DENY: The matched node refuses to endow the expected permission, 
- *	for example, the matched node is being writing by another process when the current process
- *	want to read or write it, or the matched node is being read by another process when the current
- *	process want to write it.
- */
+*	Description:
+*	Find a specific node with single keyword match.	
+*	Parameters:
+*	1. LIST_HANDLE HeadHandle [input] (non-empty handle), handle of list
+*	2. void** KeyWordPtrArray [input] (valid pointer), a pointer points to keyword pointer array
+*	3. int CmpFcnIndex [input] (none zero integer), compare keyword mark bits.
+*	4. LIST_HANDLE NodeHandle [output] (non-empty handle), a handle for returning the matched node.
+*	5. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), 
+*		set the access permission for obtained node.
+*  6. void* UserData [output] (valid pointer), a pointer points to extra user data. In some cases
+*      user may want to transfer some extra information during finding action.
+*	Return:
+*	1. ERROR: When a error occur
+*	2. LIST_PERMISSION_DENY: The matched node refuses to endow the expected permission, 
+*	for example, the matched node is being writing by another process when the current process
+*	want to read or write it, or the matched node is being read by another process when the current
+*	process want to write it.
+*  3. >0 Successfully find specific node and return the index of node.
+*/
 int FindSW(
            LIST_HANDLE HeadHandle,
            void** KeyWordPtrArray,
@@ -144,12 +148,12 @@ int FindSW(
 *      keywords matching, user can define user data for each keyword matching.
 *
 *	Return:
-*	ERROR: When an error occur
-*	OK: Successfully return a matched node with the desired access permission.
-*	PERMISSION_DENY: The matched node refuses to endow the expected permission, 
+*	1. ERROR: When an error occur
+*	2. PERMISSION_DENY: The matched node refuses to endow the expected permission, 
 *	for example, the matched node is being writing by another process when the current process
 *	want to read or write it, or the matched node is being read by another process when the current
 *	process want to write it.
+*  3. >0 Successfully find specific node and return the index of node.
 */
 int FindMW(
            LIST_HANDLE HeadHandle,

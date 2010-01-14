@@ -6,7 +6,6 @@
 *	Foundation Services, Tool Module.
 *	Based on SDK5.RC16, Linux 2.6.20, ARM Host CPU.
 *	
-*	MG3500 (MAXIM, mobilygen, Inc.) HD project
 *   Copyright (c) Artificial Intelligence Infinity.
 *
 *	2009.07.24 Solution designed by shaobin, Programmed by shaobin.
@@ -20,21 +19,35 @@
 #include "tool.h"
 #include "list.h"
 
-#define MAX_CONFIG_CHAR_NUM		128
-
-static config_parameter_cmp(void* node_data_ptr, void* key_word_ptr);
-
-
-LIST_HANDLE read_config_file(STRING filename)
+typedef struct
 {
-	char* line_ptr;
-	size_t line_len;
-	int nread,count,i;
-	LIST_HANDLE handle;
+    STRING config_file_name;
+    LIST_HANDLE config_handle;
+}CONFIG_FILE_ENTRY,*CONFIG_FILE_ENTRY_PTR;
+
+
+
+CONFIG_FILE_HANDLE read_config(STRING config_file_name)
+{
+    CONFIG_FILE_ENTRY_PTR config_file_entry_ptr;
+    LIST_HANDLE config_handle;
+
+    if (config_file_name == NULL || config_file_entry_ptr == NULL)
+    {
+        printf("Parameters error!\n");
+        return ERROR;
+    }
+
+    config_handle=read_text(config_file_name);
     
+    if (config_handle == NULL)
+    {
+        return ERROR;
+    }
     
-    
-	return handle;
+    if ()
+    {
+    }
 }
 
 /*
@@ -80,7 +93,7 @@ static int pars_line(
 	return OK;
 }
 
-static config_parameter_cmp(void* node_data_ptr, void* key_word_ptr, void* userdata)
+static int config_parameter_cmp(void* node_data_ptr, void* key_word_ptr, void* userdata)
 {
 	LINUX_CONFIG_ENTRY_PTR cfentry_ptr;
 	STRING param_str;

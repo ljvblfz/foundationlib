@@ -12,6 +12,10 @@
 */
 
 #include "libtype.h"
+#include "list.h"
 
-typedef void* CONFIG_FILE_HANDLE;
 
+
+
+int get_config_value(LIST_HANDLE text_handle, STRING config_name, STRING* config_value_ptr);
+int modify_config(LIST_HANDLE text_handle, STRING config_name, STRING config_value);

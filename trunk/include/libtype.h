@@ -2,25 +2,28 @@
 #define _DATATYPE
 
 /* OS definition */
+/*
 #ifndef	LINUX_OS
 #define LINUX_OS
 #endif
+*/
 
 #ifndef WINDOWS_OS
 #define WINDOWS_OS
 #endif
+
 /*
 #ifndef VXWORKS_OS
 #define VXWORKS_OS
 #endif
 */
 
-#ifndef ERROR
-#define ERROR						-1
+#ifndef OSI_ERROR
+#define OSI_ERROR						-1
 #endif
 
-#ifndef OK
-#define OK							0
+#ifndef OSI_OK
+#define OSI_OK							0
 #endif
 
 /* variable alias define */

@@ -78,7 +78,7 @@ err:
 
 #ifdef LINUX_OS
 	printf("This function is not yet available Linux!\n");
-	return ERROR;
+	return OSI_ERROR;
 #endif
 }
 
@@ -98,7 +98,7 @@ LOGICAL mgIsQEmpty(OSI_LIB_HANDLE MgMsgHandle)
 	
 #ifdef LINUX_OS
 	printf("This function is not yet available Linux!\n");
-	return ERROR;
+	return OSI_ERROR;
 #endif
 
 }
@@ -119,12 +119,12 @@ LOGICAL is_msg_queue_full(OSI_LIB_HANDLE MgMsgHandle)
 #endif
 	
 #ifdef VXWORKS_OS
-	return OK;	/* No such function in vxWorks */
+	return OSI_OK;	/* No such function in vxWorks */
 #endif
 	
 #ifdef LINUX_OS
 	printf("This function is not yet available Linux!\n");
-	return ERROR;
+	return OSI_ERROR;
 #endif
 }
 
@@ -156,7 +156,7 @@ UINT32 msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle)
 
 #ifdef LINUX_OS
 	printf("This function is not yet available Linux!\n");
-	return ERROR;
+	return OSI_ERROR;
 #endif
 
 }
@@ -185,12 +185,12 @@ UINT32 msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle)
 
 #ifdef VXWORKS_OS
 	printf("This function is not yet available Linux!\n");
-	return ERROR;
+	return OSI_ERROR;
 #endif
 
 #ifdef LINUX_OS
 	printf("This function is not yet available Linux!\n");
-	return ERROR;
+	return OSI_ERROR;
 #endif
 	
 }
@@ -214,7 +214,7 @@ int msg_send(
 
 	if (MsgQHandle==NULL || buffer==NULL)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MsgQHandle;
@@ -243,7 +243,7 @@ int msg_send(
 				*	mutex is set to nonsignaled.
 				*/
 			case WAIT_ABANDONED:	
-				return ERROR;
+				return OSI_ERROR;
 				break;
 				/*
 				*	The state of the specified object is signaled.
@@ -255,7 +255,7 @@ int msg_send(
 				*	is nonsignaled.
 				*/
 			case WAIT_TIMEOUT:
-				return ERROR;
+				return OSI_ERROR;
 				break;
 			default:
 				break;
@@ -273,7 +273,7 @@ int msg_send(
 	}
 
 
-	return OK;
+	return OSI_OK;
 #endif
 	
 #ifdef VXWORKS_OS
@@ -291,7 +291,7 @@ int msg_send(
 
 #ifdef LINUX_OS
 	printf("This function is not yet available Linux!\n");
-	return ERROR;
+	return OSI_ERROR;
 #endif
 }
 
@@ -313,7 +313,7 @@ int msg_receive(
 
 	if (MsgQHandle==NULL || buffer==NULL)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MsgQHandle;
 	MgMsgHandleEntryPtr->ReadTimeout=timeout;
@@ -339,7 +339,7 @@ int msg_receive(
 				*	mutex is set to nonsignaled.
 				*/
 			case WAIT_ABANDONED:	
-				return ERROR;
+				return OSI_ERROR;
 				break;
 				/*
 				*	The state of the specified object is signaled.
@@ -351,7 +351,7 @@ int msg_receive(
 				*	is nonsignaled.
 				*/
 			case WAIT_TIMEOUT:
-				return ERROR;
+				return OSI_ERROR;
 				break;
 			default:
 				break;
@@ -370,7 +370,7 @@ int msg_receive(
 		}
 	}
 
-	return OK;
+	return OSI_OK;
 #endif
 	
 #ifdef VXWORKS_OS
@@ -387,7 +387,7 @@ int msg_receive(
 
 #ifdef LINUX_OS
 	printf("This function is not yet available Linux!\n");
-	return ERROR;
+	return OSI_ERROR;
 #endif
 }
 
@@ -429,14 +429,14 @@ OSI_LIB_HANDLE mutex_create(
 	posix_mutex=malloc(sizeof(pthread_mutex_t));
 	if (posix_mutex==NULL)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 	
 	mutex=(mutex_t)posix_mutex;
 
-	if (pthread_mutex_init((pthread_mutex_t*)mutex,(pthread_mutexattr_t*) option)!=OK)
+	if (pthread_mutex_init((pthread_mutex_t*)mutex,(pthread_mutexattr_t*) option)!=OSI_OK)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 	
 	return (OSI_LIB_HANDLE)mutex;
@@ -583,10 +583,10 @@ int task_delete(
 	WinThreadHandle=(WIN_HANDLE)MgTaskHandle;
 	if (GetExitCodeThread(WinThreadHandle,&ExitCode)==0)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 	ExitThread(ExitCode);
-	return OK;
+	return OSI_OK;
 #endif
 
 #ifdef VXWORKS_OS
@@ -620,13 +620,13 @@ int task_delete_force(OSI_LIB_HANDLE MgTaskHandle)
 	WinThreadHandle=(WIN_HANDLE)MgTaskHandle;
 	if (GetExitCodeThread(WinThreadHandle,&ExitCode)==0)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 	if (TerminateThread(WinThreadHandle,ExitCode)==0)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
-	return OK;
+	return OSI_OK;
 #endif
 
 #ifdef VXWORKS_OS

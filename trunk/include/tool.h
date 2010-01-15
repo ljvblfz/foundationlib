@@ -15,33 +15,7 @@
 
 #include "libtype.h"
 
-/*
-*	Function: getline_all
-*	Description: 
-*	getline()  reads an entire line includes delimiters from stream, storing 
-*	the address of the buffer containing the text into *lineptr.  The  buffer  
-*	is  null-terminated and includes the newline character includes delimiters.
-
-*  If  *lineptr is NULL, then getline() will allocate a buffer for storing
-*  the line, which should be freed by the  user  program.   Alternatively,
-*  before  calling  getline(),  *lineptr  can  contain a pointer to a mal-
-*  loc()-allocated buffer *n bytes in size. If the  buffer  is  not  large
-*  enough  to hold the line, getline() resizes it with realloc(), updating
-*  *lineptr and *n as necessary. In either case,  on  a  successful  call,
-*  *lineptr and *n will be updated to reflect the buffer address and allo-
-*  cated size respectively.
-*	
-*  Input:	
-*			n:	character string buffer size.
-*			fp: File pointer to text stream file.
-*	Output:
-*			lineptr: pointer to string line buffer
-*	Return:
-*			ERROR or count of read character.
-*	Note: the real character number that stored in lineptr always 1 less than
-*			n because of the delimiter character '\0'
-*/
-int getline_all(STRING* lineptr, int* n, FILE* fp);
+int getline(char** lineptr, int* n, FILE* fp);
 
 /*
 *	Function: findstr
@@ -75,5 +49,10 @@ unsigned long byte_sum(unsigned char* buf, int len);
 int TCPLinkToServer(ULONG preAddr,UINT16 port,int bufsize);
 int findchar(char c, char* str, int case_sensitive);
 
+#ifndef min
 #define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef max
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#endif

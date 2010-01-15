@@ -23,12 +23,12 @@ $ Reversion 1.2 $ $Date: 2009/11/18 $
 
 #define LIST_PERMISSION_DENY			-2
 
-#ifndef ERROR
-#define ERROR              -1
+#ifndef OSI_ERROR
+#define OSI_ERROR              -1
 #endif
 
-#ifndef OK
-#define OK                 0
+#ifndef OSI_OK
+#define OSI_OK                 0
 #endif
 
 #ifndef NULL
@@ -72,7 +72,7 @@ void DeleteHandle(LIST_HANDLE handle);
 *      which also contains CmpFcnAmount pointers point to each comparison function.
 *  
 *	Return:
-*	Function Execution Status, (OK, ERROR)
+*	Function Execution Status, (OSI_OK, OSI_ERROR)
 */
 int Initialize(
                LIST_HANDLE handle,
@@ -86,7 +86,7 @@ int Initialize(
 *	Parameters:
 *	1. LIST_HANDLE handle [input] (non-empty handle), the handle of list head
 *	Return:
-*	Function Execution Status, (ERROR, OK).
+*	Function Execution Status, (OSI_ERROR, OSI_OK).
 */
 int Count(LIST_HANDLE handle);
 
@@ -98,7 +98,7 @@ int Count(LIST_HANDLE handle);
 *	1. LIST_HANDLE HeadHandle [input] (valid pointer)
 *
 *	Return:
-*	ERROR if an error occur. False if the list is not empty, True if 
+*	OSI_ERROR if an error occur. False if the list is not empty, True if 
 *	the list is empty. 
 */
 int IsEmpty(LIST_HANDLE HeadHandle);
@@ -116,7 +116,7 @@ int IsEmpty(LIST_HANDLE HeadHandle);
 *  6. void* UserData [output] (valid pointer), a pointer points to extra user data. In some cases
 *      user may want to transfer some extra information during finding action.
 *	Return:
-*	1. ERROR: When a error occur
+*	1. OSI_ERROR: When a error occur
 *	2. LIST_PERMISSION_DENY: The matched node refuses to endow the expected permission, 
 *	for example, the matched node is being writing by another process when the current process
 *	want to read or write it, or the matched node is being read by another process when the current
@@ -148,7 +148,7 @@ int FindSW(
 *      keywords matching, user can define user data for each keyword matching.
 *
 *	Return:
-*	1. ERROR: When an error occur
+*	1. OSI_ERROR: When an error occur
 *	2. PERMISSION_DENY: The matched node refuses to endow the expected permission, 
 *	for example, the matched node is being writing by another process when the current process
 *	want to read or write it, or the matched node is being read by another process when the current
@@ -175,8 +175,8 @@ int FindMW(
 *  4. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), Permission tag of matched node
 *	
 *  Return: 
-*	ERROR: When an error occur
-*	OK: Successfully return a matched node with the desired access permission.
+*	OSI_ERROR: When an error occur
+*	OSI_OK: Successfully return a matched node with the desired access permission.
 *	LIST_PERMISSION_DENY: The matched node refuses to endow the expected permission, 
 *	for example, the matched node is being writing by another process when the current process
 *	want to read or write it, or the matched node is being read by another process when the current
@@ -199,8 +199,8 @@ int FindNodeNum(
  *  3. void* DataPtr [input] (valid pointer), pointer to node data.
  * 
  *	Return:
- *  ERROR: When an error occur.
- *  OK: Successfully inserted.
+ *  OSI_ERROR: When an error occur.
+ *  OSI_OK: Successfully inserted.
  *  
  */
 int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr);
@@ -218,8 +218,8 @@ int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr);
 *  5. void* DataPtr [input] (valid data pointer) node data.
 *	
 *	Return:
-*	ERROR: When an error occurs.
-*  OK: When successfully inserted a node.
+*	OSI_ERROR: When an error occurs.
+*  OSI_OK: When successfully inserted a node.
 */
 #define INSERT_BEFORE_NODE  0
 #define INSERT_AFTER_NODE   1
@@ -239,8 +239,8 @@ int InsertNodeHandle( LIST_HANDLE HeadHandle,
 *      output for user processing.
 *  
 *	Return:
-*	ERROR: When an error occur or inexist expected node.
-*  OK: Successfully delete the expected node.
+*	OSI_ERROR: When an error occur or inexist expected node.
+*  OSI_OK: Successfully delete the expected node.
 *  LIST_PERMISSION_DENY: The matched node refuses to endow the expected permission, 
 *	for example, the matched node is being writing by another process when the current process
 *	want to read or write it, or the matched node is being read by another process when the current
@@ -265,8 +265,8 @@ int DeleteNodeSW(
 *      output for user processing.
 *  
 *	Return:
-*	ERROR: When an error occur or inexist expected node.
-*  OK: Successfully delete the expected node.
+*	OSI_ERROR: When an error occur or inexist expected node.
+*  OSI_OK: Successfully delete the expected node.
 *  LIST_PERMISSION_DENY: The matched node refuses to endow the expected permission, 
 *	for example, the matched node is being writing by another process when the current process
 *	want to read or write it, or the matched node is being read by another process when the current
@@ -289,7 +289,7 @@ int DeleteNodeMW(
 *
 *	
 *	Return:
-*	ERROR: When an error occur
+*	OSI_ERROR: When an error occur
 *  EntryAmount: left nodes amount.
 */
 int DeleteNodes( LIST_HANDLE handle );
@@ -305,9 +305,9 @@ int DeleteNodes( LIST_HANDLE handle );
 *	1. LIST_HANDLE handle [input] (non-empty handle), handle of list.
 *	
 *	Return:
-*	ERROR: When an error occurs.
+*	OSI_ERROR: When an error occurs.
 *  Left nodes amount: left nodes amount of list.
-*  OK: When this routine successfully deletes all the nodes and list head.
+*  OSI_OK: When this routine successfully deletes all the nodes and list head.
 */
 
 int Delete(LIST_HANDLE handle);
@@ -322,8 +322,8 @@ int Delete(LIST_HANDLE handle);
 *  int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag of node.
 *	
 *	Return:
-*	ERROR: When an error occurs.
-*  OK: Successfully release specific permission tag of the node.
+*	OSI_ERROR: When an error occurs.
+*  OSI_OK: Successfully release specific permission tag of the node.
 */
 int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag);
 
@@ -335,8 +335,8 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag);
 *	LIST_HANDLE NodeHandle [input] (non-empty handle), handle of node.
 *	
 *	Return:
-*	ERROR: When an error occurs.
-*  OK: Successfully printed the permission tag.
+*	OSI_ERROR: When an error occurs.
+*  OSI_OK: Successfully printed the permission tag.
 */
 int PrintPermission(LIST_HANDLE NodeHandle);
 
@@ -350,8 +350,8 @@ int PrintPermission(LIST_HANDLE NodeHandle);
 *  2. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag of a node
 *	
 *	Return:
-*	ERROR: When an error occurs.
-*  OK: Successfully obtained specific permission.
+*	OSI_ERROR: When an error occurs.
+*  OSI_OK: Successfully obtained specific permission.
 *  LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission, 
 *	for example, the specific node is being writing by another process when the current process
 *	want to get read or write permission, or the specific node is being read 
@@ -392,8 +392,8 @@ void* GetData( LIST_HANDLE NodeHandle );
 *	5. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
 *
 *	Return:
-*  1. ERROR: When an error occurs.
-*  2. OK: successfully get next node with specific permission.
+*  1. OSI_ERROR: When an error occurs.
+*  2. OSI_OK: successfully get next node with specific permission.
 *  3. LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
 *	For example, the next node is being writing by another process when the current process
 *	want to get read or write permission, or the next node is being read 
@@ -426,8 +426,8 @@ int GetNextNode(
 *	5. int PermissionTag [input] (READ_PERMISSION_TAG, WRITE_PERMISSION_TAG), permission tag.
 *
 *	Return:
-*  1. ERROR: When an error occurs.
-*  2. OK: successfully get previous node with specific permission.
+*  1. OSI_ERROR: When an error occurs.
+*  2. OSI_OK: successfully get previous node with specific permission.
 *  3. LIST_PERMISSION_DENY: The specific node refuses to endow the expected permission. 
 *	For example, the previous node is being writing by another process when the current process
 *	want to get read or write permission, or the previous node is being read 
@@ -451,7 +451,7 @@ int GetPreviousNode(
 *	LIST_HANDLE handle [input] (non-empty handle), handle of a node.
 *	
 *	Return:
-*	ERROR: When an error occurs.
+*	OSI_ERROR: When an error occurs.
 *  Data length: When the node includes valid data block.
 */
 int GetDataLen(LIST_HANDLE handle);

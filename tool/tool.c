@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef LINUX_OS
 #include <time.h>
 #include <sys/time.h>
 #include <assert.h>
@@ -31,7 +33,6 @@
 #include <asm/ioctl.h>
 #include <sys/vfs.h>
 #include <stdarg.h>
-
 /* Network */
 #include <netdb.h>
 #include <sys/socket.h>
@@ -42,114 +43,68 @@
 #include <resolv.h>
 #include <linux/sockios.h>
 
+#endif
+
+
 #include "tool.h"
 
 /*
- *	Function: getline_all
- *	Description: 
- *	getline()  reads an entire line includes delimiters from stream, storing 
- *	the address of the buffer containing the text into *lineptr.  The  buffer  
- *	is  null-terminated and includes the newline character includes delimiters.
-
- *  If  *lineptr is NULL, then getline() will allocate a buffer for storing
- *  the line, which should be freed by the  user  program.   Alternatively,
- *  before  calling  getline(),  *lineptr  can  contain a pointer to a mal-
- *  loc()-allocated buffer *n bytes in size. If the  buffer  is  not  large
- *  enough  to hold the line, getline() resizes it with realloc(), updating
- *  *lineptr and *n as necessary. In either case,  on  a  successful  call,
- *  *lineptr and *n will be updated to reflect the buffer address and allo-
- *  cated size respectively.
+ *	Description:
  *	
- *  Input:	
- *			n:	character string buffer size.
- *			fp: File pointer to text stream file.
- *	Output:
- *			lineptr: pointer to string line buffer
+ *	
+ *	Parameters:
+ *	
+ *	
  *	Return:
- *			ERROR or count of read character.
- *	Note: the real character number that stored in lineptr always 1 less than
- *			n because of the delimiter character '\0'
+ *		
  */
-int getline_all(STRING* lineptr, int* n, FILE* fp)
+
+#ifdef WINDOWS_OS
+
+int getline(char** lineptr, int* n, FILE* fp)
 {
 	int count;
-	int c,linelen;
-	long offset;
-	char tempbuf[1024];
-	STRING readstr;
-
-	if (*lineptr==NULL)	/* Internal allocate memory */
+	long cur_offset;
+	int ci;
+	char* readbuf;
+	
+	cur_offset=ftell(fp);
+	
+	count=0;
+	while ((ci=fgetc(fp)) != '\n' && ci != EOF)
 	{
-		count=0;
-		while ((c=fgetc(fp))>0)
-		{
-			if (count < 1024)
-			{
-				tempbuf[count]=(char)c;
-			}
-			count++;
-
-			if (c == '\n')
-			{
-				break;
-			}
-		}
-
-		if (count==0)
-		{
-			return ERROR;
-		}
-
-		linelen=count;
-		if ((readstr=malloc(linelen+1))==NULL)
-		{
-			printf("Memory limited!\n");
-			return ERROR;
-		}
-
-		if (linelen > 1024)
-		{
-			offset=1024-linelen;
-			fseek(fp,offset,SEEK_CUR);
-			memcpy(readstr,tempbuf,1024);
-			if (fread(readstr+1024, linelen-1024, 1, fp)!=1)
-			{
-				printf("Read data error, the storage media maybe damaged!\n");
-				return ERROR;
-			}
-		}
-		else
-		{
-			memcpy(readstr,tempbuf,linelen);
-		}
-
-		readstr[linelen]='\0';
-		*n=linelen;
+		count++;
 	}
-	else	/* Memory has been allocated outside */
+	
+	if (count == 0)
 	{
-		readstr=*lineptr;
-		linelen=*n;
-		count=0;
-		while (--linelen && (c=fgetc(fp))>0 && readstr[count]=c)
+		return OSI_ERROR;
+	}
+	
+	count++; /* For storing extra '\0' char */
+	if (*lineptr == NULL || *n < count)
+	{
+		if ((*lineptr=(char*)realloc(*lineptr,count))==NULL)
 		{
-			count++;
-			if (c == '\n')
-			{
-				break;
-			}
-		}
-		readstr[count]='\0';
-
-		if (count == 0)
-		{
-			return ERROR;
+			return OSI_ERROR;
 		}
 	}
+	*n=count;
 
+	fseek(fp,cur_offset,SEEK_SET);
+	readbuf=*lineptr;
+	count=0;
+	while ((ci=fgetc(fp)) != '\n' && ci != EOF)
+	{
+		readbuf[count++]=(char)ci;
+	}
+	
+	readbuf[count]='\0';
+	
 	return count;
 }
 
+#endif
 
 /*
  *	Function: findstr
@@ -158,7 +113,7 @@ int getline_all(STRING* lineptr, int* n, FILE* fp)
  *			original_str:	Original string.
  *			match_str:		Match string.
  *	Return:
- *			ERROR or index of matched string.
+ *			OSI_ERROR or index of matched string.
  */
 int findstr(char* original_str, char* match_str)
 {
@@ -166,7 +121,7 @@ int findstr(char* original_str, char* match_str)
 
 	if (original_str==NULL || match_str==NULL)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 
 	while (original_str[index]!='\0')
@@ -181,11 +136,14 @@ int findstr(char* original_str, char* match_str)
 		index++;
 	}
 
-	return ERROR;
+	return OSI_ERROR;
 }
+
+
 
 int TCPLinkToServer(ULONG preAddr,UINT16 port,int bufsize)
 {
+#ifdef LINUX_OS
 	int s;
 	struct	sockaddr_in	peeraddr_in;
 	int optlen;
@@ -195,18 +153,18 @@ int TCPLinkToServer(ULONG preAddr,UINT16 port,int bufsize)
 	*/
 	if (preAddr==0 || port==0)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 
-	if ((s=socket(AF_INET,SOCK_STREAM,0))==ERROR)
+	if ((s=socket(AF_INET,SOCK_STREAM,0))==OSI_ERROR)
 	{
 		printf("Create socket fail!\n");
-		return ERROR;
+		return OSI_ERROR;
 	}
 
 	if (bufsize>0)
 	{
-		if (setsockopt (s, SOL_SOCKET, SO_RCVBUF, (char *)&bufsize, sizeof (bufsize))==ERROR)
+		if (setsockopt (s, SOL_SOCKET, SO_RCVBUF, (char *)&bufsize, sizeof (bufsize))==OSI_ERROR)
 		{
 			printf("Set socket buffer size error, use the default buffer size!\n");
 		}
@@ -220,22 +178,30 @@ int TCPLinkToServer(ULONG preAddr,UINT16 port,int bufsize)
 	{
 		printf("bind error\n");
 		close (s);
-		return ERROR;
+		return OSI_ERROR;
 	}	
 	peeraddr_in.sin_addr.s_addr = preAddr;/*(int) inet_addr (preAddr);*/
 	peeraddr_in.sin_port        = htons (port);	
 
-	if (connect (s, (struct sockaddr *)&peeraddr_in, sizeof(peeraddr_in)) == ERROR)
+	if (connect (s, (struct sockaddr *)&peeraddr_in, sizeof(peeraddr_in)) == OSI_ERROR)
 	{
 		close(s);    
-		return ERROR;    
+		return OSI_ERROR;    
 	}
 
 	return s;
+#endif
+	
+#ifdef WINDOWS_OS
+
+	return OSI_OK;
+#endif
 }
 
 int atomread(int fd,void* buf, int len)
 {
+
+#ifdef LINUX_OS
 	fd_set rset;
 	struct timeval select_timeout;
 	int remlen,rlen,ret,count=60;
@@ -253,7 +219,7 @@ int atomread(int fd,void* buf, int len)
 			ret=read(fd,buf+rlen,remlen);
 			if (ret<=0)
 			{
-				return ERROR;
+				return OSI_ERROR;
 			}
 			remlen-=ret;
 			rlen+=ret;
@@ -261,9 +227,15 @@ int atomread(int fd,void* buf, int len)
 	}
 	if (remlen==0)
 	{
-		return OK;
+		return OSI_OK;
 	}
-	return ERROR;
+	return OSI_ERROR;
+
+#endif
+
+#ifdef WINDOWS_OS
+	return OSI_OK;
+#endif
 }
 
 
@@ -274,21 +246,23 @@ int atomread(int fd,void* buf, int len)
  *			fd:
  *			buf:
  *			len:
- *	return: OK, ERROR
+ *	return: OSI_OK, OSI_ERROR
  */
 int atomwrite(int fd, void* buf, int len)
 {
+
+#ifdef LINUX_OS
 	fd_set wset;
 	struct timeval select_timeout;
 	int remlen,wlen,ret,count=60;
 
 	if (len<0)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 	if (len==0)
 	{
-		return OK;
+		return OSI_OK;
 	}
 
 	remlen=len;
@@ -302,9 +276,9 @@ int atomwrite(int fd, void* buf, int len)
 		if (select(fd+1,NULL,&wset,NULL,&select_timeout)>0)
 		{
 			ret=write(fd,buf+wlen,remlen);
-			if (ret==ERROR)
+			if (ret==OSI_ERROR)
 			{
-				return ERROR;
+				return OSI_ERROR;
 			}
 			remlen-=ret;
 			wlen+=ret;
@@ -313,10 +287,16 @@ int atomwrite(int fd, void* buf, int len)
 
 	if (remlen==0)
 	{
-		return OK;
+		return OSI_OK;
 	}
 
-	return ERROR;
+	return OSI_ERROR;
+#endif
+
+#ifdef WINDOWS_OS
+
+	return OSI_OK;
+#endif
 }
 
 int lower (int c)
@@ -360,7 +340,7 @@ int strmatch (int n,STRING strarray[], STRING cs)
 			return n;
 		}
 	}
-	return ERROR;
+	return OSI_ERROR;
 }
 
 void bezeros (int n,void * p)
@@ -412,7 +392,7 @@ unsigned long byte_sum(unsigned char* buf, int len)
 
 	if (buf==NULL || len<0)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 
 	sum=0;
@@ -431,7 +411,7 @@ int findchar(char c, char* str, int case_sensitive)
 
 	if (str==NULL)
 	{
-		return ERROR;
+		return OSI_ERROR;
 	}
 	
 	while (str[index])
@@ -453,6 +433,6 @@ int findchar(char c, char* str, int case_sensitive)
 		index++;
 	}
 
-	return ERROR;
+	return OSI_ERROR;
 }
 

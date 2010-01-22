@@ -1,14 +1,21 @@
-/************************************************************************/
-/*	
-	Copyright to AI INFINITY, Inc.
-	Solution designed by shaobin.
-	Programmed by shaobin, wangxian.chen.
-
-	$ Reversion 1.0 $ $Data: 2007/09/07 $
-	$ Reversion 1.1 $ $Data: 2007/09/30 $
-	$ Reversion 1.2 $ $Date: 2009/11/18 $
-*/
-/************************************************************************/
+/*
+ *	list.c
+ *	list data structure class C code file. This class implements a parallel
+ *	access double link loop list data structure class. It provides enough interfaces
+ *	to manipulate and access every node of the list.
+ *
+ *	Based on OS Interfaces which can cross Windows, Linux, vxWorks and MAC OS
+ *	system.
+ *
+ *	A class of Foundation Library. Foundation Library project.
+ *
+ *	Copyright to Artificial Intelligence Infinity, Inc.
+ *	Solution designed by shaobin, programmed by shaobin.
+ *
+ *	$ Reversion 1.0 $ $Data: 2007/09/07 $
+ *	$ Reversion 1.1 $ $Data: 2007/09/30 $
+ *	$ Reversion 1.2 $ $Date: 2009/11/18 $
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

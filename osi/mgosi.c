@@ -443,6 +443,7 @@ OSI_LIB_HANDLE mutex_create(
 #endif
 
 }
+
 void mutex_lock(
 				OSI_LIB_HANDLE mutex_handle,
 				DWORD timeout	/* non useful */

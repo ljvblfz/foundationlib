@@ -10,6 +10,8 @@
  **************************************************************************************/ 
 #include "pthreadHead.h"
 
+#ifdef LINUX_OS
+
 typedef void *(*FUNCPTR)(void*, void*, void*, void*, void*, void*, void*, void*, void*, void*);
 typedef void *(*START_ROUTINE)(void*);
 
@@ -287,4 +289,5 @@ int pthreadSpawn(pthread_t *ptid, int priority, size_t stacksize, void *funcptr,
 	return rval;
 }
 
+#endif
 

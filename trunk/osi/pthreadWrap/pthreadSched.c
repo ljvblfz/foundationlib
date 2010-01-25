@@ -10,6 +10,8 @@
  **************************************************************************************/
 #include "pthreadHead.h"
 
+#ifdef LINUX_OS
+
 /*************************************************
   * Function:		Sched_get_priority_min()
   * Description:    获取调度策略最小优先级包裹函数 
@@ -166,3 +168,4 @@ int Sched_rr_get_interval(pid_t pid, struct timespec *tp)
 	return rval;
 }
 
+#endif

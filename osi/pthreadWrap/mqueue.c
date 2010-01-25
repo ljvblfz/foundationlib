@@ -10,6 +10,8 @@
  **************************************************************************************/
 #include "pthreadHead.h"
 
+#ifdef LINUX_OS
+
 static inline void getTimespec(int wait_ms, struct timespec *tp)
 {
 	time_t sec, t;
@@ -227,5 +229,5 @@ int Mq_close(mqd_t mqdes)
 	return rval;
 }
 
-
+#endif
 

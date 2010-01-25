@@ -10,6 +10,8 @@
  **************************************************************************************/
 #include "pthreadHead.h"
 
+#ifdef LINUX_OS
+
 static inline void getTimespec(int wait_ms, struct timespec *tp)
 {
 	time_t sec, t;
@@ -673,4 +675,5 @@ int Pthread_cond_broadcast(pthread_cond_t *cond)
 	return rval;
 }
 
+#endif
 

@@ -10,6 +10,8 @@
  **************************************************************************************/
 #include "pthreadHead.h"
 
+#ifdef LINUX_OS
+
 /*************************************************
   * Function:		Pthread_attr_init()
   * Description:    线程属性初始化包裹函数 
@@ -679,3 +681,4 @@ int Pthread_attr_set(pthread_attr_t *attr, int priority, size_t stacksize)
 	return 0;
 }
 
+#endif

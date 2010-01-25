@@ -1,0 +1,44 @@
+-- auto-gen settings (DO NOT MODIFY) --
+
+CWD=E:/AII/foundationlib
+Version=21
+VimEntryName=project
+VimfilesDirName=_vimfiles_project
+
+-- ex-plugins File Settings --
+
+LangType=auto
+Project=./_vimfiles_project/project_tree.exproject
+FilenameList=./_vimfiles_project/filenamelist
+Tag=./_vimfiles_project/tags
+ID=./_vimfiles_project/ID
+Symbol=./_vimfiles_project/symbol
+Macro=./_vimfiles_project/macro
+Cscope=./_vimfiles_project/cscope.out
+Inherits=./_vimfiles_project/inherits
+
+vimentryRefs+=
+
+-- ex-plugins Behavior Settings --
+
+RestoreBuffers=false
+AskForRestoration=true
+RestoreInfo=./_vimfiles_project/restore_info
+
+-- LookupFile Settings --
+
+LookupFileTag=./_vimfiles_project/filenametags
+
+-- Visual Studio Settings --
+
+vsTaskList=./_vimfiles_project/vs_task_list
+vsOutput=./_vimfiles_project/vs_output
+vsFindResult1=./_vimfiles_project/vs_find_results_1
+vsFindResult2=./_vimfiles_project/vs_find_results_2
+
+-- vimwiki Settings --
+
+wikiHome=./_doc/
+wikiHomeHtml=./wiki_html/
+wikiHtmlHeader=./_doc/template/header.tpl
+

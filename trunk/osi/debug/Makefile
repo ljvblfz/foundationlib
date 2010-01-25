@@ -32,8 +32,6 @@ $(LIB):$(OBJS)
 	cp debug.c ../ioApiWrap
 	cp debug.h ../timeApiWrap
 	cp debug.c ../timeApiWrap
-	cp debug.h ../miscApiWrap
-	cp debug.c ../miscApiWrap
 
 %.o:%.c
 	$(CC) $(CFLAGS) -c $^ -o $@

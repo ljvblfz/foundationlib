@@ -20,6 +20,8 @@
 
 #undef DEBUG_VERSION
 
+#ifdef LINUX_OS
+
 /*
  * =====================================================================
  * Function:debug_doit()
@@ -110,4 +112,6 @@ void debug_info(int debugLevel, const char *fmt, ...)
 
 	return;
 }
+
+#endif
 

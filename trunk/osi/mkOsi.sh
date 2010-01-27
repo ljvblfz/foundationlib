@@ -12,10 +12,10 @@ make
 echo "###################make pthreadWrap end"
 cd ..
 #netApiWrap
-#cd netApiWrap
-#make clean
-#make 
-#echo "###################make netApiWrap end"
+cd netApiWrap
+make clean
+make 
+echo "###################make netApiWrap end"
 #cd ..
 #ioApiWrap
 #cd ioApiWrap

@@ -1,9 +1,9 @@
 /**************************************************************************************
- *	Copyright 2003-2010 Hangzhou Hikvision Digital Technology Co., Ltd. 
+ *  Copyright (c) Artificial Intelligence Infinity.
  *  Filename: pthread.h 
  *  Description: 线程封装库共用头文件 
  *  Author: caoyun
- *  Create:2009-04-1 
+ *  Create:2010-01-25 
  *  Modification history:
  *
  *

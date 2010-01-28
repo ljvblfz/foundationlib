@@ -1,4 +1,4 @@
-# libxxx.a Makefile
+# libsysTest.a Makefile
 
 SOURCES = $(wildcard *.c)
 HEADERS = $(wildcard *.h)
@@ -10,21 +10,20 @@ AR = $(CROSS_COMPILE)ar
 RANLIB = $(CROSS_COMPILE)ranlib
 
 CFLAG	=
-DFLAG	=-D_REENTRANT -O2 -Wall -D_GNU_SOURCE
+DFLAG	=-Wall -O2
 OTHERS	=-DLINUX_OS 
 INCLUDES=
 CFLAGS	=$(CFLAG) $(DFLAG) $(OTHERS) $(INCLUDES)
 
-LIB = libpthreadWrap.a
+LIB = libsysTest.a
 
 all : $(LIB)
 
 $(LIB):$(OBJS)
 	$(AR) r $@ $(OBJS)
 	$(RANLIB) $@
-	cp pthreadWrap.h ../../include/osi
-	cp $@ ../../lib
-
+	cp sysTest.h ../../include/osi
+	cp $@ ../../lib/
 
 %.o:%.c
 	$(CC) $(CFLAGS) -c $^ -o $@

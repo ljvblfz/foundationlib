@@ -1,9 +1,9 @@
 /**************************************************************************************
- *	Copyright 2003-2010 Hangzhou Hikvision Digital Technology Co., Ltd. 
+ *  Copyright (c) Artificial Intelligence Infinity.
  *  Filename: dateType.h 
  *  Description: 工程数据类型定义(全工程范围遵守) 
  *  Author: caoyun
- *  Create:2009-04-1 
+ *  Create:2010-01-25 
  *  Modification history:
  *
  *

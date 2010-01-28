@@ -16,25 +16,25 @@ cd netApiWrap
 make clean
 make 
 echo "###################make netApiWrap end"
-#cd ..
+cd ..
 #ioApiWrap
-#cd ioApiWrap
-#make clean
-#make 
-#echo "###################make ioApiWrap end"
-#cd ..
-#miscApiWrap
-#cd miscApiWrap
-#make clean
-#make 
-#echo "###################make miscApiWrap end"
-#cd ..
+cd ioApiWrap
+make clean
+make 
+echo "###################make ioApiWrap end"
+cd ..
 #timeApiWrap
-#cd timeApiWrap
-#make clean
-#make 
-#echo "###################make timeApiWrap end"
-#cd ..
+cd timeApiWrap
+make clean
+make 
+echo "###################make timeApiWrap end"
+cd ..
+#sysTset
+cd sysTest 
+make clean
+make 
+echo "###################make sysTest end"
+cd ..
 
 
 

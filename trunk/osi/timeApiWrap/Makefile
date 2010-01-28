@@ -1,4 +1,4 @@
-# libxxx.a Makefile
+# libtimeApiWrap.a Makefile
 
 SOURCES = $(wildcard *.c)
 HEADERS = $(wildcard *.h)
@@ -9,22 +9,21 @@ CC = $(CROSS_COMPILE)gcc
 AR = $(CROSS_COMPILE)ar
 RANLIB = $(CROSS_COMPILE)ranlib
 
-CFLAG	=
-DFLAG	=-D_REENTRANT -O2 -Wall -D_GNU_SOURCE
+CFLAG	= 
+DFLAG	=-Wall -O2 
 OTHERS	=-DLINUX_OS 
 INCLUDES=
 CFLAGS	=$(CFLAG) $(DFLAG) $(OTHERS) $(INCLUDES)
 
-LIB = libpthreadWrap.a
+LIB = libtimeApiWrap.a
 
 all : $(LIB)
 
 $(LIB):$(OBJS)
 	$(AR) r $@ $(OBJS)
 	$(RANLIB) $@
-	cp pthreadWrap.h ../../include/osi
+	cp timeApiWrap.h ../../include/osi
 	cp $@ ../../lib
-
 
 %.o:%.c
 	$(CC) $(CFLAGS) -c $^ -o $@

@@ -572,8 +572,7 @@ int Pthread_attr_getguardsize(const pthread_attr_t *attr, size_t *guardsize)
 	}
 	
 	return rval;
-#endif
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
 	printf("This function is not yet available Vxworks!\n");
     return -1;
 #endif
@@ -604,8 +603,7 @@ int Pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize)
 	}
 	
 	return rval;
-#endif
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
 	printf("This function is not yet available Vxworks!\n");
     return -1;
 #endif

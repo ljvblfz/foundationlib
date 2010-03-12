@@ -16,8 +16,7 @@ int getSysClkRate(void)
 {
 #ifdef LINUX_OS
     return 100;
-#endif
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
     return sysClkRateGet();
 #endif
 }

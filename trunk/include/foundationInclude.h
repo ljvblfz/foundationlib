@@ -43,9 +43,8 @@ extern "C"
 #include <sched.h>
 #include <mqueue.h>
 #include <semaphore.h>
-#endif
 
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
 /* TODO need collect */
 #endif
 

@@ -25,6 +25,19 @@ extern "C"
  *				POSIX thread library interface
  *=========================================================*/
 
+/*
+ * =====================================================================
+ * Function:pthreadSpawn()
+ * Description: This function create a new pthread.
+ * Input:   priority -- priority of new task
+ *          stacksize -- stack size
+ *          funcptr -- entry of new task
+ *          args -- amount of arguments, max to 10
+ *          ... -- argument
+ * Output:  ptid
+ * Return:  Calling thread's ID. 
+ *======================================================================
+ */
 int pthreadSpawn(pthread_t *ptid, int priority, size_t stacksize, void *funcptr, unsigned args, ...);
 
 /*
@@ -167,10 +180,6 @@ int Pthread_join(pthread_t thread, void **value);
  */
 int pthreadIdVerify(pthread_t tid);
 
-
-
-int Pthread_attr_set(pthread_attr_t *attr, int priority, size_t stacksize);
-
 /*
  * =====================================================================
  * Function:Pthread_attr_init()
@@ -233,11 +242,11 @@ int Pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy);
  * Description: set schedpolicy attribute in thread attributes object (POSIX)
  * Input:   attr -- thread attributes
  *          policy -- new policy 
-            POSIX defines the following policies: 
-            SCHED_RR Realtime, round-robin scheduling. 
-            SCHED_FIFO Realtime, first-in first-out scheduling. 
-            SCHED_OTHER Other, non-realtime scheduling. 
-            VxWorks only supports SCHED_RR and SCHED_FIFO. 
+ * POSIX defines the following policies: 
+ *          SCHED_RR Realtime, round-robin scheduling. 
+ *          SCHED_FIFO Realtime, first-in first-out scheduling. 
+ *          SCHED_OTHER Other, non-realtime scheduling. 
+ *          VxWorks only supports SCHED_RR and SCHED_FIFO. 
  * Output:  N/A
  * Return:  On success zero; on failure a non-zero error code.
  *======================================================================
@@ -284,11 +293,10 @@ int Pthread_attr_getinheritsched(const pthread_attr_t *attr, int *inheritsched);
  * Description: set current value if inheritsched attribute in thread attributes object (POSIX)
  * Input:   attr -- thread attributes
  *          inheritsched -- new inheritsched
-            Possible values are: 
-            PTHREAD_INHERIT_SCHED 
-            Inherit scheduling parameters from parent thread. 
-            PTHREAD_EXPLICIT_SCHED 
-            Use explicitly provided scheduling parameters (i.e. those specified in the thread attributes object). 
+ * Possible values are: 
+ *          PTHREAD_INHERIT_SCHED, Inherit scheduling parameters from parent thread. 
+ *          PTHREAD_EXPLICIT_SCHED, Use explicitly provided scheduling parameters 
+ *                                  (i.e. those specified in the thread attributes object). 
  * Return:  On success zero; on failure a non-zero error code.
  *======================================================================
  */
@@ -453,15 +461,14 @@ int Sched_getscheduler(pid_t pid);
  * =====================================================================
  * Function:Sched_setscheduler()
  * Description: set scheduling policy and scheduling parameters (POSIX)
- * This routine sets the scheduling policy and scheduling parameters for a specified task, tid. 
-   If tid is 0, it sets the scheduling policy and scheduling parameters for the calling task. 
-
- * NOTE Because VxWorks does not set scheduling policies (e.g., round-robin scheduling) on a task-by-task basis, 
- *      setting a scheduling policy that conflicts with the current system policy simply fails and errno is set to EINVAL. 
- *      If the requested scheduling policy is the same as the current system policy, then this routine acts just like sched_setparam( ). 
+ *              This routine sets the scheduling policy and scheduling parameters for a specified task, tid. 
+ *              If tid is 0, it sets the scheduling policy and scheduling parameters for the calling task. 
  * Input:   pid -- pthread id
  *          policy -- scheduling policy requested
  *          param -- scheduling parameters requested
+ * NOTE:    Because VxWorks does not set scheduling policies (e.g., round-robin scheduling) on a task-by-task basis, 
+ *          setting a scheduling policy that conflicts with the current system policy simply fails and errno is set to EINVAL. 
+ *          If the requested scheduling policy is the same as the current system policy, then this routine acts just like sched_setparam( ). 
  * Output:  N/A
  * Return:  This routine returns the currents scheduling policy (i.e., SCHED_FIFO or SCHED_RR). 
  *======================================================================
@@ -496,7 +503,7 @@ int Sched_setparam(pid_t pid, struct sched_param *param);
  * =====================================================================
  * Function:Sched_rr_get_interval()
  * Description: get the current time slice (POSIX)
- * This routine get current time slice period if round-robin scheduling is currently enabled.
+ *              This routine get current time slice period if round-robin scheduling is currently enabled.
  * Input:   pid -- pthread id
  * Output:  tp -- current time slice
  * Return:  0 (OK) if successful, or -1 (ERROR) on error. 
@@ -511,17 +518,19 @@ int Sched_rr_get_interval(pid_t pid, struct timespec *tp);
 
 #define NO_WAIT	        0           /* time method */
 #define WAIT_FOREVER    (-1)        /* time method */
-#define	SEM_EMPTY		0           /* Sem_init  */
-#define	SEM_FULL		1           /* Sem_init */
+#define	SEM_EMPTY		0           /* Sem_init locked */
+#define	SEM_FULL		1           /* Sem_init unlocked */
 
 /*
  * =====================================================================
  * Function:Pthread_mutex_init()
  * Description: initialize mutex from attributes object (POSIX)
- * This routine called int pthread_mutex_init (
-                                        pthread_mutex_t *           pMutex, 
-                                        const pthread_mutexattr_t * pAttr  )
-   pAttr is NULL, default attributes are used as defined in the POSIX specification. 
+ *              This routine called 
+ *              int pthread_mutex_init (
+ *                                      pthread_mutex_t *           pMutex, 
+ *                                      const pthread_mutexattr_t * pAttr  
+ *                                      )
+ *              pAttr is NULL, default attributes are used as defined in the POSIX specification. 
  * Input:   mutex
  * Output:  mutex
  * Return:  On success zero; on failure a non-zero error code.
@@ -575,18 +584,19 @@ int Pthread_mutex_unlock(pthread_mutex_t *mutex);
  * =====================================================================
  * Function:Sem_init()
  * Description: initialize an unnamed semaphore (POSIX)
- * This routine called int sem_init (
-                                    sem_t *      sem,          semaphore to be initialized 
-                                    int          pshared,      process sharing 
-                                    unsigned int value         semaphore initialization value 
-                                    )
-   in Linux, pshared is 0, sem can be shared between pthreads.
-   in Vxworks, pshared invalid now.
+ *              This routine called 
+ *              int sem_init (
+ *                            sem_t *      sem,          semaphore to be initialized 
+ *                            int          pshared,      process sharing 
+ *                            unsigned int value         semaphore initialization value 
+ *                            )
+ *              In Linux, pshared is 0, sem can be shared between pthreads.
+ *              In Vxworks, pshared invalid now.
  * Input:   sem -- semaphore to be initialized 
  *          value -- semaphore initialization value
  * This argument has two selections:
-            SEM_EMPTY		
-            SEM_FULL	
+ *          SEM_EMPTY(0),   init state is locked		
+ *          SEM_FULL(1)	,   init state is unlocked
  * Output:  N/A
  * Return:  0 (OK), or -1 (ERROR) if unsuccessful. 
  *======================================================================
@@ -603,32 +613,373 @@ int Sem_init(sem_t *sem, unsigned value);
  *======================================================================
  */
 int Sem_destroy(sem_t *sem);
+
+/*
+ * =====================================================================
+ * Function:Sem_post()
+ * Description: unlock (give) a semaphore (POSIX)
+ * Input:   sem -- semaphore descriptor
+ * Output:  N/A
+ * Return:  0 (OK), or -1 (ERROR) if unsuccessful.
+ *======================================================================
+ */
 int Sem_post(sem_t *sem);
+
+/*
+ * =====================================================================
+ * Function:Sem_wait()
+ * Description: lock (take) a semaphore, blocking if not available (POSIX)
+ *              If the semaphore’s value is greater than zero, then the decrement proceeds, 
+ *              and the function returns, immediately.
+ *              If the semaphore currently has  the  value zero, 
+ *              then the call blocks until either it becomes possible to perform the decrement 
+ *              (i.e., the semaphore value rises above zero), or a signal handler interrupts the call.
+ * Input:   sem -- psem
+ *          wait_ms -- wait time
+ * This argument has three selections:
+ *          WAIT_FOREVER,   lock sem if it is unlocked,
+ *                          wait forever util sem unlock by any thread if it is locked.
+ *          NO_WAIT,        lock sem if it is unlocked, 
+ *                          return immediately with error code if it is locked.
+ *          wait time,      lock sem if it is unlocked,
+ *                          wait util time out if it is locked.
+ *                          This is just support in Linux!
+ * Output:  N/A
+ * Return:  0 (OK), or -1 (ERROR) if unsuccessful. 
+ *======================================================================
+ */
 int Sem_wait(sem_t *sem, int wait_ms);
 
 //读写锁(注意:pthread_rwlock_t 必须加上编译选择选项-D_GNU_SOURCE!!!)
+/*
+ * =====================================================================
+ * Function:Pthread_rwlock_init()
+ * Description: initialize rwlock from attributes object (POSIX)
+ * This routine called int pthread_rwlock_init(
+ *                          pthread_rwlock_t *rwlock,
+ *                          const pthread_rwlockattr_t *pAttr);
+ * pAttr is NULL, default attributes are used as defined in the POSIX specification. 
+ * Input:   rwlock
+ * Output:  rwlock
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_rwlock_init(pthread_rwlock_t *rwlock);
+
+/*
+ * =====================================================================
+ * Function:Pthread_rwlock_destroy()
+ * Description: destroy the rwlock (POSIX)
+ * Input:   rwlock
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
+
+/*
+ * =====================================================================
+ * Function:Pthread_rwlock_rdlock()
+ * Description: apply a read lock to the read-write lock(POSIX)
+ *              The calling thread acquires the read lock if a writer does not hold the lock. 
+ *              It acquires the read lock even the read-lock has been locked.
+ *              This is just supported in Linux!
+ * Input:   rwlock -- prwlock
+ *          wait_ms -- wait time
+ * This argument has three selections:
+ *          WAIT_FOREVER,   lock read-lock if its write-lock is unlocked,
+ *                          wait forever util write-lock unlock if its write-lock is locked.
+ *          NO_WAIT,        lock read-lock if its write-lock is unlocked, 
+ *                          return immediately with error code if its write-lock is locked.
+ *          wait time,      lock read-lock if its write-lock is unlocked,
+ *                          wait util time out if its write-lock is locked.
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_rwlock_rdlock(pthread_rwlock_t *rwlock, int wait_ms);
+
+/*
+ * =====================================================================
+ * Function:Pthread_rwlock_wrlock()
+ * Description: 
+ *              apply a write lock to the read-write lock referenced by rwlock. 
+ *              The calling thread acquires the write lock if no other thread (reader or writer) 
+ *              holds the read-write lock  rwlock.  Otherwise, the thread shall block until it can 
+ *              acquire the lock. The calling thread may deadlock if at the time the call is made 
+ *              it holds the read-write lock (whether a read or write lock).
+ * Input:   rwlock -- prwlock
+ *          wait_ms -- wait time
+ * This argument has three selections:
+ *          WAIT_FOREVER,   lock write-lock if all the two lock is unlocked,
+ *                          wait forever util all the two lock unlock if any of read-lock or write-lock is locked.
+ *          NO_WAIT,        lock write-lock if all the two lock is unlocked, 
+ *                          return immediately with error code if any of read-lock or write-lock is locked.
+ *          wait time,      lock write-lock if all the two lock is unlocked,
+ *                          wait util time out if any of read-lock or write-lock is locked.
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_rwlock_wrlock(pthread_rwlock_t *rwlock, int wait_ms);
+
+/*
+ * =====================================================================
+ * Function:Pthread_rwlock_unlock()
+ * Description: unlock a read-write lock object
+                This rountine release  a lock held on the read-write lock object referenced by rwlock.
+                It unlocks write-lock once but unlocks read-lock as decrease the counter.  
+                If this function is called to release a read lock from the read-write lock object  and  
+                there  are  other  read locks  currently  held  on  this  read-write lock object, the 
+                read-write lock object remains in the read locked state. If this function releases 
+                the last read lock for this read-write lock object, the read-write lock object shall 
+                be put in the unlocked state with no owners.
+ * Input:   rwlock
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
 
-//条件变量
+/*
+ * =====================================================================
+ * Function:Pthread_cond_init()
+ * Description: initialize condition variable (POSIX)
+ *              This routine called 
+ *              int pthread_cond_init (
+ *                                      pthread_cond_t *     pCond,  condition variable 
+ *                                      pthread_condattr_t * pAttr   condition variable attributes 
+ *                                     )
+ *              pAttr is NULL, default attributes are used as defined in the POSIX specification. 
+ * Input:   cond 
+ * Output:  cond
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_cond_init(pthread_cond_t *cond);
+
+/*
+ * =====================================================================
+ * Function:Pthread_cond_destroy()
+ * Description: destroy a condition variable (POSIX)
+ *              If there are threads waiting on the condition variable, 
+ *              then pthread_cond_destroy( ) returns EBUSY. 
+ * Input:   cond 
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_cond_destroy(pthread_cond_t *cond);
+
+/*
+ * =====================================================================
+ * Function:Pthread_cond_wait()
+ * Description: wait on a condition
+ *              These functions atomically release mutex and cause the calling thread 
+ *              to block on the condition variable  cond.Firstly, it realese mutex;
+ *              Then, wait for the condition until the condition actived; Before return,
+ *              It lock the mutex.
+ * Input:   cond -- condition variable
+ *          mutex -- POSIX mutex
+ * NOTE:    The mutex must be locked by the calling thread when pthread_cond_wait( ) is called; 
+ *          if it is not then this function returns an error (EINVAL).
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+
+/*
+ * =====================================================================
+ * Function:Pthread_cond_timedwait()
+ * Description: wait for a condition variable with a timeout (POSIX)
+ *              These functions atomically release mutex and cause the calling thread 
+ *              to block on the condition variable  cond.Firstly, it realese mutex;
+ *              Then, wait for the condition until the condition actived or time out; 
+ *              Before return, It lock the mutex.
+ * Input:   cond -- condition variable
+ *          mutex -- POSIX mutex
+ *          wait_ms -- timeout time
+ * This argument has two selections:
+ *          NO_WAIT,        pthread_cond_timedwait() return at once without waiting condition
+ *          wait time,      pthread_cond_timedwait() wait for condition active for a while(wait_ms)
+ * NOTE:    The mutex must be locked by the calling thread when pthread_cond_wait( ) is called; 
+ *          if it is not then this function returns an error (EINVAL).
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, int wait_ms);
+
+/*
+ * =====================================================================
+ * Function:Pthread_cond_signal()
+ * Description: unblock a condition, active a waiting thread (POSIX)
+ *              If no threads are waiting on the condition variable then this routine does nothing; 
+ *              if more than one thread is waiting, then one will be released, but it is not specified which one.
+ * Input:   cond 
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_cond_signal(pthread_cond_t *cond);
+
+/*
+ * =====================================================================
+ * Function:Pthread_cond_broadcast()
+ * Description: unblock a condition, active all waiting threads (POSIX)
+ *              If no threads are waiting on the condition variable then this routine does nothing; 
+ * Input:   cond 
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Pthread_cond_broadcast(pthread_cond_t *cond);
 
 
-//POSIX 消息队列
+/*==========================================================
+ *				POSIX message queue interface
+ *=========================================================*/
+
+/*
+ * =====================================================================
+ * Function:Mq_open()
+ * Description: Creates a new POSIX message queue or opens an existing queue.  
+ *              The queue is identified by name.
+ * Input:   name -- name of queue to open/create
+ *          oflag -- open flags, O_RDWR|O_CREAT_OEXCL as default.
+ * Here are three flag bits, MUST only one of them can be set:
+ *             O_RDONLY 
+ *                 Open the message queue for receiving messages. 
+ *                 The task can use the returned message queue descriptor with mq_receive( ), but not mq_send( ). 
+ *             O_WRONLY 
+ *                 Open the message queue for sending messages. 
+ *                 The task can use the returned message queue descriptor with mq_send( ), but not mq_receive( ). 
+ *             O_RDWR 
+ *                 Open the queue for both receiving and sending messages. 
+ *                 The task can use any of the functions allowed for O_RDONLY and O_WRONLY. 
+ * Here are three combination flag bits:
+ *             O_NONBLOCK
+ *                Open  the  queue in non-blocking mode.  In circumstances where mq_receive() and mq_send() would normally
+ *                block, these functions instead fail with the error EAGAIN.
+ *             O_CREAT
+ *                Create the message queue if it does not exist.  The owner (user ID) of the message queue is set  to  the
+ *                effective  user ID of the calling process.  The group ownership (group ID) is set to the effective group
+ *                ID of the calling process.
+ *             O_EXCL 
+ *                If O_CREAT was specified in oflag, and a queue with the given name already exists, then  fail  with  the
+ *                error EEXIST.
+ *          mode -- file permission mode, 0600 as default,
+ *                  only usable while creating.
+ *          attr -- attribution 
+ * Output:  N/A
+ * Return:  A message queue descriptor, otherwise -1 (ERROR).
+ *======================================================================
+ */
 mqd_t Mq_open(const char *name, int oflag, mode_t mode, struct mq_attr *attr);
+
+/*
+ * =====================================================================
+ * Function:Mq_send()
+ * Description: send a message to a message queue (POSIX)
+ * Input:   mqdes -- message queue descriptor
+ *          msg_ptr -- message to send
+ *          meg_len -- size of message, in bytes
+ *          wait_ms
+ * This argument has three selections:
+ *              WAIT_FOREVER,   wait forever if the queue is full
+ *              NO_WAIT,        return at once if the queue if full
+ *              wait time,      return after time expire if the queue is full
+ *          msg_prio -- priority of message, 0(low)-31(high) in Posix.
+ *              high priority message will insert before low ones into queue,
+ *              the same priority will insert after the same priority ones.
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
 int Mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, int wait_ms, unsigned msg_prio);
+
+/*
+ * =====================================================================
+ * Function:Mq_receive()
+ * Description: receive a message from a message queue (POSIX)
+ * Input:   mqdes -- message queue descriptor
+ *          msg_ptr -- receive buffer to save message
+ *          meg_len -- size of buffer in bytes
+ *          wait_ms
+ * This argument has three selections:
+ *              WAIT_FOREVER,   wait forever if the queue is full
+ *              NO_WAIT,        return at once if the queue if full
+ *              wait time,      return after time expire if the queue is full
+ *          *msg_prio -- restore priority of received message
+ * NOTE:    while tasks blocking at waiting for message, it according to fifo,
+ *          it means who calls mq_receive first, who get message first.
+ * Output:  N/A
+ * Return:  The length of the selected message in bytes, otherwise -1 (ERROR).
+ *======================================================================
+ */
 ssize_t Mq_receive(mqd_t mqdes, char *msg_ptr, size_t msg_len, int wait_ms, unsigned *msg_prio);
+
+/*
+ * =====================================================================
+ * Function:Mq_getattr()
+ * Description: get message queue attributes (POSIX)
+ * Input:   mqdes -- message queue descriptor
+ *          mqstat -- buffer in which to return attributes
+             struct mq_attr 
+             {
+                 long mq_flags;        Flags: 0 or O_NONBLOCK 
+                 long mq_maxmsg;       Max. # of messages on queue 
+                 long mq_msgsize;      Max. message size (bytes) 
+                 long mq_curmsgs;      # of messages currently in queue 
+             }
+ * Output:  N/A
+ * Return:  0 (OK) if message attributes can be determined, otherwise -1 (ERROR).
+ *======================================================================
+ */
 int Mq_getattr(mqd_t mqdes, struct mq_attr *mqstat);
+
+/*
+ * =====================================================================
+ * Function:Mq_setattr()
+ * Description: set message queue attributes (POSIX),Only mq_flags can be set!
+ * Input:   mqdes -- message queue descriptor
+ *          mqstat -- buffer in which to return attributes
+             struct mq_attr 
+             {
+                 long mq_flags;        Flags: 0 or O_NONBLOCK 
+                 long mq_maxmsg;       Max. # of messages on queue 
+                 long mq_msgsize;      Max. message size (bytes) 
+                 long mq_curmsgs;      # of messages currently in queue 
+             }
+            The only attribute that can be modified is the setting of the O_NONBLOCK flag in mq_flags.  
+            The other fields  in newattr are ignored. 
+ * Output:  N/A
+ * Return:  0 (OK) if message attributes can be determined, otherwise -1 (ERROR).
+ *======================================================================
+ */
 int Mq_setattr(mqd_t mqdes, const struct mq_attr *mqstat, struct mq_attr *omqstat);
+
+/*
+ * =====================================================================
+ * Function:Mq_unlink()
+ * Description: remove a message queue (POSIX)
+ * Input:   name -- name of message queue
+ * Output:  N/A
+ * Return:  0 (OK) if the message queue is unlinked successfully, otherwise -1 (ERROR). 
+ *======================================================================
+ */
 int Mq_unlink(const char *name);
+
+/*
+ * =====================================================================
+ * Function:Mq_close()
+ * Description: close a message queue (POSIX)
+ * Input:   mqdes -- message queue descriptor
+ * Output:  N/A
+ * Return:  0 (OK) if the message queue is closed successfully, otherwise -1 (ERROR).
+ *======================================================================
+ */
 int Mq_close(mqd_t mqdes);
 
 #ifdef __cplusplus

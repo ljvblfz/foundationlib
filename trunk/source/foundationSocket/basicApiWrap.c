@@ -249,8 +249,7 @@ int ConnectWithTimeout(int sockfd, struct sockaddr*addrs, int adrsLen,struct tim
     }
 
     return ret;
-#endif
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
     /* TODO need to fill in */
 #endif
 }

@@ -150,8 +150,7 @@ int Pthread_mutex_lock(pthread_mutex_t *mutex, int wait_ms)
 		{
 			debug_info(DEBUG_LEVEL_3, "pthread_mutex_timedlock() failed!\n");	
 		}
-#endif
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
         printf("This function is not yet available Vxworks!\n");
         rval = -1;
 #endif
@@ -308,8 +307,7 @@ int Sem_wait(sem_t *sem, int wait_ms)
 		{
             /* debug_info(DEBUG_LEVEL_3, "sem_timedwait() failed!\n");	 */
 		}
-#endif
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
         printf("This function is not yet available Vxworks!\n");
         rval = -1;
 #endif
@@ -368,6 +366,7 @@ int Sem_close(sem_t *sem)
 *************************************************/
 int Pthread_rwlock_init(pthread_rwlock_t *rwlock)
 {
+#ifdef LINUX_OS
 	int	rval;
 
 	if(rwlock == NULL)
@@ -379,6 +378,10 @@ int Pthread_rwlock_init(pthread_rwlock_t *rwlock)
 	{
 		debug_info(DEBUG_LEVEL_4, "pthread_rwlock_init() failed!\n");	
 	}
+#elif VXWORKS_OS
+    printf("This function is not yet available Vxworks!\n");
+    rval = -1;
+#endif
 
 	return rval;
 }
@@ -392,6 +395,7 @@ int Pthread_rwlock_init(pthread_rwlock_t *rwlock)
 *************************************************/
 int Pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
 {
+#ifdef LINUX_OS
 	int	rval;
 
 	if(rwlock == NULL)
@@ -403,7 +407,10 @@ int Pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
 	{
 		debug_info(DEBUG_LEVEL_4, "pthread_rwlock_destroy() failed!\n");	
 	}
-
+#elif VXWORKS_OS
+    printf("This function is not yet available Vxworks!\n");
+    rval = -1;
+#endif
 	return rval;
 }
 
@@ -417,6 +424,7 @@ int Pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
 *************************************************/
 int Pthread_rwlock_rdlock(pthread_rwlock_t *rwlock, int wait_ms)
 {
+#ifdef LINUX_OS
 	int	rval = 0;
 	//struct timespec timeout;
 
@@ -449,6 +457,10 @@ int Pthread_rwlock_rdlock(pthread_rwlock_t *rwlock, int wait_ms)
 		}
 	}
 #endif
+#elif VXWORKS_OS
+        printf("This function is not yet available Vxworks!\n");
+        rval = -1;
+#endif
 
 	return rval;
 }
@@ -463,6 +475,7 @@ int Pthread_rwlock_rdlock(pthread_rwlock_t *rwlock, int wait_ms)
 *************************************************/
 int Pthread_rwlock_wrlock(pthread_rwlock_t *rwlock, int wait_ms)
 {
+#ifdef LINUX_OS
 	int	rval = 0;
 	//struct timespec timeout;
 
@@ -495,6 +508,10 @@ int Pthread_rwlock_wrlock(pthread_rwlock_t *rwlock, int wait_ms)
 		}
 	}
 #endif
+#elif VXWORKS_OS
+        printf("This function is not yet available Vxworks!\n");
+        rval = -1;
+#endif
 
 	return rval;
 }
@@ -508,6 +525,7 @@ int Pthread_rwlock_wrlock(pthread_rwlock_t *rwlock, int wait_ms)
 *************************************************/
 int Pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 {
+#ifdef LINUX_OS
 	int	rval;
 
 	if(rwlock == NULL)
@@ -519,6 +537,10 @@ int Pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 	{
 		debug_info(DEBUG_LEVEL_4, "pthread_rwlock_unlock() failed!\n");	
 	}
+#elif VXWORKS_OS
+        printf("This function is not yet available Vxworks!\n");
+        rval = -1;
+#endif
 
 	return rval;
 }

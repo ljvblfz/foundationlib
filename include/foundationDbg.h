@@ -2,12 +2,6 @@
  *  Copyright (c) Artificial Intelligence Infinity.
  *  Filename: foundationDbg.h 
  *  Description: debug infomation API header 
- *      debug api function: void debug_info(int debugLevel, const char *fmt, ...)
- *      this function has 4 level
-        DEBUG_LEVEL_1://normol debug information
-        DEBUG_LEVEL_2://important debug information
-        DEBUG_LEVEL_3://slight error debug information
-        DEBUG_LEVEL_4://fatal error debug information
  *  Author: caoyun
  *  Create:2010-01-25 
  *  Modification history:

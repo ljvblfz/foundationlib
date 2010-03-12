@@ -95,13 +95,39 @@ int Mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, int wait_ms, unsig
 {
 	int rval;
 	struct timespec timeout;
+    struct mq_attr omq_attr;
 
-	if (wait_ms == WAIT_FOREVER)
+	if (wait_ms == NO_WAIT)
 	{
-		if((rval = mq_send(mqdes, msg_ptr, msg_len, msg_prio)) != 0)
+        /* set msgQ nonblock, it returns immediately if msgQ blocking */
+        omq_attr.mq_flag = O_NONBLOCK;
+		if((rval = mq_setattr(mqdes, &omq_attr, NULL)) != 0)
 		{
-			debug_info(DEBUG_LEVEL_3, "mq_send() failed!\n");	
+			debug_info(DEBUG_LEVEL_3, "mq_setattr() failed!\n");	
 		}
+        else
+        {
+            if((rval = mq_send(mqdes, msg_ptr, msg_len, msg_prio)) != 0)
+            {
+                debug_info(DEBUG_LEVEL_3, "mq_send() failed!\n");	
+            }
+        }
+	}
+	else if (wait_ms == WAIT_FOREVER) 
+	{
+        /* set msgQ block, it waits forever if msgQ blocking */
+        omq_attr.mq_flag = 0;
+		if((rval = mq_setattr(mqdes, &omq_attr, NULL)) != 0)
+		{
+			debug_info(DEBUG_LEVEL_3, "mq_setattr() failed!\n");	
+		}
+        else
+        {
+            if((rval = mq_send(mqdes, msg_ptr, msg_len, msg_prio)) != 0)
+            {
+                debug_info(DEBUG_LEVEL_3, "mq_send() failed!\n");	
+            }
+        }
 	}
 	else
 	{
@@ -111,8 +137,7 @@ int Mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, int wait_ms, unsig
 		{
 			debug_info(DEBUG_LEVEL_3, "mq_timedsend() failed!\n");	
 		}
-#endif
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
         printf("This function is not yet available Vxworks!\n");
         rval = -1;
 #endif
@@ -152,8 +177,7 @@ ssize_t Mq_receive(mqd_t mqdes, char *msg_ptr, size_t msg_len, int wait_ms, unsi
 		{
 			//debug_info(DEBUG_LEVEL_3, "mq_timedrecrive() failed!\n");	
 		}
-#endif
-#ifdef VXWORKS_OS
+#elif VXWORKS_OS
         printf("This function is not yet available Vxworks!\n");
         rval = -1;
 #endif

@@ -18,11 +18,27 @@ extern "C"
 {
 #endif
 
-//unsigned int sleep(unsigned int seconds);
-//int usleep(useconds_t usec);
-int msleep(unsigned int ms);
+/*
+ * =====================================================================
+ * Function:getSysClkRate()
+ * Description: Get system clock Rate, times/second
+ * Input:   N/A
+ * Output:  N/A
+ * Return:  clock rate on SUCCESS, -1 otherwise.
+ *======================================================================
+ */
+int getSysClkRate(void);
+
+/*
+ * =====================================================================
+ * Function:getSysMsPerTick()
+ * Description: Get times of one tick, in millisecond.
+ * Input:   N/A
+ * Output:  N/A
+ * Return:  times of millisencod on SUCCESS, -1 otherwise.
+ *======================================================================
+ */
 int getSysMsPerTick(void);
-int taskDelay(int ticks);
 
 /*=========================================================
  *						定时相关API

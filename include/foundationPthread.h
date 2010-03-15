@@ -35,7 +35,7 @@ extern "C"
  *          args -- amount of arguments, max to 10
  *          ... -- argument
  * Output:  ptid
- * Return:  Calling thread's ID. 
+ * Return:  0/errno
  *======================================================================
  */
 int pthreadSpawn(pthread_t *ptid, int priority, size_t stacksize, void *funcptr, unsigned args, ...);

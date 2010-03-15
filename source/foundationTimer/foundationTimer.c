@@ -30,23 +30,6 @@ int getSysMsPerTick(void)
 	return ms;	
 }
 
-#if 0
-int msleep(unsigned int ms)
-{
-	return usleep(ms*1000);
-}
-
-int taskDelay(int ticks)
-{
-	int msPertick;
-
-	msPertick = getSysMsPerTick();
-	msleep(msPertick*ticks);
-
-	return 0;	
-}
-#endif
-
 
 /*=========================================================
  *						定时相关API

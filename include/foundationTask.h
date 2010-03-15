@@ -19,9 +19,9 @@ extern "C"
 #endif
 
 #ifdef LINUX_OS 
-    #define TASK_ID int
+    typedef pthread_t   TASK_ID 
 #elif VXWORKS_OS
-    #define TASK_ID pthread_t
+    typedef int         TASK_ID 
 #endif
 
 /*==========================================================

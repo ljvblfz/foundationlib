@@ -19,9 +19,17 @@ extern "C"
 #endif
 
 #ifdef LINUX_OS 
-    #define MSG_QUEUE_ID MSG_Q_ID
+    typedef struct mqd_t*   MSG_QUEUE_ID 
 #elif VXWORKS_OS
-    #define MSG_QUEUE_ID mqd_t
+    typedef struct MSG_Q_ID MSG_QUEUE_ID 
+#endif
+
+#ifndef MSG_PRI_NORMAL
+#define MSG_PRI_NORMAL 0
+#endif
+
+#ifndef MSG_PRI_URGENT
+#define MSG_PRI_URGENT 1
 #endif
 
 /*==========================================================
@@ -45,9 +53,11 @@ extern "C"
  *                      In Linux, the queue is identified by name.
  *          maxMsgs -- max message amount in queue
  *          maxMsgLength -- max size(bytes) of each message  
- * NOTE:    
+ * NOTE:    Message in queue ordered by the msg_priority. 
+ *          High priority added before low ones,the same priority ordered one after one according to fifo.
+ *          Tasks waiting for receiving messages if no available, ordered by fifo.
  * Output:  N/A
- * Return:  OK on success or ERROR otherwise.
+ * Return:  MsgQId on success or NULL otherwise.
  *======================================================================
  */
 MSG_QUEUE_ID MsgQCreate(const char* mqname, int maxMsgs, int maxMsgLength);
@@ -73,9 +83,12 @@ int MsgQDelete(const char* mqname, MSG_QUEUE_ID msgQId);
  *          msgBuffer   -- message to send
  *          msgLength   -- length of the message to be sent
  *          timeTick    -- wait time (in ticks)
+ *              WAIT_FOREVER,   this routine block until queue not full
+ *              NO_WAIT,        this routine return immediately with errorno
+ *              wait time,      this routine block until queue not full or time up
  *          msgPriority -- MSG_PRI_NORMAL or MSG_PRI_URGENT
- *              MSG_PRI_NORMAL add the message to the tail of the queue
- *              MSG_PRI_URGENT add the message to the head of the queue
+ *              MSG_PRI_NORMAL(0) add the message to the tail of the queue
+ *              MSG_PRI_URGENT(1) add the message to the head of the queue
  * Output:  N/A
  * Return:  OK on success or ERROR otherwise.
  *======================================================================
@@ -90,6 +103,9 @@ int MsgQSend(MSG_QUEUE_ID msgQId, const char* msgBuffer, int msgLength, int time
  *          recvBuffer  -- buffer to save message
  *          bufLength   -- length of recvBuffer
  *          timeTick    -- wait time (in ticks)
+ *              WAIT_FOREVER,   this routine block until message available 
+ *              NO_WAIT,        this routine return immediately with errorno
+ *              wait time,      this routine block until message available or time up
  * Output:  N/A
  * Return:  OK on success or ERROR otherwise.
  *======================================================================

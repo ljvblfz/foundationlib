@@ -39,15 +39,18 @@ TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, i
 
 	if (funcptr == NULL || argnums > 10) 
 	{
-		return -1;
+        debug_info(DEBUG_LEVEL_4, "%s %s %d:input error!",__FILE__, __FUNCTION__, __LINE__);
+		return (-1);
 	}
 
     rval = pthreadSpawn(&pid, priority, stacksize, funcptr, argnums, ...);
     if (rval != 0)
     {
+        debug_info(DEBUG_LEVEL_4, "%s %s %d:pthreadSpawn error!",__FILE__, __FUNCTION__, __LINE__);
         return -1;
     }
     return pid;
+
 #elif VXWORKS_OS
 	void *arg[] = {[0 ... 9] = NULL};
 	va_list ap;
@@ -55,7 +58,8 @@ TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, i
 
 	if (funcptr == NULL || argnums > 10) 
 	{
-		return -1;
+        debug_info(DEBUG_LEVEL_4, "%s %s %d:input error!",__FILE__, __FUNCTION__, __LINE__);
+		return (-1);
 	}
 
 	va_start(ap, argnums);
@@ -70,7 +74,8 @@ TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, i
                     arg[5], arg[6], arg[7], arg[8], arg[9]);
     if (tid == -1)
     {
-        return -1;
+        debug_info(DEBUG_LEVEL_4, "%s %s %d:pthreadSpawn error!",__FILE__, __FUNCTION__, __LINE__);
+        return (-1);
     }
     return tid;
 #endif
@@ -106,18 +111,26 @@ TASK_ID TaskIdSelf(void)
  */
 int TaskIdVerify(TASK_ID taskId)
 {
+#ifdef LINUX_OS
     int rval;
 
-#ifdef LINUX_OS
     rval = pthreadIdVerify(taskId);
-#elif VXWORKS_OS
-    rval = taskIdVerify(taskId);
-#endif
     if (rval != 0)
     {
-        return -1;
+        return (-1);
     }
     return 0;
+
+#elif VXWORKS_OS
+    int rval;
+
+    rval = taskIdVerify(taskId);
+    if (rval != 0)
+    {
+        return (-1);
+    }
+    return 0;
+#endif
 }
 
 /*
@@ -138,6 +151,7 @@ void TaskSleep(int sleepTick)
     int msPerTick;
     msPerTick = getSysMsPerTick();
     usleep(sleepTick*msPerTick*1000);
+
 #elif VXWORKS_OS
     taskDelay(sleepTick);
 #endif

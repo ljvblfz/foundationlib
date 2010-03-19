@@ -46,6 +46,7 @@ extern "C"
 
 #elif VXWORKS_OS
 /* TODO need collect */
+
 #endif
 
 

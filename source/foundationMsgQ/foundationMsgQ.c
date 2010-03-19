@@ -35,28 +35,30 @@ MSG_QUEUE_ID MsgQCreate(const char* mqname, int maxMsgs, int maxMsgLength)
 {
 #ifdef LINUX_OS
     mq_attr mqAttr = {0};
-    mqd_t* msgQId;
+    mqd_t* msgQId = NULL;
 
     if (mqname == NULL)
     {
-        debug_info(DEBUG_LEVEL_4, "MsgQCreate() mqname NULL!");
-        return -1;
+        return NULL;
     }
+    /* allocate memory in MsgQCreate
+     * free memory later in MsgQDelete */
     msgQId = (mqd_t*)malloc(sizeof(mqd_t));
     if (msgQId == NULL)
     {
-        return -1;
+        return NULL;
     }
     
     mqAttr.mq_maxmsg = maxMsgs;
     mqAttr.mq_msgsize = maxMsgLength;
-    *msgQId = Mq_open(mqname, O_CREAT|O_EXCL|O_RDWR, 0600, &mqAttr);
+    *msgQId = Mq_open(mqname, O_CREAT|O_EXCL|O_RDWR, 0600, (struct mq_attr*)&mqAttr);
     if (*msgQId == -1)
     {
         free(msgQId);
         return NULL;
     }
     return msgQId;
+
 #elif VXWORKS_OS
     /* create msgQ with MSG_Q_FIFO, pending tasks in fifo order, 
      * the same with  linux posix queue */
@@ -80,17 +82,17 @@ int MsgQDelete(const char* mqname, MSG_QUEUE_ID msgQId)
 #ifdef LINUX_OS
     if (mqname == NULL || msgQId == NULL)
     {
-        debug_info(DEBUG_LEVEL_4, "MsgQDelete() mqname NULL!");
-        return -1;
+        return (-1);
     }
+
     free(msgQId);
     msgQId = NULL;
     return Mq_unlink(mqname);
+
 #elif VXWORKS_OS
     if (msgQId == NULL)
     {
-        debug_info(DEBUG_LEVEL_4, "MsgQDelete() msgQId NULL!");
-        return -1;
+        return (-1);
     }
     return msgQDelete(msgQId);
 #endif
@@ -119,13 +121,14 @@ int MsgQSend(MSG_QUEUE_ID msgQId, const char* msgBuffer, int msgLength, int time
 #ifdef LINUX_OS
     if (msgQId == NULL || msgBuffer == NULL)
     {
-        return -1;
+        return (-1);
     }
     return Mq_send((mqd_t*)msgQId, msgBuffer, msgLength, timeTick, msgPriority);
+
 #elif VXWORKS_OS
     if (msgQId == NULL || msgBuffer == NULL)
     {
-        return -1;
+        return (-1);
     }
     return msgQSend(msgQId, msgBuffer, msgLength, timeTick, msgPriority);
 #endif
@@ -151,13 +154,14 @@ int MsgQReceive(MSG_QUEUE_ID msgQId, char* recvBuffer, int bufLength, int timeTi
 #ifdef LINUX_OS
     if (msgQId == NULL || recvBuffer == NULL)
     {
-        return -1;
+        return (-1);
     }
     return Mq_receive((mqd_t*)msgQId, recvBuffer, bufLength, timeTick, NULL);
+
 #elif VXWORKS_OS
     if (msgQId == NULL || recvBuffer == NULL)
     {
-        return -1;
+        return (-1);
     }
     return msgQReceive(msgQId, recvBuffer, bufLength, timeTick);
 #endif
@@ -180,20 +184,20 @@ int MsgQNumMsgs(MSG_QUEUE_ID msgQId)
 
     if (msgQId == NULL)
     {
-        return -1;
+        return (-1);
     }
      
-    rval = Mq_getattr((mqd_t*)msgQId, &mqAttr);
+    rval = Mq_getattr((mqd_t*)msgQId, (struct mq_attr*)&mqAttr);
     if (rval != 0)
     {
         debug_info(DEBUG_LEVEL_4, "MsgQNumMsgs() Mq_getattr error!");
-        return -1;
+        return (-1);
     }
     return mqAttr.mq_curmsgs;
 #elif VXWORKS_OS
     if (msgQId == NULL)
     {
-        return -1;
+        return (-1);
     }
     return msgQNumMsgs(msgQId);
 #endif

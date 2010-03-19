@@ -21,6 +21,22 @@ extern "C"
 {
 #endif
 
+#ifndef NO_WAIT
+#define NO_WAIT	        0           /* time method */
+#endif
+
+#ifndef WAIT_FOREVER
+#define WAIT_FOREVER    (-1)        /* time method */
+#endif
+
+#ifndef SEM_EMPTY
+#define	SEM_EMPTY		0           /* Sem_init locked */
+#endif
+
+#ifndef SEM_FULL
+#define	SEM_FULL		1           /* Sem_init unlocked */
+#endif
+
 /*==========================================================
  *				POSIX thread library interface
  *=========================================================*/
@@ -515,11 +531,6 @@ int Sched_rr_get_interval(pid_t pid, struct timespec *tp);
 /*==========================================================
  *					POSIX thread synchronism
  *=========================================================*/
-
-#define NO_WAIT	        0           /* time method */
-#define WAIT_FOREVER    (-1)        /* time method */
-#define	SEM_EMPTY		0           /* Sem_init locked */
-#define	SEM_FULL		1           /* Sem_init unlocked */
 
 /*
  * =====================================================================

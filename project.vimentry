@@ -1,7 +1,7 @@
 -- auto-gen settings (DO NOT MODIFY) --
 
-CWD=E:/AII/foundationlib
-Version=21
+CWD=D:/foundationlib
+Version=23
 VimEntryName=project
 VimfilesDirName=_vimfiles_project
 
@@ -16,6 +16,7 @@ Symbol=./_vimfiles_project/symbol
 Macro=./_vimfiles_project/macro
 Cscope=./_vimfiles_project/cscope.out
 Inherits=./_vimfiles_project/inherits
+Bookmarks=./_vimfiles_project/bookmarks
 
 vimentryRefs+=
 
@@ -38,7 +39,7 @@ vsFindResult2=./_vimfiles_project/vs_find_results_2
 
 -- vimwiki Settings --
 
-wikiHome=./_doc/
-wikiHomeHtml=./wiki_html/
+wikiHome=./_doc
+wikiHomeHtml=./wiki_html
 wikiHtmlHeader=./_doc/template/header.tpl
 

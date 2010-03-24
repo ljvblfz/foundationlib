@@ -19,9 +19,9 @@ extern "C"
 #endif
 
 #ifdef LINUX_OS
-typedef pthread_mutex_t* MUTEX_ID 
+typedef pthread_mutex_t* MUTEX_ID; 
 #elif VXWORKS
-typedef SEM_ID           MUTEX_ID 
+typedef SEM_ID           MUTEX_ID; 
 #endif
 
 /*

@@ -34,7 +34,7 @@ MUTEX_ID MutexCreate(void)
     mutexId = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
     if (mutexId == NULL)
     {
-        return (-1);
+        return NULL;
     }
      
     rval = Pthread_mutex_init(mutexId);

@@ -17,7 +17,8 @@
  *
  *
  **************************************************************************************/ 
-#include "foundationInclude.h"
+#include "foundationSocket.h"
+#include "foundationDbg.h"
 
 /*=======================================================
  *				»ù±¾¡¡sock API¡¡Wrapper

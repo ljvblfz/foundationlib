@@ -35,8 +35,7 @@ SEM_ID SemCreate(unsigned initValue)
         return NULL;
     }
 
-    /* shared semaphore between threads of a process */
-    rval = Sem_init((sem_t*)semId, 0, initValue);
+    rval = Sem_init((sem_t*)semId, initValue);
     if (rval != 0)
     {
         free(semId);
@@ -58,7 +57,7 @@ SEM_ID SemCreate(unsigned initValue)
  * Return:  On success zero; on failure -1.
  *======================================================================
  */
-int SemDelete(SEM_ID semId);
+int SemDelete(SEM_ID semId)
 {
 #ifdef LINUX_OS
     int rval;
@@ -94,7 +93,7 @@ int SemDelete(SEM_ID semId);
  * Return:  On success zero; on failure -1.
  *======================================================================
  */
-int SemLock(SEM_ID semId, int timeTick);
+int SemLock(SEM_ID semId, int timeTick)
 {
 #ifdef LINUX_OS
     if (semId == NULL)
@@ -121,7 +120,7 @@ int SemLock(SEM_ID semId, int timeTick);
  * Return:  On success zero; on failure -1.
  *======================================================================
  */
-int SemUnlock(SEM_ID semId);
+int SemUnlock(SEM_ID semId)
 {
 #ifdef LINUX_OS
     if (semId == NULL)

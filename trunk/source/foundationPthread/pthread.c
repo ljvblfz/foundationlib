@@ -10,7 +10,8 @@
  *
  *
  **************************************************************************************/ 
-#include "foundationInclude.h"
+#include "foundationPthread.h"
+#include "foundationDbg.h"
 
 
 typedef void *(*FUNCPTR)(void*, void*, void*, void*, void*, void*, void*, void*, void*, void*);

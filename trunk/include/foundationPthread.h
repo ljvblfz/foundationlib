@@ -198,6 +198,17 @@ int pthreadIdVerify(pthread_t tid);
 
 /*
  * =====================================================================
+ * Function:Pthread_attr_set()
+ * Description: set thread at priority and stacksize
+ * Input:   priority
+ *          stacksize
+ * Output:  N/A
+ * Return:  On success zero; on failure a non-zero error code.
+ *======================================================================
+ */
+int Pthread_attr_set(pthread_attr_t *attr, int priority, size_t stacksize);
+/*
+ * =====================================================================
  * Function:Pthread_attr_init()
  * Description: initialize thread attributes object (POSIX)
  * Input:   attr -- thread attributes

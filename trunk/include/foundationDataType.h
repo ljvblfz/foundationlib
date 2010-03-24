@@ -67,11 +67,6 @@ typedef unsigned char UCHAR;
 typedef enum {False, True}BOOL;
 #endif
 
-#ifndef TYPE_LOGICAL
-#define TYPE_LOGICAL
-typedef enum {False,True}LOGICAL;
-#endif
-
 #ifndef TYPE_UINT8
 #define TYPE_UINT8
 typedef unsigned char UINT8;

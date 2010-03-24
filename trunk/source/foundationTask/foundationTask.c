@@ -9,8 +9,10 @@
  *
  *
  **************************************************************************************/ 
-#include "foundationInclude.h"
 #include "foundationPthread.h"
+#include "foundationTask.h"
+#include "foundationTime.h"
+#include "foundationDbg.h"
 
 
 /*
@@ -34,8 +36,11 @@
 TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, int argnums, ...)
 {
 #ifdef LINUX_OS
+	void *arg[] = {[0 ... 9] = NULL};
+	va_list ap;
     pthread_t pid;
     int rval;
+    int i;
 
 	if (funcptr == NULL || argnums > 10) 
 	{
@@ -43,7 +48,16 @@ TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, i
 		return (-1);
 	}
 
-    rval = pthreadSpawn(&pid, priority, stacksize, funcptr, argnums, ...);
+	va_start(ap, argnums);
+	for (i = 0; i < argnums; i++)
+	{
+		arg[i] = va_arg(ap, void *);
+	}
+	va_end(ap);
+
+    rval = pthreadSpawn(&pid, priority, stacksize, funcptr, argnums, 
+                        arg[0], arg[1], arg[2], arg[3], arg[4],
+                        arg[5], arg[6], arg[7], arg[8], arg[9]);
     if (rval != 0)
     {
         debug_info(DEBUG_LEVEL_4, "%s %s %d:pthreadSpawn error!",__FILE__, __FUNCTION__, __LINE__);
@@ -55,6 +69,7 @@ TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, i
 	void *arg[] = {[0 ... 9] = NULL};
 	va_list ap;
     int tid;
+    int i;
 
 	if (funcptr == NULL || argnums > 10) 
 	{

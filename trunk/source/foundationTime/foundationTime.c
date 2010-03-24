@@ -49,6 +49,58 @@ unsigned long convertTime (unsigned int year, unsigned int mon,
 
 /*
  * =====================================================================
+ * Function:setCalendarTime()
+ * Description: Set time in second
+ * Input:  calendarTime -- time in second
+ * Output:   N/A
+ * Return:  0 on SUCCESS, -1 otherwise.
+ *======================================================================
+ */
+int setCalendarTime(time_t calendarTime)
+{
+#ifdef LINUX_OS
+    struct timeval newtime;
+
+    newtime.tv_sec = calendarTime;
+    newtime.tv_usec = 0;
+
+    return settimeofday((const struct timeval*)&newtime, NULL);
+#elif VXWORKS_OS
+    struct timespec newtime;
+
+    newtime.tv_sec = calendarTime;
+    newtime.tv_nsec = 0;
+
+	return clock_settime (CLOCK_REALTIME, (const struct timespec*)&newtime);
+#endif
+}
+
+/*
+ * =====================================================================
+ * Function:getCalendarTime()
+ * Description: Get time in second
+ * Input:  calendarTime -- save space of time in second
+ * Output:   N/A
+ * Return:  0 on SUCCESS, -1 otherwise.
+ *======================================================================
+ */
+int getCalendarTime(time_t* calendarTime)
+{
+    time_t curCalendarTime; 
+
+    if (calendarTime == NULL)
+    {
+        return (-1);
+    }
+     
+    curCalendarTime = time(NULL);
+    *calendarTime = curCalendarTime;
+
+    return 0;
+}
+
+/*
+ * =====================================================================
  * Function:setNormalTime()
  * Description: Set time in our struct
  * Input:  normalTime
@@ -67,6 +119,7 @@ unsigned long convertTime (unsigned int year, unsigned int mon,
  */
 int setNormalTime(const TIME_NORMAL* normalTime)
 {
+#ifdef LINUX_OS
     struct timeval newtime;
     unsigned long timeSec;
 
@@ -83,11 +136,27 @@ int setNormalTime(const TIME_NORMAL* normalTime)
     timeSec = convertTime(normalTime->year, normalTime->month, normalTime->day,
                           normalTime->hour, normalTime->minite, normalTime->second);
     newtime.tv_sec = timeSec;
-    newtime.tv_nsec = 0;
-#ifdef LINUX_OS
+    newtime.tv_usec = 0;
     return settimeofday((const struct timeval*)&newtime, NULL);
 #elif VXWORKS_OS
-	return clock_settime (CLOCK_REALTIME, (const struct timeval*)&newtime);
+    struct timespec newtime;
+    unsigned long timeSec;
+
+    if (normalTime == NULL)
+    {
+        return (-1);
+    }
+    if (normalTime->year > 2038 ||normalTime->month > 12 ||normalTime->day > 31
+        ||normalTime->hour > 23 ||normalTime->minite > 59 ||normalTime->second > 59)
+    {
+        return (-1);
+    }
+
+    timeSec = convertTime(normalTime->year, normalTime->month, normalTime->day,
+                          normalTime->hour, normalTime->minite, normalTime->second);
+    newtime.tv_sec = timeSec;
+    newtime.tv_nsec = 0;
+	return clock_settime (CLOCK_REALTIME, (const struct timespec*)&newtime);
 #endif
 }
 
@@ -116,7 +185,7 @@ int getNormalTime(TIME_NORMAL* normalTime)
     /*     int tm_sec;	|+ seconds after the minute	- [0, 59] +|  */
     /*     int tm_min;	|+ minutes after the hour	- [0, 59] +|  */
     /*     int tm_hour;	|+ hours after midnight		- [0, 23] +|  */
-    /*     int tm_mday;	|+ day of the month		- [1, 31] +|      */
+    /*     int tm_mday;	|+ day of the month		    - [1, 31] +|      */
     /*     int tm_mon;	|+ months since January		- [0, 11] +|  */
     /*     int tm_year;	|+ years since 1900	+|                    */
     /*     int tm_wday;	|+ days since Sunday		- [0, 6] +|   */
@@ -132,14 +201,13 @@ int getNormalTime(TIME_NORMAL* normalTime)
     }
      
     curCalendarTime = time(NULL);
-    gmtime_r((const time_t*)&curCalendarTime, (struct tm*)curGmTime);
+    gmtime_r((const time_t*)&curCalendarTime, (struct tm*)&curGmTime);
     normalTime->second = curGmTime.tm_sec;
     normalTime->minite = curGmTime.tm_min;
     normalTime->hour = curGmTime.tm_hour;
     normalTime->day = curGmTime.tm_mday;
     normalTime->month = curGmTime.tm_mon + 1;
     normalTime->year = curGmTime.tm_year + 1900;
-    normalTime->wday = curGmTime.tm_wday;
 
     return 0;
 }
@@ -178,106 +246,5 @@ int getSysMsPerTick(void)
 	ms = (1*1000)/getSysClkRate();		//系统时钟节拍：10毫秒
 
 	return ms;	
-}
-
-
-/*=========================================================
- *						定时相关API
- * =======================================================*/
-/*************************************************
-* Function:		  Timer_create()
-* Description:    创建POSIX实时扩展定时器 
-* Input:          clockId---定时器类型
-* Output:         eventHandle---定时器到期时处理方式 
-*				  timerId---创建的定时器ID
-* Return:         0/errno 
-*************************************************/
-int Timer_create(clockid_t clockId, struct sigevent *eventHandle, timer_t *timerId)
-{
-	int rval;
-
-	if((rval = timer_create(clockId, eventHandle, timerId)) != 0)
-	{
-		debug_info(DEBUG_LEVEL_4, "%s%d: timer_create error!\n", __FILE__, __LINE__);	
-	}
-
-	return rval;	
-}
-
-/*************************************************
-* Function:		  Timer_delete()
-* Description:    删除已创建的POSIX实时扩展定时器 
-* Input:          timer---定时器
-* Output:         N/A 
-* Return:         0/errno 
-*************************************************/
-int Timer_delete(timer_t timer)
-{
-	int rval;
-
-	if((rval = timer_delete(timer)) != 0)
-	{
-		debug_info(DEBUG_LEVEL_4, "%s%d: timer_delete error!\n", __FILE__, __LINE__);	
-	}
-
-	return rval;	
-}
-
-/*************************************************
-* Function:		  Timer_getoverrun()
-* Description:    根据timerID获取定时器overruns 
-* Input:          clockId---定时器类型
-* Output:         N/A 
-* Return:         overruns/errno 
-*************************************************/
-int	Timer_getoverrun(timer_t timerId)
-{
-	int overruns; 
-
-	if((overruns = timer_getoverrun(timerId)) == EINVAL)
-	{
-		debug_info(DEBUG_LEVEL_4, "%s%d: timer_getoverrun error!\n", __FILE__, __LINE__);	
-	}
-
-	return overruns;
-}
-
-/*************************************************
-* Function:		  Timer_gettime()
-* Description:    根据timerID获取定时器剩余定时时间 
-* Input:          clockId---定时器类型
-* Output:         ovalue---定时器剩余定时时间 
-* Return:         0/errno 
-*************************************************/
-int Timer_gettime(timer_t timerId, struct itimerspec *ovalue)
-{
-	int rval;
-	
-	if((rval = timer_gettime(timerId, ovalue)) != 0)
-	{
-		debug_info(DEBUG_LEVEL_4, "%s%d: timer_gettime error!\n", __FILE__, __LINE__);	
-	}
-
-	return rval;	
-}
-
-/*************************************************
-* Function:		  Timer_settime()
-* Description:    根据timerID设置定时器 
-* Input:          clockId---定时器类型
-* Output:         value---定时器定时时间 
-*				  ovalue---定时器剩余定时时间 
-* Return:         0/errno 
-*************************************************/
-int Timer_settime(timer_t timerId, int flags, const struct itimerspec *value, struct itimerspec *ovalue)
-{
-	int rval;
-	
-	if((rval = timer_settime(timerId, flags, value, ovalue)) != 0)
-	{
-		debug_info(DEBUG_LEVEL_4, "%s%d: timer_settime error!\n", __FILE__, __LINE__);	
-	}
-
-	return rval;	
 }
 

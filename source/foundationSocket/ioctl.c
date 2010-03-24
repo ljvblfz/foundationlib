@@ -10,7 +10,8 @@
  *
  *
  **************************************************************************************/ 
-#include "foundationInclude.h"
+#include "foundationSocket.h"
+#include "foundationDbg.h"
 
 /*************************************************
 * Function:       ioctl_sockBuf_datas()

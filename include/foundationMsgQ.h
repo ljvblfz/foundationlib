@@ -12,6 +12,7 @@
 #ifndef _MSGQ_API_H
 #define _MSGQ_API_H
 
+#include "foundationInclude.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -19,9 +20,9 @@ extern "C"
 #endif
 
 #ifdef LINUX_OS 
-typedef struct mqd_t*   MSG_QUEUE_ID 
+typedef mqd_t*          MSG_QUEUE_ID;
 #elif VXWORKS_OS
-typedef struct MSG_Q_ID MSG_QUEUE_ID 
+typedef struct MSG_Q_ID MSG_QUEUE_ID; 
 #endif
 
 #ifndef MSG_PRI_NORMAL

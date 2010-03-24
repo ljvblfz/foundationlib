@@ -11,7 +11,8 @@
  *
  *
  **************************************************************************************/ 
-#include "foundationInclude.h"
+#include "foundationSocket.h"
+#include "foundationDbg.h"
 
 /*=======================================================
  *				基本　API　Wrapper

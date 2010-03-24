@@ -12,7 +12,7 @@
  *
  **************************************************************************************/ 
 
-#include "foundationInclude"
+#include "foundationInclude.h"
 #include "foundationDbg.h"
 
 /* this definition switch the debug level.

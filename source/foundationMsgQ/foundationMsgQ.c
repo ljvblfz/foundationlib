@@ -10,8 +10,9 @@
  *
  **************************************************************************************/ 
 
-#include "foundationInclude.h"
 #include "foundationPthread.h"
+#include "foundationMsgQ.h"
+#include "foundationDbg.h"
 
 /*
  * =====================================================================
@@ -34,7 +35,7 @@
 MSG_QUEUE_ID MsgQCreate(const char* mqname, int maxMsgs, int maxMsgLength)
 {
 #ifdef LINUX_OS
-    mq_attr mqAttr = {0};
+    struct mq_attr mqAttr = {0};
     mqd_t* msgQId = NULL;
 
     if (mqname == NULL)
@@ -123,7 +124,7 @@ int MsgQSend(MSG_QUEUE_ID msgQId, const char* msgBuffer, int msgLength, int time
     {
         return (-1);
     }
-    return Mq_send((mqd_t*)msgQId, msgBuffer, msgLength, timeTick, msgPriority);
+    return Mq_send((mqd_t)(*msgQId), msgBuffer, msgLength, timeTick, msgPriority);
 
 #elif VXWORKS_OS
     if (msgQId == NULL || msgBuffer == NULL)
@@ -156,7 +157,7 @@ int MsgQReceive(MSG_QUEUE_ID msgQId, char* recvBuffer, int bufLength, int timeTi
     {
         return (-1);
     }
-    return Mq_receive((mqd_t*)msgQId, recvBuffer, bufLength, timeTick, NULL);
+    return Mq_receive((mqd_t)(*msgQId), recvBuffer, bufLength, timeTick, NULL);
 
 #elif VXWORKS_OS
     if (msgQId == NULL || recvBuffer == NULL)
@@ -179,7 +180,7 @@ int MsgQReceive(MSG_QUEUE_ID msgQId, char* recvBuffer, int bufLength, int timeTi
 int MsgQNumMsgs(MSG_QUEUE_ID msgQId)
 {
 #ifdef LINUX_OS
-    mq_attr mqAttr = {0};
+    struct mq_attr mqAttr = {0};
     int rval;
 
     if (msgQId == NULL)
@@ -187,7 +188,7 @@ int MsgQNumMsgs(MSG_QUEUE_ID msgQId)
         return (-1);
     }
      
-    rval = Mq_getattr((mqd_t*)msgQId, (struct mq_attr*)&mqAttr);
+    rval = Mq_getattr((mqd_t)(*msgQId), (struct mq_attr*)&mqAttr);
     if (rval != 0)
     {
         debug_info(DEBUG_LEVEL_4, "MsgQNumMsgs() Mq_getattr error!");

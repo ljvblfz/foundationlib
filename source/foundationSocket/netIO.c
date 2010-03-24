@@ -10,7 +10,8 @@
  *
  *
  **************************************************************************************/ 
-#include "foundationInclude.h"
+#include "foundationSocket.h"
+#include "foundationDbg.h"
 
 /*=======================================================
  *				基本 网络IO API　Wrapper
@@ -108,6 +109,42 @@ int Sendto(int sockfd, const void *buf, size_t nbytes, int flags, const struct s
 /*=======================================================
  *				高级 网络IO API　Wrapper
  * ====================================================*/
+
+int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *excepfds, struct timeval *timeout)
+{
+	int rval;
+	int sockfd;
+	
+	sockfd = nfds - 1;
+
+	if(readfds != NULL)
+	{
+		FD_ZERO(readfds);
+		FD_SET(sockfd, readfds);
+	}	
+	if(writefds != NULL)
+	{
+		FD_ZERO(writefds);
+		FD_SET(sockfd, writefds);
+	}	
+	if(excepfds != NULL)
+	{
+		FD_ZERO(excepfds);
+		FD_SET(sockfd, excepfds);
+	}
+
+	rval = select(nfds, readfds, writefds, excepfds, timeout);
+	if(rval == -1)
+	{
+		debug_info(DEBUG_LEVEL_4,"select failed!\n");	
+	}
+	else if(rval == 0)
+	{
+		//debug_info("select timeout!\n");	
+	}
+
+	return rval;
+}
 /*************************************************
   * Function:		readn()
   * Description:    从连接的socket读取n个字符数据(超时5秒、阻塞型recv)

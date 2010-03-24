@@ -19,9 +19,9 @@ extern "C"
 #endif
 
 #ifdef LINUX_OS
-    typedef sem_t* SEM_ID
+    typedef sem_t* SEM_ID;
 #elif VXWORKS
-    /* typedef SEM_ID SEM_ID */
+    /* typedef SEM_ID SEM_ID; */
 #endif
 
 #define SEM_INIT_LOCK      SEM_EMPTY   /* init sync semaphore lock */

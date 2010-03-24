@@ -13,6 +13,8 @@
 #ifndef _SOCKET_API_H
 #define _SOCKET_API_H
 
+#include "foundationInclude.h"
+#include "foundationDataType.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -52,9 +54,9 @@ int Sockfd_to_family(int sockfd);
  *					NET IO  API
  * ===================================================*/
 int Recv(int sockfd, void *buf, size_t len, int flags);
+int Send(int sockfd, void *buf, size_t len, int flags);
 int readn(int connfd, void *vptr, int n);
 int writen(int connfd, void *vptr, size_t n);
-int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *excepfds, struct timeval *timeout);
 
 /*=====================================================
  *					net ioctl wrapper API
@@ -63,11 +65,9 @@ int ioctl_sockBuf_datas(int sockfd);
 int Sock_noBlock(int sockfd);
 int Sock_block(int sockfd);
 
-/*=====================================================
- *					TCP API
- * ===================================================*/
-//基本TCP API
 int Socket(int family, int type, int protocol);
+int Tcp_socket(int bufsize);
+int Udp_socket(int bufsize);
 int Connect(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen);
 int Bind(int sockfd, const struct sockaddr *myaddr, socklen_t addrlen);
 int Listen(int sockfd, int backlog);
@@ -78,14 +78,13 @@ int Getpeername(int sockfd, struct sockaddr *peeraddr, socklen_t *addrlen);
 //高级TCP API
 int connectWithTimeout(int sock, struct sockaddr*addrs, int adrsLen,struct timeval* tm);
 int Tcp_connect(int serverIp, UINT16 serverPort, int bufsize);
-int Tcp_connect_nb(int serverIp, UINT16 serverPort, int bufsize, struct timeval delaytime);
+int Tcp_timedconnect(int serverIp, UINT16 serverPort, int bufsize, struct timeval delaytime);
 
 /*=====================================================
  *					UDP API
  * ===================================================*/
 int	Recvfrom(int sockfd, void *buf, size_t nbytes, int flags, struct sockaddr *from, socklen_t *addrlen) ;
 int Sendto(int sockfd, const void *buf, size_t nbytes, int flags, const struct sockaddr *to, socklen_t addrlen);
-int Udp_socket(int bufsize);
 
 /*=====================================================
  *					MCAST API

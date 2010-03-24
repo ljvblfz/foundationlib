@@ -28,6 +28,27 @@ typedef struct
     int year;       /* [1900,2308] */
 }TIME_NORMAL;
 
+/*
+ * =====================================================================
+ * Function:setCalendarTime()
+ * Description: Set time in second
+ * Input:  calendarTime -- time in second
+ * Output:   N/A
+ * Return:  0 on SUCCESS, -1 otherwise.
+ *======================================================================
+ */
+int setCalendarTime(time_t calendarTime);
+
+/*
+ * =====================================================================
+ * Function:getCalendarTime()
+ * Description: Get time in second
+ * Input:  calendarTime -- save space of time in second
+ * Output:   N/A
+ * Return:  0 on SUCCESS, -1 otherwise.
+ *======================================================================
+ */
+int getCalendarTime(time_t* calendarTime);
 
 /*
  * =====================================================================
@@ -91,14 +112,6 @@ int getSysClkRate(void);
  */
 int getSysMsPerTick(void);
 
-/*=========================================================
- *						定时相关API
- * =======================================================*/
-int Timer_create(clockid_t clockId, struct sigevent *eventHandle, timer_t *timerId);
-int Timer_delete(timer_t timer);
-int	Timer_getoverrun(timer_t timerId);
-int Timer_gettime(timer_t timerId, struct itimerspec *ovalue);
-int Timer_settime(timer_t timerId, int flags, const struct itimerspec *value, struct itimerspec *ovalue);
 
 #ifdef __cplusplus
 }

@@ -10,7 +10,8 @@
  *
  *
  **************************************************************************************/
-#include "foundationInclude.h"
+#include "foundationPthread.h"
+#include "foundationDbg.h"
 
 static inline void getTimespec(int wait_ms, struct timespec *tp)
 {
@@ -100,7 +101,7 @@ int Mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, int wait_ms, unsig
 	if (wait_ms == NO_WAIT)
 	{
         /* set msgQ nonblock, it returns immediately if msgQ blocking */
-        omq_attr.mq_flag = O_NONBLOCK;
+        omq_attr.mq_flags = O_NONBLOCK;
 		if((rval = mq_setattr(mqdes, &omq_attr, NULL)) != 0)
 		{
 			debug_info(DEBUG_LEVEL_3, "mq_setattr() failed!\n");	
@@ -116,7 +117,7 @@ int Mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, int wait_ms, unsig
 	else if (wait_ms == WAIT_FOREVER) 
 	{
         /* set msgQ block, it waits forever if msgQ blocking */
-        omq_attr.mq_flag = 0;
+        omq_attr.mq_flags = 0;
 		if((rval = mq_setattr(mqdes, &omq_attr, NULL)) != 0)
 		{
 			debug_info(DEBUG_LEVEL_3, "mq_setattr() failed!\n");	

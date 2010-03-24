@@ -10,7 +10,8 @@
  *
  *
  **************************************************************************************/
-#include "foundationInclude.h"
+#include "foundationPthread.h"
+#include "foundationDbg.h"
 
 
 static inline void getTimespec(int wait_ms, struct timespec *tp)

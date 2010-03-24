@@ -1,0 +1,40 @@
+foundationLib
+source
+    |----foundationDbg
+    |----foundationPthread
+    |----foundationSocket
+    |----foundationMutex
+    |----foundationSem
+    |----foundationTask
+    |----foundationMsgQ
+    |----foundationTime
+include
+    |----foundationInclude.h
+    |----foundationDataType.h
+    |----foundationDbg.h
+    |----foundationPthread.h
+    |----foundationSocket.h
+    |----foundationMutex.h
+    |----foundationSem.h
+    |----foundationTask.h
+    |----foundationMsgQ.h
+    |----foundationTime.h
+build
+    |----linux
+    |----vxworks
+lib
+    |----foundationlib.a
+    |----*.h
+
+1.how to build foundationlib under linux?
+#cd build/linux
+#make clean
+#make
+you will get all the files under fold "lib"
+2.how to build foundationlib under vxworks?
+>cd build/vxworks
+>a.bat
+>c.bat
+>m.bat
+you will get all the files under fold "lib"
+

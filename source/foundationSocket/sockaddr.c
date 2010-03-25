@@ -2,13 +2,6 @@
  *  Copyright (c) Artificial Intelligence Infinity.
  *  Filename: sockaddr.c 
  *  Description: this file contains api list of socket addresss convert
- *          this api support both ipv4 and ipv6:
-                 int Sock_ntop(const struct sockaddr *sa, char *ipStr)
-                 int Sock_pton(struct sockaddr *sa, const char *ipStr)
-            this api only support ipv4:
-                 int Sock_ntop_v4(int ipaddr, char *ipStr)
-                 int Sock_pton_v4(const char *ipStr)
- *
  *  Author: caoyun
  *  Create:2010-01-25 
  *  Modification history:
@@ -40,12 +33,18 @@ static int Inet_pton(int family, const char *src, void *dst)
 		return -1;	
 	}
 
+#ifdef LINUX_OS
 	if((rval = inet_pton(family, src, dst)) <= 0)
 	{
 		debug_info(DEBUG_LEVEL_3, "inet_pton() failed!\n");	
 		rval = -1;
 	}
 
+#elif VXWORKS_OS
+    /* TODO */
+    printf("This function is not yet available Vxworks!\n");
+    rval = -1;
+#endif
 	return rval;
 }
 
@@ -65,12 +64,18 @@ static const char* Inet_ntop(int family, const void *src, char* dst, socklen_t l
 		return NULL;	
 	}
 
+#ifdef LINUX_OS
 	if(inet_ntop(family, src, dst, len) == NULL)
 	{
 		debug_info(DEBUG_LEVEL_3, "inet_ntop() failed!\n");	
 	}
 
 	return inet_ntop(family, src, dst, len);
+#elif VXWORKS_OS
+    /* TODO */
+    printf("This function is not yet available Vxworks!\n");
+    return NULL;
+#endif
 }
 
 
@@ -159,6 +164,7 @@ int Sock_ntop(const struct sockaddr *sa, char *ipStr)
 *************************************************/
 int Sock_ntop_v4(int ipaddr, char *ipStr)
 {
+#ifdef LINUX_OS
 	char	ptr[INET_ADDRSTRLEN];
 	struct sockaddr_in sockaddrIn;
 
@@ -179,6 +185,20 @@ int Sock_ntop_v4(int ipaddr, char *ipStr)
 		strcpy(ipStr, ptr);	
 		return 0;
 	}
+
+#elif VXWORKS_OS
+    struct in_addr inetaddr;
+
+	if(ipStr==NULL)
+	{
+		return -1;	
+	}
+
+    inetaddr.s_addr = ipaddr;
+    inet_ntoa_b(inetaddr, ipStr);
+
+    return 0;
+#endif
 }
 
 /*************************************************
@@ -188,7 +208,7 @@ int Sock_ntop_v4(int ipaddr, char *ipStr)
   * Output:         N/A 
   * Return:         数字型IP地址---success/-1---fail
 *************************************************/
-static int sock_pton(struct sockaddr *sa , const char *ipStr)
+static int sock_pton(const char *ipStr,struct sockaddr *sa)
 {
 	switch (sa->sa_family) 
 	{
@@ -229,7 +249,7 @@ static int sock_pton(struct sockaddr *sa , const char *ipStr)
   * Output:         N/A 
   * Return:         数字型IP地址---success/-1---fail
 *************************************************/
-int Sock_pton(struct sockaddr *sa, const char *ipStr)
+int Sock_pton(const char *ipStr, struct sockaddr *sa)
 {
 	int rval;
 
@@ -238,7 +258,7 @@ int Sock_pton(struct sockaddr *sa, const char *ipStr)
 		return -1;	
 	}
 
-	if((rval = sock_pton(sa, ipStr)) == -1)
+	if((rval = sock_pton(ipStr, sa)) == -1)
 	{
 		debug_info(DEBUG_LEVEL_3, "sock_pton() failed!\n");			
 	}
@@ -255,6 +275,7 @@ int Sock_pton(struct sockaddr *sa, const char *ipStr)
 *************************************************/
 int  Sock_pton_v4(const char *ipStr)
 {
+#ifdef LINUX_OS
 	struct sockaddr_in sockaddrIn;
 	
 	if(ipStr==NULL)
@@ -263,12 +284,21 @@ int  Sock_pton_v4(const char *ipStr)
 	}
 
 	sockaddrIn.sin_family = AF_INET; 
-	if(Sock_pton((SA*)&sockaddrIn,ipStr) == -1)
+	if(Sock_pton(ipStr, (SA*)&sockaddrIn) == -1)
 	{
 		debug_info(DEBUG_LEVEL_3, "Sock_pton() failed!\n");			
 		return -1;
 	}
 
 	return sockaddrIn.sin_addr.s_addr; 
+
+#elif VXWORKS_OS
+	if(ipStr==NULL)
+	{
+		return -1;	
+	}
+
+    return inet_addr(ipStr);
+#endif
 }
 

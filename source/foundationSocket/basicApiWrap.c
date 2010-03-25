@@ -194,7 +194,7 @@ int Getpeername(int sockfd, struct sockaddr *peeraddr, socklen_t *addrlen)
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-int ConnectWithTimeout(int sockfd, struct sockaddr*addrs, int adrsLen,struct timeval* tm)
+int ConnectWithTimeout(int sockfd, const struct sockaddr*addrs, int adrsLen,struct timeval* tm)
 {
 #ifdef LINUX_OS
     int err = 0;
@@ -250,8 +250,9 @@ int ConnectWithTimeout(int sockfd, struct sockaddr*addrs, int adrsLen,struct tim
     }
 
     return ret;
+
 #elif VXWORKS_OS
-    /* TODO need to fill in */
+    return connectWithTimeout(sockfd, (struct sockaddr*)addrs, adrslen, (struct timeval*)tm);
 #endif
 }
 
@@ -268,14 +269,14 @@ int Udp_socket(int bufsize)
 
 	if((sockfd = Socket(AF_INET,SOCK_DGRAM, IPPROTO_UDP)) == -1)
 	{
-		return -1;
+		return (-1);
 	}
 	
 	if(bufsize>0)
 	{
-		if(Sockopt_set_recvBuf(sockfd, bufsize) == -1)
+		if(SetsockRecvBuf(sockfd, bufsize) == -1)
 		{
-			return -1;
+			return (-1);
 		}
 	}
 
@@ -295,14 +296,14 @@ int Tcp_socket(int bufsize)
 
 	if((sockfd = Socket(AF_INET,SOCK_STREAM, 0)) == -1)
 	{
-		return -1;
+		return (-1);
 	}
 	
 	if(bufsize>0)
 	{
-		if(Sockopt_set_recvBuf(sockfd, bufsize) == -1)
+		if(SetsockRecvBuf(sockfd, bufsize) == -1)
 		{
-			return -1;
+			return (-1);
 		}
 	}
 
@@ -325,20 +326,20 @@ static int tcp_connect(int serverIp, UINT16 serverPort, int bufsize)
 
 	if(serverIp==0 || serverPort==0)
 	{
-		return -1;	
+		return (-1);	
 	}
 
 	if((sockfd = Socket(AF_INET,SOCK_STREAM, 0)) == -1)
 	{
-		return -1;
+		return (-1);
 	}
 	
 	if(bufsize>0)
 	{
-		if(Sockopt_set_recvBuf(sockfd, bufsize) == -1)
+		if(SetsockRecvBuf(sockfd, bufsize) == -1)
 		{
             Close(sockfd);
-			return -1;
+			return (-1);
 		}
 	}
 
@@ -348,16 +349,16 @@ static int tcp_connect(int serverIp, UINT16 serverPort, int bufsize)
 	serverAddr.sin_port = htons(serverPort);	
 	if(Connect(sockfd, (SA*)&serverAddr, sizeof(serverAddr)) == -1)
 	{
-		Sockopt_set_lingerOn(sockfd);
+		SetsockLingerOn(sockfd);
 		Close(sockfd);
-		return -1;
+		return (-1);
 	}
 
 	return sockfd;
 }
 
 /*************************************************
-  * Function:       Tcp_connect()
+  * Function:       Tcp_connectToServer()
   * Description:    tcp_connect()的封装函数 
   * Input:          serverIp---服务器的IP地址
   *                 serverPort---服务器的端口
@@ -365,7 +366,7 @@ static int tcp_connect(int serverIp, UINT16 serverPort, int bufsize)
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-int Tcp_connect(int serverIp, UINT16 serverPort, int bufsize)
+int Tcp_connectToServer(int serverIp, UINT16 serverPort, int bufsize)
 {
 	int sockfd;
 
@@ -395,20 +396,20 @@ static int tcp_timedconnect(int serverIp, UINT16 serverPort, int bufsize, struct
 
 	if(serverIp==0 || serverPort==0)
 	{
-		return -1;	
+		return (-1);	
 	}
 
 	if((sockfd = Socket(AF_INET,SOCK_STREAM, 0)) == -1)
 	{
-		return -1;
+		return (-1);
 	}
 	
 	if(bufsize>0)
 	{
-		if(Sockopt_set_recvBuf(sockfd, bufsize) == -1)
+		if(SetsockRecvBuf(sockfd, bufsize) == -1)
 		{
             Close(sockfd);
-			return -1;
+			return (-1);
 		}
 	}
 
@@ -426,19 +427,19 @@ static int tcp_timedconnect(int serverIp, UINT16 serverPort, int bufsize, struct
 		timeout.tv_sec = delaytime.tv_sec;
 		timeout.tv_usec = delaytime.tv_usec;	
 	}
-	if(connectWithTimeout(sockfd,(SA*)&serverAddr, sizeof(serverAddr), &timeout) == -1)
+	if(ConnectWithTimeout(sockfd,(SA*)&serverAddr, sizeof(serverAddr), &timeout) == -1)
 	{
 		debug_info(DEBUG_LEVEL_3, "connectWithTimeout failed!\n");	
-		Sockopt_set_lingerOn(sockfd);
+		SetsockLingerOn(sockfd);
 		Close(sockfd);
-		return -1;
+		return (-1);
 	}
 	
 	return sockfd;
 }
 
 /*************************************************
-  * Function:       Tcp_timedconnect()
+  * Function:       Tcp_timedconnectToServer()
   * Description:    tcp_timedconnect()的封装函数 
   * Input:          serverIp---服务器的IP地址
   *                 serverPort---服务器的端口
@@ -447,7 +448,7 @@ static int tcp_timedconnect(int serverIp, UINT16 serverPort, int bufsize, struct
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-int Tcp_timedconnect(int serverIp, UINT16 serverPort, int bufsize, struct timeval timeout)
+int Tcp_timedconnectToServer(int serverIp, UINT16 serverPort, int bufsize, struct timeval timeout)
 {
 	int sockfd;
 
@@ -457,5 +458,97 @@ int Tcp_timedconnect(int serverIp, UINT16 serverPort, int bufsize, struct timeva
 	}
 
 	return sockfd;
+}
+
+/*=======================================================
+ *				基本 网络IO API　Wrapper
+ * ====================================================*/
+
+/*************************************************
+* Function:       Recv()
+* Description:    recv()的封装函数 
+* Input:		  sockfd---套接口描述字
+*                 len---套接口缓冲区长度
+*                 flag---接收数据标志位
+* Output:         buf---接收缓冲区
+* Return:         0---success/-1---fail
+*************************************************/
+int Recv(int sockfd, void *buf, size_t len, int flags)
+{
+	int rval;
+
+	if((rval = recv(sockfd, buf, len, flags)) == -1)
+	{
+		debug_info(DEBUG_LEVEL_3, "recv error!\n");	
+	}
+
+	return rval;
+}
+
+/*************************************************
+* Function:       Send()
+* Description:    send()的封装函数 
+* Input:		  sockfd---套接口描述字
+*                 len---发送数据长度
+*                 flag---发送数据标志位
+* Output:         buf---发送缓冲区
+* Return:         0---success/-1---fail
+*************************************************/
+int Send(int sockfd, void *buf, size_t len, int flags)
+{
+	int rval;
+
+	if((rval = send(sockfd, buf, len, flags)) == -1)
+	{
+		debug_info(DEBUG_LEVEL_3, "recv error!\n");	
+	}
+
+	return rval;
+}
+
+/*************************************************
+* Function:		  Recvfrom()
+* Description:    常用于UDP的接收数据函数 
+* Input:          sockfd---描述字
+*				  buf---读取缓冲区的地址
+*				  nbytes---读取字节数
+*				  flags--- 
+* Output:         from---源端套接口地址结构
+*				  addrlen---源端套接口地址结构长度
+* Return:         读取字节数/-1 
+*************************************************/
+int	Recvfrom(int sockfd, void *buf, size_t nbytes, int flags, struct sockaddr *from, socklen_t *addrlen) 
+{
+	int rval;
+
+	if((rval = recvfrom(sockfd, buf, nbytes, flags, from, addrlen)) == -1)
+	{
+		debug_info(DEBUG_LEVEL_3, "recvfrom error!\n");	
+	}
+
+	return rval;
+}
+
+/*************************************************
+* Function:		  Sendto()
+* Description:    常用于UDP的发送数据函数 
+* Input:          sockfd---描述字
+*				  buf---发送缓冲区的地址
+*				  nbytes---发送字节数
+*				  flags--- 
+* Output:         from---宿端套接口地址结构
+*				  addrlen---宿端套接口地址结构长度
+* Return:         发送字节数/-1 
+*************************************************/
+int Sendto(int sockfd, const void *buf, size_t nbytes, int flags, const struct sockaddr *to, socklen_t addrlen)
+{
+	int rval;
+
+	if((rval = sendto(sockfd, buf, nbytes, flags, to, addrlen)) == -1)
+	{
+		debug_info(DEBUG_LEVEL_3, "sendto error!\n");	
+	}
+
+	return rval;
 }
 

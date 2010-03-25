@@ -13,6 +13,71 @@
 #include "foundationSocket.h"
 #include "foundationDbg.h"
 
+static int family_to_level(int family)
+{
+	switch (family) 
+	{
+		case AF_INET:
+			return IPPROTO_IP;
+		case AF_INET6:
+			return IPPROTO_IPV6;
+		default:
+			return -1;
+	}
+}
+
+/*************************************************
+* Function:		  Family_to_level()
+* Description:    根据协议族得到该选项level 
+* Input:		  family 
+* Output:         N/A
+* Return:         level---success/-1---fail
+*************************************************/
+int Family_to_level(int family)
+{
+	int		rval;
+
+	if((rval = family_to_level(family))<0)
+	{
+		debug_info(DEBUG_LEVEL_3, "family_to_level error, rval=%d\n", rval);
+	}
+
+	return (rval);
+}
+
+static int sockfd_to_family(int sockfd)
+{
+	struct sockaddr_storage ss;
+	socklen_t	len;
+
+	len = sizeof(ss);
+	if (getsockname(sockfd, (SA *) &ss, &len) < 0)
+	{
+		return(-1);
+	}
+	return(ss.ss_family);
+}
+
+/*************************************************
+* Function:		  Sockfd_to_family()
+* Description:    根据sockfd得到family 
+* Input:		  sockfd 
+* Output:         N/A 
+* Return:         family---success/-1---fail
+*************************************************/
+int Sockfd_to_family(int sockfd)
+{
+	int		rval;
+
+	if ( (rval = sockfd_to_family(sockfd)) < 0)
+	{
+		debug_info(DEBUG_LEVEL_3, "sockfd_to_family error\n");
+	}
+
+	return(rval);
+}
+
+
 #ifdef LINUX_OS
 /*============================================================
  *				多播数据报接收相关：6　API

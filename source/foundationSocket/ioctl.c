@@ -14,13 +14,13 @@
 #include "foundationDbg.h"
 
 /*************************************************
-* Function:       ioctl_sockBuf_datas()
+* Function:       GetsockNReadBytes()
 * Description:    获取套接口缓冲区的可读数据 
 * Input:		  sockfd---套接口描述字
 * Output:         N/A 
 * Return:         套接口缓冲区的可读数据
 *************************************************/
-int ioctl_sockBuf_datas(int sockfd)
+int GetsockNReadBytes(int sockfd)
 {
     int  iBytesAvail = -1; 
     int  iRetVal;          
@@ -35,13 +35,13 @@ int ioctl_sockBuf_datas(int sockfd)
 }	
 
 /*************************************************
-* Function:       Sock_noBlock()
+* Function:       SetsockNBlock()
 * Description:    设置套接口非阻塞属性
 * Input:		  sockfd---套接口描述字
 * Output:         N/A 
 * Return:         0---success/-1---fail 
 *************************************************/
-int Sock_noBlock(int sockfd)
+int SetsockNBlock(int sockfd)
 {
 	int flag, rval;
 
@@ -49,20 +49,20 @@ int Sock_noBlock(int sockfd)
 	rval = ioctl(sockfd, FIONBIO, &flag);
 	if(rval == -1)
 	{
-		debug_info(DEBUG_LEVEL_4, "Sock_noBlock() is error!\n");	
+		debug_info(DEBUG_LEVEL_4, "SetsockNBlock() is error!\n");	
 	}
 	
 	return rval;
 }
 
 /*************************************************
-* Function:       Sock_block()
+* Function:       SetsockBlock()
 * Description:    设置套接口阻塞属性 
 * Input:		  sockfd---套接口描述字
 * Output:         N/A 
 * Return:         0---success/-1---fail 
 *************************************************/
-int Sock_block(int sockfd)
+int SetsockBlock(int sockfd)
 {
 	int flag, rval;
 	
@@ -70,7 +70,7 @@ int Sock_block(int sockfd)
     rval = ioctl(sockfd, FIONBIO, &flag);
 	if(rval == -1)
 	{
-		debug_info(DEBUG_LEVEL_4, "Sock_block() is error!\n");	
+		debug_info(DEBUG_LEVEL_4, "SetsockBlock() is error!\n");	
 	}
 	
 	return rval;

@@ -177,11 +177,6 @@ typedef char * STRING;
 typedef UINT8 *	USTRING;
 #endif
 
-#ifndef TYPE_SA
-#define TYPE_SA
-#define	SA	struct sockaddr
-#endif
-
 #ifdef __cplusplus
 }
 #endif

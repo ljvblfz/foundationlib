@@ -41,7 +41,6 @@ static int Inet_pton(int family, const char *src, void *dst)
 	}
 
 #elif VXWORKS_OS
-    /* TODO */
     printf("This function is not yet available Vxworks!\n");
     rval = -1;
 #endif
@@ -72,7 +71,6 @@ static const char* Inet_ntop(int family, const void *src, char* dst, socklen_t l
 
 	return inet_ntop(family, src, dst, len);
 #elif VXWORKS_OS
-    /* TODO */
     printf("This function is not yet available Vxworks!\n");
     return NULL;
 #endif
@@ -93,10 +91,16 @@ static char *sock_ntop(const struct sockaddr *sa)
 {
     static char str[128];		/* Unix domain is largest */
 
+    if (sa == NULL)
+    {
+        return (NULL);
+    }
+     
 	switch (sa->sa_family) 
 	{
 		case AF_INET:
 			{
+#ifdef LINUX_OS
 				struct sockaddr_in	*sin = (struct sockaddr_in *) sa;
 
 				if (Inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) == NULL)
@@ -104,10 +108,17 @@ static char *sock_ntop(const struct sockaddr *sa)
 					return(NULL);
                 }
 				return(str);
+#elif VXWORKS_OS
+				struct sockaddr_in	*sin = (struct sockaddr_in *) sa;
+
+                inet_ntoa_b(sin->sin_addr, str);
+				return(str);
+#endif
 			}
 
 		case AF_INET6: 
 			{
+#ifdef LINUX_OS
 				struct sockaddr_in6	*sin6 = (struct sockaddr_in6 *) sa;
 
 				str[0] = '[';
@@ -116,6 +127,10 @@ static char *sock_ntop(const struct sockaddr *sa)
 					return(NULL);
                 }
 				return (str + 1);
+#elif VXWORKS_OS
+                printf("This function is not yet available Vxworks!\n");
+                return NULL;
+#endif
 			}
             break;
 
@@ -210,27 +225,45 @@ int Sock_ntop_v4(int ipaddr, char *ipStr)
 *************************************************/
 static int sock_pton(const char *ipStr,struct sockaddr *sa)
 {
+    if (ipStr == NULL || sa == NULL)
+    {
+        return -1;
+    }
+     
 	switch (sa->sa_family) 
 	{
 		case AF_INET:
 			{
+#ifdef LINUX_OS
 				struct sockaddr_in	*sin = (struct sockaddr_in *) sa;
 
 				if (Inet_pton(AF_INET, ipStr, &sin->sin_addr) == -1)
                 {
 					return -1;
                 }
+#elif VXWORKS_OS
+				struct sockaddr_in	*sin = (struct sockaddr_in *) sa;
+                unsigned long inetaddr;
+
+                inetaddr = inet_addr(ipStr);
+                sin->sin_addr.s_addr = inetaddr;
+#endif
 			}
             break;
 
 		case AF_INET6: 
 			{
+#ifdef LINUX_OS
 				struct sockaddr_in6	*sin6 = (struct sockaddr_in6 *) sa;
 
 				if (Inet_pton(AF_INET6, ipStr, &sin6->sin6_addr) == -1)
                 {
 					return -1;
                 }
+#elif VXWORKS_OS
+                printf("This function is not yet available Vxworks!\n");
+                return NULL;
+#endif
 			}
             break;
 

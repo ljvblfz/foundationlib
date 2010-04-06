@@ -19,8 +19,10 @@ static int family_to_level(int family)
 	{
 		case AF_INET:
 			return IPPROTO_IP;
+#ifdef	IPV6
 		case AF_INET6:
 			return IPPROTO_IPV6;
+#endif
 		default:
 			return -1;
 	}
@@ -78,13 +80,13 @@ int Sockfd_to_family(int sockfd)
 }
 
 
-#ifdef LINUX_OS
 /*============================================================
  *				多播数据报接收相关：6　API
  * ==========================================================*/
 static int mcast_join(int sockfd, const SA *grp, socklen_t grplen, const char *ifname, u_int ifindex)
 {
 
+#ifdef LINUX_OS
 #ifdef MCAST_JOIN_GROUP			//协议无关实现
 	struct group_req req;
 
@@ -154,6 +156,7 @@ static int mcast_join(int sockfd, const SA *grp, socklen_t grplen, const char *i
 			return (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)));
 		}
 
+#ifdef	IPV6
 		case AF_INET6: 
 		{
 			struct ipv6_mreq	mreq6;
@@ -179,11 +182,13 @@ static int mcast_join(int sockfd, const SA *grp, socklen_t grplen, const char *i
 
 			return (setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &mreq6, sizeof(mreq6)));
 		}
+#endif
 
 		default:
 		errno = EAFNOSUPPORT;
 		return(-1);
 	}
+#endif
 #endif
 }
 
@@ -217,6 +222,7 @@ static int mcast_join_source_group(
 		const char *ifname, u_int ifindex
 	)
 {
+#ifdef LINUX_OS
 #ifdef MCAST_JOIN_SOURCE_GROUP
 	struct group_source_req req;
 	
@@ -297,6 +303,7 @@ static int mcast_join_source_group(
 			return(-1);
 	}
 #endif
+#endif
 }
 
 /*************************************************
@@ -331,6 +338,7 @@ int Mcast_join_source_group(
 
 static int mcast_block_source(int sockfd, const SA *src, socklen_t srclen, const SA *grp, socklen_t grplen)
 {
+#ifdef LINUX_OS
 #ifdef MCAST_BLOCK_SOURCE
 	struct group_source_req req;
 
@@ -366,33 +374,13 @@ static int mcast_block_source(int sockfd, const SA *src, socklen_t srclen, const
 			return(-1);
 	}
 #endif
+#endif
 }
 
-/*************************************************
-* Function:       Mcast_block_source()
-* Description:    阻塞接收从给定单播源到给定多播组的数据报 
-* Input:		  sockfd---打开的UDP套接口 
-*				  *src--- 单播源套接口地址结构
-*				  srclen---单播源套接口地址结构长度
-*				  *grp---多播组套接口地址结构
-*				  grplen---多播组套接口地址结构长度
-* Output:         N/A 
-* Return:         0/-1
-*************************************************/
-int Mcast_block_source(int sockfd, const SA *src, socklen_t srclen, const SA *grp, socklen_t grplen)
-{
-	int rval;
-	
-	if((rval = mcast_block_source(sockfd, src, srclen, grp, grplen)) < 0)
-	{
-		debug_info(DEBUG_LEVEL_3, "mcast_block_source error\n");
-	}
-
-	return rval;
-}
 
 static int mcast_unblock_source(int sockfd, const SA *src, socklen_t srclen, const SA *grp, socklen_t grplen)
 {
+#ifdef LINUX_OS
 #ifdef MCAST_UNBLOCK_SOURCE
 	struct group_source_req req;
 
@@ -430,34 +418,13 @@ static int mcast_unblock_source(int sockfd, const SA *src, socklen_t srclen, con
 			return(-1);
 	}
 #endif
-}
-
-/*************************************************
-* Function:       Mcast_block_source()
-* Description:    开通接收从给定单播源到给定多播组的数据报 
-* Input:		  sockfd---打开的UDP套接口 
-*				  *src--- 单播源套接口地址结构
-*				  srclen---单播源套接口地址结构长度
-*				  *grp---多播组套接口地址结构
-*				  grplen---多播组套接口地址结构长度
-* Output:         N/A 
-* Return:         0/-1
-*************************************************/
-int Mcast_unblock_source(int sockfd, const SA *src, socklen_t srclen, const SA *grp, socklen_t grplen)
-{
-	int rval;
-
-	if ((rval = mcast_unblock_source(sockfd, src, srclen, grp, grplen)) < 0)
-	{
-		debug_info(DEBUG_LEVEL_3, "mcast_unblock_source error\n");
-	}
-
-	return rval;
+#endif
 }
 
 
 static int mcast_leave(int sockfd, const SA *grp, socklen_t grplen)
 {
+#ifdef LINUX_OS
 #ifdef MCAST_JOIN_GROUP
 	struct group_req req;
 
@@ -483,6 +450,7 @@ static int mcast_leave(int sockfd, const SA *grp, socklen_t grplen)
 				return(setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq)));
 			}
 
+#ifdef	IPV6
 		case AF_INET6: 
 			{
 				struct ipv6_mreq	mreq6;
@@ -491,11 +459,13 @@ static int mcast_leave(int sockfd, const SA *grp, socklen_t grplen)
 				mreq6.ipv6mr_interface = 0;
 				return(setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &mreq6, sizeof(mreq6)));
 			}
+#endif
 
 		default:
 			errno = EAFNOSUPPORT;
 			return(-1);
 	}
+#endif
 #endif
 }
 
@@ -522,6 +492,7 @@ int Mcast_leave(int sockfd, const SA *grp, socklen_t grplen)
 
 static int mcast_leave_source_group(int sockfd, const SA *src, socklen_t srclen, const SA *grp, socklen_t grplen)
 {
+#ifdef LINUX_OS
 #ifdef MCAST_LEAVE_SOURCE_GROUP
 	struct group_source_req req;
 
@@ -556,6 +527,7 @@ static int mcast_leave_source_group(int sockfd, const SA *src, socklen_t srclen,
 			errno = EAFNOSUPPORT;
 			return(-1);
 	}
+#endif
 #endif
 }
 
@@ -597,6 +569,7 @@ static int mcast_set_loop(int sockfd, int onoff)
 				return(setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &flag, sizeof(flag)));
 			}
 
+#ifdef	IPV6
 		case AF_INET6: 
 			{
 				u_int		flag;
@@ -604,6 +577,7 @@ static int mcast_set_loop(int sockfd, int onoff)
 				flag = onoff;
 				return(setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &flag, sizeof(flag)));
 			}
+#endif
 
 		default:
 			errno = EAFNOSUPPORT;
@@ -611,25 +585,6 @@ static int mcast_set_loop(int sockfd, int onoff)
 	}
 }
 
-/*************************************************
-* Function:       Mcast_set_loop()
-* Description:    设置回馈套接口选项(默认为打开) 
-* Input:		  sockfd---打开的UDP套接口
-*				  onoff---1/0 
-* Output:         N/A 
-* Return:         0/-1
-*************************************************/
-int Mcast_set_loop(int sockfd, int onoff)
-{
-	int rval;
-
-	if ((rval = mcast_set_loop(sockfd, onoff)) < 0)
-	{
-		debug_info(DEBUG_LEVEL_3, "mcast_set_loop error\n");
-	}
-	
-	return rval;
-}
 
 static int mcast_get_loop(int sockfd)
 {
@@ -648,6 +603,7 @@ static int mcast_get_loop(int sockfd)
 				return(flag);
 			}
 
+#ifdef	IPV6
 		case AF_INET6:
 			{
 				u_int		flag;
@@ -660,6 +616,7 @@ static int mcast_get_loop(int sockfd)
 				}
 				return(flag);
 			}
+#endif
 
 		default:
 			errno = EAFNOSUPPORT;
@@ -725,6 +682,7 @@ static int mcast_set_if(int sockfd, const char *ifname, u_int ifindex)
 				return (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_IF, &inaddr, sizeof(struct in_addr)));
 			}
 
+#ifdef	IPV6
 		case AF_INET6: 
 			{
 				u_int	idx;
@@ -744,32 +702,12 @@ static int mcast_set_if(int sockfd, const char *ifname, u_int ifindex)
 				}
 				return(setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &idx, sizeof(idx)));
 			}
+#endif
 
 		default:
 			errno = EAFNOSUPPORT;
 			return(-1);
 	}
-}
-
-/*************************************************
-* Function:       Mcast_set_if()
-* Description:    设置外出多播数据报的缺省接口索引 
-* Input:		  sockfd---打开的UDP套接口
-*				  ifname---接口名字
-*				  ifindex---接口索引
-* Output:         N/A 
-* Return:         0/-1
-*************************************************/
-int Mcast_set_if(int sockfd, const char *ifname, u_int ifindex)
-{
-	int rval;
-
-	if ((rval = mcast_set_if(sockfd, ifname, ifindex)) < 0)
-	{
-		debug_info(DEBUG_LEVEL_3, "mcast_set_if error\n");
-	}
-
-	return rval;
 }
 
 static int mcast_get_if(int sockfd)
@@ -782,6 +720,7 @@ static int mcast_get_if(int sockfd)
 				return(-1);
 			}
 
+#ifdef	IPV6
 		case AF_INET6: 
 			{
 				u_int		idx;
@@ -794,6 +733,7 @@ static int mcast_get_if(int sockfd)
 				}
 				return(idx);
 			}
+#endif
 
 		default:
 			errno = EAFNOSUPPORT;
@@ -832,6 +772,7 @@ static int mcast_set_ttl(int sockfd, int val)
 				return(setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)));
 			}
 
+#ifdef	IPV6
 		case AF_INET6: 
 			{
 				int		hop;
@@ -839,6 +780,7 @@ static int mcast_set_ttl(int sockfd, int val)
 				hop = val;
 				return(setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hop, sizeof(hop)));
 			}
+#endif
 
 		default:
 			errno = EAFNOSUPPORT;
@@ -846,59 +788,43 @@ static int mcast_set_ttl(int sockfd, int val)
 	}
 }
 
-/*************************************************
-* Function:       Mcast_set_ttl()
-* Description:    设置IPv4的TTL或IPv6的跳限 
-* Input:		  sockfd---打开的UDP套接口
-* Output:         N/A 
-* Return:         0/-1
-*************************************************/
-int Mcast_set_ttl(int sockfd, int val)
-{
-	int rval;
-
-	if ((rval = mcast_set_ttl(sockfd, val)) < 0)
-	{
-		debug_info(DEBUG_LEVEL_3, "mcast_set_ttl error\n");
-	}
-
-	return rval;
-}
 
 static int mcast_get_ttl(int sockfd)
 {
 	switch (Sockfd_to_family(sockfd)) 
-	{
-	case AF_INET: 
-		{
-		u_char		ttl;
-		socklen_t	len;
+    {
+    case AF_INET: 
+        {
+            u_char		ttl;
+            socklen_t	len;
 
-		len = sizeof(ttl);
-		if (getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, &len) < 0)
-		{
-			return(-1);
-		}
-		return(ttl);
-	}
+            len = sizeof(ttl);
+            if (getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, &len) < 0)
+            {
+                return(-1);
+            }
+            return(ttl);
+        }
 
-	case AF_INET6: 
-		{
-		int			hop;
-		socklen_t	len;
+#ifdef	IPV6
+    case AF_INET6: 
+        {
+            int			hop;
+            socklen_t	len;
 
-		len = sizeof(hop);
-		if (getsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hop, &len) < 0)
-		{
-			return(-1);
-		}
-		return(hop);
-	}
+            len = sizeof(hop);
+            if (getsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hop, &len) < 0)
+            {
+                return(-1);
+            }
+            return(hop);
+        }
+#endif
 
-	default:
-		errno = EAFNOSUPPORT;
-		return(-1);
-	}
+    default:
+        errno = EAFNOSUPPORT;
+        return(-1);
+    }
 }
 
 /*************************************************
@@ -920,5 +846,173 @@ int Mcast_get_ttl(int sockfd)
 	return(rval);
 }
 
-#endif
+
+/*
+ * =====================================================================
+ * Function:Mcast_add_member()
+ * Description: set local socket add to a mcast group, receive from any source.
+ * Input:   ip_mreq -- struct of ip_mreq
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_add_member(int sockfd, struct ip_mreq * ip_mreq)
+{
+    if (ip_mreq == NULL)
+    {
+        return (-1);
+    }
+    return setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)ip_mreq, sizeof(struct ip_mreq));
+}
+
+/*
+ * =====================================================================
+ * Function:Mcast_drop_member()
+ * Description: set local socket leave from a mcast group 
+ * Input:   ip_mreq -- struct of ip_mreq
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_drop_member(int sockfd, struct ip_mreq * ip_mreq)
+{
+    if (ip_mreq == NULL)
+    {
+        return (-1);
+    }
+    return setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char *)ip_mreq, sizeof(struct ip_mreq));
+}
+
+/*
+ * =====================================================================
+ * Function:Mcast_block_source()
+ * Description: set local socket stop receive from specified source in a mcast group.
+ * Input:   ip_mreq -- struct of ip_mreq_source
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_block_source(int sockfd, struct ip_mreq_source * ip_mreq)
+{
+    if (ip_mreq == NULL)
+    {
+        return (-1);
+    }
+    return setsockopt(sockfd, IPPROTO_IP, IP_BLOCK_SOURCE, (char *)ip_mreq, sizeof(struct ip_mreq_source));
+}
+
+/*
+ * =====================================================================
+ * Function:Mcast_unblock_source()
+ * Description: set local socket receive from specified source in a mcast group, while it is blocked.
+ * Input:   ip_mreq -- struct of ip_mreq_source
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+
+int Mcast_unlbock_source(int sockfd, struct ip_mreq_source * ip_mreq)
+{
+    if (ip_mreq == NULL)
+    {
+        return (-1);
+    }
+    return setsockopt(sockfd, IPPROTO_IP, IP_UNBLOCK_SOURCE, (char *)ip_mreq, sizeof(struct ip_mreq_source));
+}
+
+/*
+ * =====================================================================
+ * Function:Mcast_add_source_member()
+ * Description: set local socket add to a mcast group.
+ *              But receive just from a specified source, others will be blocked.
+ * Input:   ip_mreq -- struct of ip_mreq_source
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_add_source_member(int sockfd, struct ip_mreq_source * ip_mreq)
+{
+    if (ip_mreq == NULL)
+    {
+        return (-1);
+    }
+    return setsockopt(sockfd, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP, (char *)ip_mreq, sizeof(struct ip_mreq_source));
+}
+
+/*
+ * =====================================================================
+ * Function:Mcast_drop_source_member()
+ * Description: set local socket stop receiving from specified source in a mcast group,
+ *              others in the group can work normal.
+ * Input:   ip_mreq -- struct of ip_mreq_source
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_drop_source_member(int sockfd, struct ip_mreq_source * ip_mreq)
+{
+    if (ip_mreq == NULL)
+    {
+        return (-1);
+    }
+    return setsockopt(sockfd, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP, (char *)ip_mreq, sizeof(struct ip_mreq_source));
+}
+
+/*
+ * =====================================================================
+ * Function:Mcast_set_if()
+ * Description: Select a Default Interface for Outgoing Multicasts
+ * Input:   sockfd
+ *          if_addr -- outgoing network address
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_set_if(int sockfd, struct in_addr * if_addr)
+{
+    if (if_addr == NULL)
+    {
+        return (-1);
+    }
+    return setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_IF, (char *)if_addr, sizeof(struct in_addr));
+}
+
+/*
+ * =====================================================================
+ * Function:Mcast_set_loop()
+ * Description: Enable or Disable Loopback
+ * Input:   sockfd
+ *          onoff -- 1:enable 0:disable
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_set_loop(int sockfd, int onoff)
+{
+    return setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, (char *)&onoff, sizeof(onoff));
+}
+
+/*
+ * =====================================================================
+ * Function:Mcast_set_ttl()
+ * Description: Select a Default TTL
+ * Input:   sockfd
+ *          val -- time to live
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_set_ttl(int sockfd, int val)
+{
+    return setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&val, sizeof(val));
+}
 

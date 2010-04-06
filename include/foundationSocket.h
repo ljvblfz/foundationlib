@@ -92,6 +92,15 @@ extern "C"
  int SetsockBlock(int sockfd);
  * ===================================================*/
 
+/*=====================================================
+ *					sockaddr API
+ int Sock_pton(struct sockaddr *sa, const char *ipStr);
+ int Sock_ntop(const struct sockaddr *sa, char *ipStr);
+
+ int Sock_pton_v4(const char *ipStr);
+ int Sock_ntop_v4(int ipaddr, char *ipStr);
+ * ===================================================*/
+
 /*
  * =====================================================================
  * Function:Socket()
@@ -546,34 +555,148 @@ int Sock_ntop_v4(int ipaddr, char *ipStr);
  *					MCAST API
  * ===================================================*/
 /* mcast receiving operation */
-int Mcast_join(
-               int sockfd, 
-               const SA *grp, socklen_t grplen, 
-               const char *ifname, u_int ifindex);
-int Mcast_join_source_group(
-                            int sockfd, 
-                            const SA *src, socklen_t srclen,
-                            const SA *grp, socklen_t grplen,
-                            const char *ifname, u_int ifindex);
-int Mcast_block_source(int sockfd, 
-                       const SA *src, socklen_t srclen, 
-                       const SA *grp, socklen_t grplen);
-int Mcast_unblock_source(int sockfd, 
-                         const SA *src, socklen_t srclen, 
-                         const SA *grp, socklen_t grplen);
-int Mcast_leave(int sockfd, 
-                const SA *grp, socklen_t grplen);
-int Mcast_leave_source_group(int sockfd, 
-                             const SA *src, socklen_t srclen, 
-                             const SA *grp, socklen_t grplen);
+/* 
+ * 
+ struct ip_mreq 
+ {
+    struct in_addr imr_multiaddr;	 IP multicast address of group 
+    struct in_addr imr_interface;	 local IP address of interface 
+ };
+
+ struct ip_mreq_source 
+ {
+    uint32 imr_multiaddr;
+    uint32 imr_interface;
+    uint32 imr_sourceaddr;
+ };
+
+ struct in_addr 
+ {
+	u_long s_addr;
+ };
+ */
+
+/*
+ * =====================================================================
+ * Function:Mcast_add_member()
+ * Description: set local socket add to a mcast group, receive from any source.
+ * Input:   sockfd
+ *          ip_mreq -- struct of ip_mreq
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_add_member(int sockfd, struct ip_mreq * ip_mreq);
+
+/*
+ * =====================================================================
+ * Function:Mcast_drop_member()
+ * Description: set local socket leave from a mcast group 
+ * Input:   sockfd
+ *          ip_mreq -- struct of ip_mreq
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_drop_member(int sockfd, struct ip_mreq * ip_mreq);
+
+/*
+ * =====================================================================
+ * Function:Mcast_block_source()
+ * Description: set local socket stop receive from specified source in a mcast group.
+ * Input:   sockfd
+ *          ip_mreq -- struct of ip_mreq_source
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_block_source(int sockfd, struct ip_mreq_source * ip_mreq);
+
+/*
+ * =====================================================================
+ * Function:Mcast_unblock_source()
+ * Description: set local socket receive from specified source in a mcast group, while it is blocked.
+ * Input:   sockfd
+ *          ip_mreq -- struct of ip_mreq_source
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+
+int Mcast_unlbock_source(int sockfd, struct ip_mreq_source * ip_mreq);
+/*
+ * =====================================================================
+ * Function:Mcast_add_source_member()
+ * Description: set local socket add to a mcast group.
+ *              But receive just from a specified source, others will be blocked.
+ * Input:   sockfd
+ *          ip_mreq -- struct of ip_mreq_source
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_add_source_member(int sockfd, struct ip_mreq_source * ip_mreq);
+
+/*
+ * =====================================================================
+ * Function:Mcast_drop_source_member()
+ * Description: set local socket stop receiving from specified source in a mcast group,
+ *              others in the group can work normal.
+ * Input:   sockfd
+ *          ip_mreq -- struct of ip_mreq_source
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_drop_source_member(int sockfd, struct ip_mreq_source * ip_mreq);
+
 
 /* mcast sending operation */
+
+/*
+ * =====================================================================
+ * Function:Mcast_set_if()
+ * Description: Select a Default Interface for Outgoing Multicasts
+ * Input:   sockfd
+ *          if_addr -- outgoing network address
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
+int Mcast_set_if(int sockfd, struct in_addr * if_addr);
+
+/*
+ * =====================================================================
+ * Function:Mcast_set_loop()
+ * Description: Enable or Disable Loopback
+ * Input:   sockfd
+ *          onoff -- 1:enable 0:disable
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
 int Mcast_set_loop(int sockfd, int onoff);
-int Mcast_get_loop(int sockfd);
-int Mcast_set_if(int sockfd, const char *ifname, u_int ifindex);
-int Mcast_get_if(int sockfd);
+
+/*
+ * =====================================================================
+ * Function:Mcast_set_ttl()
+ * Description: Select a Default TTL
+ * Input:   sockfd
+ *          val -- time to live
+ * Output:  
+ *          N/A
+ * Return:  0 if success, -1 if failed.
+ *======================================================================
+ */
 int Mcast_set_ttl(int sockfd, int val);
-int Mcast_get_ttl(int sockfd);
 
 
 #ifdef __cplusplus

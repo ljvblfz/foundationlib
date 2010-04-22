@@ -741,24 +741,6 @@ static int mcast_get_if(int sockfd)
 	}
 }
 
-/*************************************************
-* Function:       Mcast_get_if()
-* Description:    获取外出多播数据报的缺省接口索引 
-* Input:		  sockfd---打开的UDP套接口
-* Output:         N/A 
-* Return:         0/-1
-*************************************************/
-int Mcast_get_if(int sockfd)
-{
-	int		rval;
-
-	if ( (rval = mcast_get_if(sockfd)) < 0)
-	{
-		debug_info(DEBUG_LEVEL_3, "mcast_get_if error\n");
-	}
-
-	return(rval);
-}
 
 static int mcast_set_ttl(int sockfd, int val)
 {

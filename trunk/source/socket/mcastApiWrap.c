@@ -94,7 +94,7 @@ static int mcast_join(int sockfd, const SA *grp, socklen_t grplen, const char *i
 	{
 		req.gr_interface = ifindex;
 	} 
-	else if (ifname != NULL) //未定义接口索引，定义了接口名字，则使用接口名字
+	else if (ifname != AII_NULL) //未定义接口索引，定义了接口名字，则使用接口名字
 	{
 		if ( (req.gr_interface = if_nametoindex(ifname)) == 0) 
 		{
@@ -128,7 +128,7 @@ static int mcast_join(int sockfd, const SA *grp, socklen_t grplen, const char *i
 
 			if (ifindex > 0) 
 			{
-				if (if_indextoname(ifindex, ifreq.ifr_name) == NULL) 
+				if (if_indextoname(ifindex, ifreq.ifr_name) == AII_NULL) 
 				{
 					errno = ENXIO;	/* i/f index not found */
 					return(-1);
@@ -139,7 +139,7 @@ static int mcast_join(int sockfd, const SA *grp, socklen_t grplen, const char *i
 				}
 				memcpy(&mreq.imr_interface, &((struct sockaddr_in *) &ifreq.ifr_addr)->sin_addr, sizeof(struct in_addr));
 			} 
-			else if (ifname != NULL) 
+			else if (ifname != AII_NULL) 
 			{
 				strncpy(ifreq.ifr_name, ifname, IFNAMSIZ);
 				if (ioctl(sockfd, SIOCGIFADDR, &ifreq) < 0)
@@ -167,7 +167,7 @@ static int mcast_join(int sockfd, const SA *grp, socklen_t grplen, const char *i
 			{
 				mreq6.ipv6mr_interface = ifindex;
 			} 
-			else if (ifname != NULL) 
+			else if (ifname != AII_NULL) 
 			{
 				if ( (mreq6.ipv6mr_interface = if_nametoindex(ifname)) == 0) 
 				{
@@ -230,7 +230,7 @@ static int mcast_join_source_group(
 	{
 		req.gsr_interface = ifindex;
 	} 
-	else if (ifname != NULL) 
+	else if (ifname != AII_NULL) 
 	{
 		if ( (req.gsr_interface = if_nametoindex(ifname)) == 0) 
 		{
@@ -267,7 +267,7 @@ static int mcast_join_source_group(
 
 				if (ifindex > 0) 
 				{
-					if (if_indextoname(ifindex, ifreq.ifr_name) == NULL) 
+					if (if_indextoname(ifindex, ifreq.ifr_name) == AII_NULL) 
 					{
 						errno = ENXIO;	/* i/f index not found */
 						return(-1);
@@ -278,7 +278,7 @@ static int mcast_join_source_group(
 					}
 					memcpy(&mreq.imr_interface, &((struct sockaddr_in *) &ifreq.ifr_addr)->sin_addr, sizeof(struct in_addr));
 				} 
-				else if (ifname != NULL) 
+				else if (ifname != AII_NULL) 
 				{
 					strncpy(ifreq.ifr_name, ifname, IFNAMSIZ);
 					if (ioctl(sockfd, SIOCGIFADDR, &ifreq) < 0)
@@ -654,7 +654,7 @@ static int mcast_set_if(int sockfd, const char *ifname, u_int ifindex)
 
 				if (ifindex > 0) 
 				{
-					if (if_indextoname(ifindex, ifreq.ifr_name) == NULL) 
+					if (if_indextoname(ifindex, ifreq.ifr_name) == AII_NULL) 
 					{
 						errno = ENXIO;	/* i/f index not found */
 						return(-1);
@@ -665,7 +665,7 @@ static int mcast_set_if(int sockfd, const char *ifname, u_int ifindex)
 					}
 					memcpy(&inaddr, &((struct sockaddr_in *) &ifreq.ifr_addr)->sin_addr, sizeof(struct in_addr));
 				} 
-				else if (ifname != NULL) 
+				else if (ifname != AII_NULL) 
 				{
 					strncpy(ifreq.ifr_name, ifname, IFNAMSIZ);
 					if (ioctl(sockfd, SIOCGIFADDR, &ifreq) < 0)
@@ -689,7 +689,7 @@ static int mcast_set_if(int sockfd, const char *ifname, u_int ifindex)
 
 				if ( (idx = ifindex) == 0) 
 				{
-					if (ifname == NULL) 
+					if (ifname == AII_NULL) 
 					{
 						errno = EINVAL;	/* must supply either index or name */
 						return(-1);
@@ -841,7 +841,7 @@ int Mcast_get_ttl(int sockfd)
  */
 int Mcast_add_member(int sockfd, struct ip_mreq * ip_mreq)
 {
-    if (ip_mreq == NULL)
+    if (ip_mreq == AII_NULL)
     {
         return (-1);
     }
@@ -860,7 +860,7 @@ int Mcast_add_member(int sockfd, struct ip_mreq * ip_mreq)
  */
 int Mcast_drop_member(int sockfd, struct ip_mreq * ip_mreq)
 {
-    if (ip_mreq == NULL)
+    if (ip_mreq == AII_NULL)
     {
         return (-1);
     }
@@ -879,7 +879,7 @@ int Mcast_drop_member(int sockfd, struct ip_mreq * ip_mreq)
  */
 int Mcast_block_source(int sockfd, struct ip_mreq_source * ip_mreq)
 {
-    if (ip_mreq == NULL)
+    if (ip_mreq == AII_NULL)
     {
         return (-1);
     }
@@ -899,7 +899,7 @@ int Mcast_block_source(int sockfd, struct ip_mreq_source * ip_mreq)
 
 int Mcast_unlbock_source(int sockfd, struct ip_mreq_source * ip_mreq)
 {
-    if (ip_mreq == NULL)
+    if (ip_mreq == AII_NULL)
     {
         return (-1);
     }
@@ -919,7 +919,7 @@ int Mcast_unlbock_source(int sockfd, struct ip_mreq_source * ip_mreq)
  */
 int Mcast_add_source_member(int sockfd, struct ip_mreq_source * ip_mreq)
 {
-    if (ip_mreq == NULL)
+    if (ip_mreq == AII_NULL)
     {
         return (-1);
     }
@@ -939,7 +939,7 @@ int Mcast_add_source_member(int sockfd, struct ip_mreq_source * ip_mreq)
  */
 int Mcast_drop_source_member(int sockfd, struct ip_mreq_source * ip_mreq)
 {
-    if (ip_mreq == NULL)
+    if (ip_mreq == AII_NULL)
     {
         return (-1);
     }
@@ -959,7 +959,7 @@ int Mcast_drop_source_member(int sockfd, struct ip_mreq_source * ip_mreq)
  */
 int Mcast_set_if(int sockfd, struct in_addr * if_addr)
 {
-    if (if_addr == NULL)
+    if (if_addr == AII_NULL)
     {
         return (-1);
     }

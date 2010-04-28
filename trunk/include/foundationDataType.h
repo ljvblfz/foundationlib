@@ -18,163 +18,100 @@ extern "C"
 {
 #endif
 
-#ifndef FOREVER
-#define FOREVER for(;;)
+#if 1
+#ifndef WIN32
+#define WIN32
+#endif
 #endif
 
-#ifndef NULL
-#define NULL   0
+#if 0
+#ifndef LINUX_OS
+#define LINUX_OS
+#endif
 #endif
 
-#ifndef ERROR
-#define ERROR -1
+#if 0
+#ifndef VXWORKS_OS
+#define VXWORKS_OS
+#endif
 #endif
 
-#ifndef OK
-#define OK  0
+
+    /* Especial macro definition */
+    #define AII_FOREVER for(;;)
+
+    #define AII_NULL    ((void*) 0)
+
+    #define AII_ERROR   -1
+
+    #define AII_OK      0
+
+    #define AII_TRUE    1
+
+    #define AII_FALSE   0
+
+    /*
+     *	Basic type definition, compliant with ISO (POSIX)
+     */
+#ifndef char_t
+    typedef char                char_t;
+#endif
+    
+#ifndef int8_t
+    typedef signed char         int8_t;
 #endif
 
-#ifndef TRUE
-#define TRUE  1
+#ifndef uint8_t
+    typedef unsigned char       uint8_t;
 #endif
 
-#ifndef FALSE
-#define FALSE 0
+#ifndef int16_t
+    typedef signed short        int16_t;
 #endif
 
-#ifndef TYPE_ERR
-#define TYPE_ERR
-typedef unsigned int ERR;
+#ifndef uint16_t
+    typedef unsigned short      uint16_t;
 #endif
 
-#ifndef TYPE_VOID
-#define TYPE_VOID
-typedef void VOID;
+#ifndef int32_t
+    typedef signed int          int32_t;
 #endif
 
-#ifndef TYPE_BYTE
-#define TYPE_BYTE
-typedef unsigned char BYTE;
+#ifndef uint32_t
+    typedef unsigned int        uint32_t;
 #endif
 
-#ifndef TYPE_UCHAR
-#define TYPE_UCHAR
-typedef unsigned char UCHAR;
+#ifndef int64_t
+    typedef signed long long    int64_t;
 #endif
 
-#ifndef TYPE_BOOL
-#define TYPE_BOOL
-typedef enum {False, True}BOOL;
+#ifndef uint64_t
+    typedef unsigned long long  uint64_t;
 #endif
 
-#ifndef TYPE_UINT8
-#define TYPE_UINT8
-typedef unsigned char UINT8;
+#ifndef float32_t
+    typedef float               float32_t;
 #endif
 
-#ifndef TYPE_UINT16
-#define TYPE_UINT16 
-typedef unsigned short UINT16;
+#ifndef float64_t
+    typedef double              float64_t;
 #endif
 
-#ifndef TYPE_UINT32
-#define TYPE_UINT32
-typedef unsigned int UINT32;
+#ifndef float128_t
+    typedef long double         float128_t;
+#endif
+    
+    /* Convenient type definition */
+#ifndef STRING
+    typedef char * STRING;
 #endif
 
-#ifndef TYPE_UINT64
-#define TYPE_UINT64
-typedef unsigned long long UINT64;
+#ifndef USTRING
+    typedef unsigned char * USTRING;
 #endif
 
-#ifndef TYPE_INT8
-#define TYPE_INT8
-typedef char INT8;
-#endif
-
-#ifndef TYPE_INT16
-#define TYPE_INT16
-typedef short INT16;
-#endif
-
-#ifndef TYPE_INT32
-#define TYPE_INT32
-typedef int INT32;
-#endif
-
-#ifndef TYPE_INT64
-#define TYPE_INT64
-typedef long long INT64;
-#endif
-
-#ifndef TYPE_UINT
-#define TYPE_UINT
-typedef unsigned int UINT;
-#endif
-
-#ifndef TYPE_USHORT
-#define TYPE_USHORT
-typedef unsigned short USHORT;
-#endif
-
-#ifndef TYPE_ULONG
-#define TYPE_ULONG
-typedef unsigned long ULONG;
-#endif
-
-#ifndef TYPE_INT
-#define TYPE_INT
-typedef int INT;
-#endif
-
-#ifndef TYPE_SHORT
-#define TYPE_SHORT
-typedef short SHORT;
-#endif
-
-#ifndef TYPE_LONG
-#define TYPE_LONG
-typedef long LONG;
-#endif
-
-#ifndef TYPE_PUINT
-#define TYPE_PUINT
-typedef unsigned int* PUINT;
-#endif
-
-#ifndef TYPE_PINT
-#define TYPE_PINT
-typedef int* PINT;
-#endif
-
-#ifndef TYPE_PUINT8
-#define TYPE_PUINT8
-typedef unsigned char* PUINT8;
-#endif
-
-#ifndef TYPE_PVOID
-#define TYPE_PVOID
-typedef void* PVOID;
-#endif
-
-#ifndef TYPE_UINTV
-#define TYPE_UINTV
-typedef volatile UINT UINTV;
-#endif
-
-#ifndef TYPE_PUINTV
-#define TYPE_PUINTV
-typedef volatile UINT* PUINTV;
-#endif
-
-#ifndef TYPE_STRING
-#define TYPE_STRING
-typedef char * STRING;
-#endif
-
-#ifndef TYPE_USTRING
-#define TYPE_USTRING
-typedef UINT8 *	USTRING;
+#ifndef BOOL
+    typedef enum {False, True}BOOL;
 #endif
 
 #ifdef __cplusplus

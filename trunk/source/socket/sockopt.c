@@ -77,7 +77,7 @@ int GetsockRecvBuf(int sockfd, int *bufsize)
 	int rval;
 	int optlen = sizeof(int);
 
-	if(bufsize==NULL)
+	if(bufsize==AII_NULL)
 	{
 		return -1;	
 	}
@@ -128,7 +128,7 @@ int GetsockSendBuf(int sockfd, int *bufsize)
 	int rval;
 	socklen_t optlen = sizeof(int);
 
-	if(bufsize==NULL)
+	if(bufsize==AII_NULL)
 	{
 		return -1;	
 	}

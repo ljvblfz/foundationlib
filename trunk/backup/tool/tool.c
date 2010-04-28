@@ -82,9 +82,9 @@ int getline(char** lineptr, int* n, FILE* fp)
 	}
 	
 	count++; /* For storing extra '\0' char */
-	if (*lineptr == NULL || *n < count)
+	if (*lineptr == AII_NULL || *n < count)
 	{
-		if ((*lineptr=(char*)realloc(*lineptr,count))==NULL)
+		if ((*lineptr=(char*)realloc(*lineptr,count))==AII_NULL)
 		{
 			return OSI_ERROR;
 		}
@@ -119,7 +119,7 @@ int findstr(char* original_str, char* match_str)
 {
 	int index=0;
 
-	if (original_str==NULL || match_str==NULL)
+	if (original_str==AII_NULL || match_str==AII_NULL)
 	{
 		return OSI_ERROR;
 	}
@@ -141,7 +141,7 @@ int findstr(char* original_str, char* match_str)
 
 
 
-int TCPLinkToServer(ULONG preAddr,UINT16 port,int bufsize)
+int TCPLinkToServer(uint32_t preAddr,uint16_t port,int bufsize)
 {
 #ifdef LINUX_OS
 	int s;
@@ -214,7 +214,7 @@ int atomread(int fd,void* buf, int len)
 		FD_SET(fd,&rset);
 		select_timeout.tv_sec=1;
 		select_timeout.tv_usec=0;
-		if (select(fd+1,&rset,NULL,NULL,&select_timeout)>0)
+		if (select(fd+1,&rset,AII_NULL,AII_NULL,&select_timeout)>0)
 		{
 			ret=read(fd,buf+rlen,remlen);
 			if (ret<=0)
@@ -273,7 +273,7 @@ int atomwrite(int fd, void* buf, int len)
 		FD_SET(fd,&wset);
 		select_timeout.tv_sec=1;
 		select_timeout.tv_usec=0;
-		if (select(fd+1,NULL,&wset,NULL,&select_timeout)>0)
+		if (select(fd+1,AII_NULL,&wset,AII_NULL,&select_timeout)>0)
 		{
 			ret=write(fd,buf+wlen,remlen);
 			if (ret==OSI_ERROR)
@@ -359,7 +359,7 @@ void * zeros (int n)
 	void * p;
 
 	p=malloc(n);
-	if (p==NULL)
+	if (p==AII_NULL)
 	{
 		return p;
 	}
@@ -390,7 +390,7 @@ unsigned long byte_sum(unsigned char* buf, int len)
 {
 	unsigned long sum;
 
-	if (buf==NULL || len<0)
+	if (buf==AII_NULL || len<0)
 	{
 		return OSI_ERROR;
 	}
@@ -409,7 +409,7 @@ int findchar(char c, char* str, int case_sensitive)
 {
 	int index=0;
 
-	if (str==NULL)
+	if (str==AII_NULL)
 	{
 		return OSI_ERROR;
 	}

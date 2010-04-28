@@ -26,22 +26,22 @@
 MUTEX_ID MutexCreate(void)
 {
 #ifdef LINUX_OS
-    pthread_mutex_t* mutexId = NULL;
+    pthread_mutex_t* mutexId = AII_NULL;
     int rval;
 
     /* allocate memory in MutexCreate,
      * free memory later in MutexDelete */
     mutexId = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t));
-    if (mutexId == NULL)
+    if (mutexId == AII_NULL)
     {
-        return NULL;
+        return AII_NULL;
     }
      
     rval = Pthread_mutex_init(mutexId);
     if (rval != 0)
     {
         free(mutexId);
-        return NULL;
+        return AII_NULL;
     }
     return mutexId;
 #elif VXWORKS_OS
@@ -65,14 +65,14 @@ int MutexDelete(MUTEX_ID mutexId)
 #ifdef LINUX_OS
     int rval;
 
-    if (mutexId == NULL)
+    if (mutexId == AII_NULL)
     {
         return (-1);
     }
 
     rval = Pthread_mutex_destroy((pthread_mutex_t*)mutexId);
     free(mutexId);
-    mutexId = NULL;
+    mutexId = AII_NULL;
     if (rval != 0)
     {
         return (-1);
@@ -80,7 +80,7 @@ int MutexDelete(MUTEX_ID mutexId)
     return 0;
 
 #elif VXWORKS
-    if (mutexId == NULL)
+    if (mutexId == AII_NULL)
     {
         return (-1);
     }
@@ -106,7 +106,7 @@ int MutexLock(MUTEX_ID mutexId, int timeTick)
 #ifdef LINUX_OS
     int rval;
 
-    if (mutexId == NULL)
+    if (mutexId == AII_NULL)
     {
         return (-1);
     }
@@ -119,7 +119,7 @@ int MutexLock(MUTEX_ID mutexId, int timeTick)
     return 0;
 
 #elif VXWORKS_OS
-    if (mutexId == NULL)
+    if (mutexId == AII_NULL)
     {
         return (-1);
     }
@@ -141,7 +141,7 @@ int MutexUnlock(MUTEX_ID mutexId)
 #ifdef LINUX_OS
     int rval;
 
-    if (mutexId == NULL)
+    if (mutexId == AII_NULL)
     {
         return (-1);
     }
@@ -154,7 +154,7 @@ int MutexUnlock(MUTEX_ID mutexId)
     return 0;
 
 #elif VXWORKS_OS
-    if (mutexId == NULL)
+    if (mutexId == AII_NULL)
     {
         return (-1);
     }

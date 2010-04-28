@@ -32,17 +32,17 @@ int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *excepfds, struct
 	
 	sockfd = nfds - 1;
 
-	if(readfds != NULL)
+	if(readfds != AII_NULL)
 	{
 		FD_ZERO(readfds);
 		FD_SET(sockfd, readfds);
 	}	
-	if(writefds != NULL)
+	if(writefds != AII_NULL)
 	{
 		FD_ZERO(writefds);
 		FD_SET(sockfd, writefds);
 	}	
-	if(excepfds != NULL)
+	if(excepfds != AII_NULL)
 	{
 		FD_ZERO(excepfds);
 		FD_SET(sockfd, excepfds);
@@ -111,9 +111,9 @@ int readn(int connfd, void *vptr, int n)
 		FD_ZERO(&rset);
 		FD_SET(connfd, &rset);
 		
-        if(Select(connfd+1, &rset, NULL, NULL, &select_timeout) <= 0) 
+        if(Select(connfd+1, &rset, AII_NULL, AII_NULL, &select_timeout) <= 0) 
 		{	/* 0--timeout */
-			return ERROR;
+			return AII_ERROR;
 		}
 		
         if((nread = recv(connfd, ptr, nleft, 0)) < 0)
@@ -125,7 +125,7 @@ int readn(int connfd, void *vptr, int n)
 			} 
 			else 
 			{
-				return ERROR;
+				return AII_ERROR;
 			}
 		} 
 		else if (nread == 0) 
@@ -159,7 +159,7 @@ int writen(int connfd, void *vptr, size_t n)
 
 	while(nleft>0)
 	{
-		if((nwritten = send(connfd, ptr, nleft, MSG_NOSIGNAL)) == ERROR)
+		if((nwritten = send(connfd, ptr, nleft, MSG_NOSIGNAL)) == AII_ERROR)
 		{
 			//debug_info(DEBUG_LEVEL_3, "send failed!\n");
 			if(errno == EINTR)
@@ -168,7 +168,7 @@ int writen(int connfd, void *vptr, size_t n)
 			}
 			else 
 			{
-				return ERROR;
+				return AII_ERROR;
 			}
 		}
 		nleft -= nwritten;

@@ -31,12 +31,12 @@ static inline void getTimespec(int wait_ms, struct timespec *tp)
 	if (clock_gettime(CLOCK_REALTIME, tp) == -1)
 	{
 		debug_info(DEBUG_LEVEL_1,"getTimespec: clock_gettime call fail, error %d(%s)\n", errno, strerror(errno));
-		tp->tv_sec = time(NULL) + 1;
+		tp->tv_sec = time(AII_NULL) + 1;
 		tp->tv_nsec = 0;
 	}
 	else
 	{
-		t = time(NULL) + 1;
+		t = time(AII_NULL) + 1;
 		if ((int)(tp->tv_sec - t) > 30) 
 		{
 			tp->tv_sec = t;
@@ -102,7 +102,7 @@ int Mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, int wait_ms, unsig
 	{
         /* set msgQ nonblock, it returns immediately if msgQ blocking */
         omq_attr.mq_flags = O_NONBLOCK;
-		if((rval = mq_setattr(mqdes, &omq_attr, NULL)) != 0)
+		if((rval = mq_setattr(mqdes, &omq_attr, AII_NULL)) != 0)
 		{
 			debug_info(DEBUG_LEVEL_3, "mq_setattr() failed!\n");	
 		}
@@ -118,7 +118,7 @@ int Mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, int wait_ms, unsig
 	{
         /* set msgQ block, it waits forever if msgQ blocking */
         omq_attr.mq_flags = 0;
-		if((rval = mq_setattr(mqdes, &omq_attr, NULL)) != 0)
+		if((rval = mq_setattr(mqdes, &omq_attr, AII_NULL)) != 0)
 		{
 			debug_info(DEBUG_LEVEL_3, "mq_setattr() failed!\n");	
 		}

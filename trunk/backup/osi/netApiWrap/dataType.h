@@ -16,29 +16,29 @@ extern "C"
 {
 #endif
 
-#ifndef FOREVER
-#define FOREVER for(;;)
+#ifndef AII_FOREVER
+#define AII_FOREVER for(;;)
 #endif
 
-#ifndef NULL
-#define NULL   0
+#ifndef AII_NULL
+#define AII_NULL   0
 #endif
 
-#ifndef ERROR
-#define ERROR -1
+#ifndef AII_ERROR
+#define AII_ERROR -1
 #endif
 
-#ifndef OK
-#define OK  0
+#ifndef AII_OK
+#define AII_OK  0
 #endif
 
 //用于函数返回值
-#ifndef TRUE
-#define TRUE  1
+#ifndef AII_TRUE
+#define AII_TRUE  1
 #endif
 
-#ifndef FALSE
-#define FALSE 0
+#ifndef AII_FALSE
+#define AII_FALSE 0
 #endif
 
 #ifndef HIK_TYPE_ERR
@@ -73,62 +73,62 @@ typedef enum
 
 #ifndef HIK_TYPE_UINT8
 #define HIK_TYPE_UINT8
-typedef unsigned char UINT8;
+typedef unsigned char uint8_t;
 #endif
 
 #ifndef HIK_TYPE_UINT16
 #define HIK_TYPE_UINT16 
-typedef unsigned short UINT16;
+typedef unsigned short uint16_t;
 #endif
 
 #ifndef HIK_TYPE_UINT32
 #define HIK_TYPE_UINT32
-typedef unsigned int UINT32;
+typedef unsigned int uint32_t;
 #endif
 
 #ifndef HIK_TYPE_UINT64
 #define HIK_TYPE_UINT64
-typedef unsigned long long UINT64;
+typedef unsigned long long uint64_t;
 #endif
 
 #ifndef HIK_TYPE_INT8
 #define HIK_TYPE_INT8
-typedef char INT8;
+typedef char int8_t;
 #endif
 
 #ifndef HIK_TYPE_INT16
 #define HIK_TYPE_INT16
-typedef short INT16;
+typedef short int16_t;
 #endif
 
 #ifndef HIK_TYPE_INT32
 #define HIK_TYPE_INT32
-typedef int INT32;
+typedef int int32_t;
 #endif
 
 #ifndef HIK_TYPE_INT64
 #define HIK_TYPE_INT64
-typedef long long INT64;
+typedef long long int64_t;
 #endif
 
 #ifndef HIK_TYPE_UINT
 #define HIK_TYPE_UINT
-typedef unsigned int UINT;
+typedef unsigned int uint32_t;
 #endif
 
 #ifndef HIK_TYPE_USHORT
 #define HIK_TYPE_USHORT
-typedef unsigned short USHORT;
+typedef unsigned short uint16_t;
 #endif
 
 #ifndef HIK_TYPE_ULONG
 #define HIK_TYPE_ULONG
-typedef unsigned long ULONG;
+typedef unsigned long uint32_t;
 #endif
 
 #ifndef HIK_TYPE_INT
 #define HIK_TYPE_INT
-typedef int INT;
+typedef int int32_t;
 #endif
 
 #ifndef HIK_TYPE_SHORT
@@ -163,12 +163,12 @@ typedef void* PVOID;
 
 #ifndef HIK_TYPE_UINTV
 #define HIK_TYPE_UINTV
-typedef volatile UINT UINTV;
+typedef volatile uint32_t UINTV;
 #endif
 
 #ifndef HIK_TYPE_PUINTV
 #define HIK_TYPE_PUINTV
-typedef volatile UINT* PUINTV;
+typedef volatile uint32_t* PUINTV;
 #endif
 
 #ifdef __cplusplus

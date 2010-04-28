@@ -26,20 +26,20 @@
 SEM_ID SemCreate(unsigned initValue)
 {
 #ifdef LINUX_OS
-    sem_t* semId = NULL;
+    sem_t* semId = AII_NULL;
     int rval;
 
     semId = (sem_t*)malloc(sizeof(sem_t));
-    if (semId == NULL)
+    if (semId == AII_NULL)
     {
-        return NULL;
+        return AII_NULL;
     }
 
     rval = Sem_init((sem_t*)semId, initValue);
     if (rval != 0)
     {
         free(semId);
-        return NULL;
+        return AII_NULL;
     }
     return semId;
 
@@ -62,17 +62,17 @@ int SemDelete(SEM_ID semId)
 #ifdef LINUX_OS
     int rval;
 
-    if (semId == NULL)
+    if (semId == AII_NULL)
     {
         return (-1);
     }
     rval = Sem_destroy((sem_t*)semId);
     free(semId);
-    semId = NULL;
+    semId = AII_NULL;
     return rval;
 
 #elif VXWORKS_OS
-    if (semId == NULL)
+    if (semId == AII_NULL)
     {
         return (-1);
     }
@@ -96,14 +96,14 @@ int SemDelete(SEM_ID semId)
 int SemLock(SEM_ID semId, int timeTick)
 {
 #ifdef LINUX_OS
-    if (semId == NULL)
+    if (semId == AII_NULL)
     {
         return (-1);
     }
     return Sem_wait((sem_t*)semId, timeTick);
 
 #elif VXWORKS_OS
-    if (semId == NULL)
+    if (semId == AII_NULL)
     {
         return (-1);
     }
@@ -123,14 +123,14 @@ int SemLock(SEM_ID semId, int timeTick)
 int SemUnlock(SEM_ID semId)
 {
 #ifdef LINUX_OS
-    if (semId == NULL)
+    if (semId == AII_NULL)
     {
         return (-1);
     }
     return Sem_post((sem_t*)semId);
 
 #elif VXWORKS_OS
-    if (semId == NULL)
+    if (semId == AII_NULL)
     {
         return (-1);
     }

@@ -38,8 +38,8 @@
 #define OSI_OK                 0
 #endif
 
-#ifndef NULL
-#define NULL               ((void*) 0)
+#ifndef AII_NULL
+#define AII_NULL               ((void*) 0)
 #endif
 
 typedef void*   LIST_HANDLE;

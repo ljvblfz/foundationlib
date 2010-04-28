@@ -23,7 +23,7 @@ int Pthread_attr_init(pthread_attr_t *attr)
 {
 	int rval;
 
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -47,7 +47,7 @@ int Pthread_attr_destroy(pthread_attr_t *attr)
 {
 	int rval;
 
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -71,7 +71,7 @@ int Pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate)
 {
 	int rval;
 
-	if(attr==NULL || detachstate==NULL)
+	if(attr==AII_NULL || detachstate==AII_NULL)
 	{
 		return -1;	
 	}
@@ -98,7 +98,7 @@ int Pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)
 {
 	int rval;
 
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -122,7 +122,7 @@ int Pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
 {
 	int rval;
 
-	if(attr==NULL || policy==NULL)
+	if(attr==AII_NULL || policy==AII_NULL)
 	{
 		return -1;	
 	}
@@ -150,7 +150,7 @@ int Pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
 {
 	int rval;
 
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -174,7 +174,7 @@ int Pthread_attr_getschedparam(const pthread_attr_t *attr, struct sched_param * 
 {
 	int rval;
 
-	if(attr==NULL || param==NULL)
+	if(attr==AII_NULL || param==AII_NULL)
 	{
 		return -1;	
 	}
@@ -199,7 +199,7 @@ int Pthread_attr_setschedparam(pthread_attr_t *attr, const struct sched_param *p
 {
 	int rval;
 
-	if(attr==NULL || param==NULL)
+	if(attr==AII_NULL || param==AII_NULL)
 	{
 		return -1;	
 	}
@@ -223,7 +223,7 @@ int Pthread_attr_getinheritsched(const pthread_attr_t *attr, int *inheritsched)
 {
 	int rval;
 
-	if(attr==NULL || inheritsched==NULL)
+	if(attr==AII_NULL || inheritsched==AII_NULL)
 	{
 		return -1;	
 	}
@@ -252,7 +252,7 @@ int Pthread_attr_setinheritsched(pthread_attr_t *attr, int inheritsched)
 {
 	int rval;
 
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -277,7 +277,7 @@ int Pthread_attr_getschedpriority(const pthread_attr_t *attr, int *priority)
 	struct sched_param	params;
 	int rval;
 
-	if(attr==NULL || priority==NULL)
+	if(attr==AII_NULL || priority==AII_NULL)
 	{
 		return -1;	
 	}
@@ -305,7 +305,7 @@ static int  Pthread_get_priorityscope(int policy , int *minPriority, int *maxPri
 {
 	int priority;
 
-	if(maxPriority==NULL || minPriority==NULL)
+	if(maxPriority==AII_NULL || minPriority==AII_NULL)
 	{
 		return -1;	
 	}
@@ -345,7 +345,7 @@ int Pthread_attr_setschedpriority(pthread_attr_t *attr, int priority)
 	int maxPriority, minPriority;
 	int rval;
 	
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -395,7 +395,7 @@ int Pthread_attr_getscope(const pthread_attr_t *attr, int *scope)
 {
 	int rval;
 	
-	if(attr==NULL || scope==NULL)
+	if(attr==AII_NULL || scope==AII_NULL)
 	{
 		return -1;	
 	}
@@ -423,7 +423,7 @@ int Pthread_attr_setscope(pthread_attr_t *attr, int scope)
 {
 	int rval;
 	
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -448,7 +448,7 @@ int Pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize)
 {
 	int rval;
 	
-	if(attr==NULL || stacksize==NULL)
+	if(attr==AII_NULL || stacksize==AII_NULL)
 	{
 		return -1;	
 	}
@@ -475,7 +475,7 @@ int Pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize)
 {
 	int rval;
 	
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -507,7 +507,7 @@ int Pthread_attr_getstackaddr(const pthread_attr_t *attr, void **stackaddr)
 {
 	int rval;
 	
-	if(attr==NULL || stackaddr==NULL)
+	if(attr==AII_NULL || stackaddr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -533,7 +533,7 @@ int Pthread_attr_setstackaddr(pthread_attr_t *attr,  void *stackaddr)
 {
 	int rval;
 	
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -558,7 +558,7 @@ int Pthread_attr_getguardsize(const pthread_attr_t *attr, size_t *guardsize)
 {
 	int rval;
 	
-	if(attr==NULL || guardsize==NULL)
+	if(attr==AII_NULL || guardsize==AII_NULL)
 	{
 		return -1;	
 	}
@@ -584,7 +584,7 @@ int Pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize)
 {
 	int rval;
 	
-	if(attr==NULL)
+	if(attr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -618,7 +618,7 @@ int Pthread_attr_set(pthread_attr_t *attr, int priority, size_t stacksize)
 {
 	int rval;
 	
-	if(attr == NULL)
+	if(attr == AII_NULL)
 	{
 		return -1;	
 	}

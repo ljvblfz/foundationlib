@@ -67,9 +67,9 @@ LIST_HANDLE CreateHandle(int HandleType)
 	DS_HANDLE_ENTRY_PTR HandleEntryPtr;
 
 	if ((HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)
-		malloc(sizeof(DS_HANDLE_ENTRY)))==NULL)
+		malloc(sizeof(DS_HANDLE_ENTRY)))==AII_NULL)
 	{
-		return NULL;
+		return AII_NULL;
 	}
 	memset(HandleEntryPtr,0,sizeof(DS_HANDLE_ENTRY));
 	HandleEntryPtr->HandleType=HandleType;
@@ -89,10 +89,10 @@ LIST_HANDLE CreateHandle(int HandleType)
  */
 void DeleteHandle(LIST_HANDLE handle)
 {
-	if (handle != NULL)
+	if (handle != AII_NULL)
 	{
         free(handle);
-        handle = NULL;
+        handle = AII_NULL;
     }
 
     return;
@@ -122,10 +122,10 @@ int Initialize(
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
     int         opt;
 
-	ListHeadPtr = NULL;
-    DSHandleEntryPtr = NULL;
+	ListHeadPtr = AII_NULL;
+    DSHandleEntryPtr = AII_NULL;
 
-	if ((handle == NULL)||(CmpFcnAmount == 0))
+	if ((handle == AII_NULL)||(CmpFcnAmount == 0))
 	{
 		return OSI_ERROR;
 	}
@@ -139,19 +139,19 @@ int Initialize(
 	/* Allocate compare callback function array */
 	ListHeadPtr->CmpFcnAmount=CmpFcnAmount;
 	if ((ListHeadPtr->CmpFcnArray=(void**)
-		malloc(CmpFcnAmount*sizeof(void*)))==NULL)
+		malloc(CmpFcnAmount*sizeof(void*)))==AII_NULL)
 	{
-		if (ListHeadPtr != NULL)
+		if (ListHeadPtr != AII_NULL)
 		{
             free(ListHeadPtr);
-            ListHeadPtr = NULL;
+            ListHeadPtr = AII_NULL;
 		}
         return OSI_ERROR;
 	}
 
 	memcpy(ListHeadPtr->CmpFcnArray,CmpFcnArray,CmpFcnAmount*sizeof(void*));
 	ListHeadPtr->EntryAmount=0;
-	ListHeadPtr->EntriesList=NULL;
+	ListHeadPtr->EntriesList=AII_NULL;
     opt=OSI_SEM_Q_PRIORITY | OSI_SEM_DELETE_SAFE | OSI_SEM_INVERSION_SAFE;
 	ListHeadPtr->MutexHandle=mutex_create(opt);
 
@@ -176,8 +176,8 @@ int Count(LIST_HANDLE handle)
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
 	int amount;
 	
-    ListHeadPtr = NULL;
-    DSHandleEntryPtr = NULL;
+    ListHeadPtr = AII_NULL;
+    DSHandleEntryPtr = AII_NULL;
     amount = 0;
 
 	if (IsHandleEmpty(handle)==True)
@@ -192,7 +192,7 @@ int Count(LIST_HANDLE handle)
 		return OSI_ERROR;
 	}
 	ListHeadPtr=(LIST_HEAD_PTR)DSHandleEntryPtr->EntryPtr;
-    if (ListHeadPtr == NULL)
+    if (ListHeadPtr == AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -221,8 +221,8 @@ int IsEmpty(LIST_HANDLE HeadHandle)
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
 	LOGICAL logi;
 
-    list = NULL;
-    DSHandleEntryPtr = NULL;
+    list = AII_NULL;
+    DSHandleEntryPtr = AII_NULL;
     logi = False;
 
 	if (IsHandleEmpty(HeadHandle)==True)
@@ -289,14 +289,14 @@ int FindSW(
 	DS_HANDLE_ENTRY_PTR DSNodeHandleEntryPtr;
 	int logi,i,MaskTmp,NodeIndex;
 
-    CurrentNodePtr = NULL;
-    CmpFcnArray = NULL;
-    list = NULL;
-    DSHeadHandleEntryPtr = NULL;
-    DSNodeHandleEntryPtr = NULL;
+    CurrentNodePtr = AII_NULL;
+    CmpFcnArray = AII_NULL;
+    list = AII_NULL;
+    DSHeadHandleEntryPtr = AII_NULL;
+    DSNodeHandleEntryPtr = AII_NULL;
     logi=i=MaskTmp=0;
 
-	if (IsEmpty(HeadHandle) || KeyWordPtrArray==NULL || NodeHandle==NULL)
+	if (IsEmpty(HeadHandle) || KeyWordPtrArray==AII_NULL || NodeHandle==AII_NULL)
 	{
 		return OSI_ERROR;
 	}
@@ -443,16 +443,16 @@ int FindMW(
 	int logi,i,MaskTmp,CompareCnt, NodeIndex;
 	void* CurrentUserData;
 
-    CurrentNodePtr = NULL;
-    CmpFcnArray = NULL;
-    list = NULL;
-    DSHeadHandleEntryPtr = NULL;
-    DSNodeHandleEntryPtr = NULL;
+    CurrentNodePtr = AII_NULL;
+    CmpFcnArray = AII_NULL;
+    list = AII_NULL;
+    DSHeadHandleEntryPtr = AII_NULL;
+    DSNodeHandleEntryPtr = AII_NULL;
     logi=i=MaskTmp=CompareCnt=0;
 
 	if (
         IsHandleEmpty(HeadHandle)==True || IsHandleEmpty(NodeHandle)==True 
-        || KeyWordPtrArray==NULL 
+        || KeyWordPtrArray==AII_NULL 
         )
 	{
 		return OSI_ERROR;
@@ -500,9 +500,9 @@ int FindMW(
 		{
 			if ((MaskTmp & 0x1) && KeyWordPtrArray[i])
 			{
-				if (UserDataArray == NULL)
+				if (UserDataArray == AII_NULL)
 				{
-					CurrentUserData=NULL;
+					CurrentUserData=AII_NULL;
 				}
 				else
 				{
@@ -596,8 +596,8 @@ int FindNodeNum(
     DS_HANDLE_ENTRY_PTR DSHeadHandleEntryPtr;
     DS_HANDLE_ENTRY_PTR DSNodeHandleEntryPtr;
 
-    CurrentNodePtr=list=NULL;
-    DSHeadHandleEntryPtr=DSNodeHandleEntryPtr=NULL;
+    CurrentNodePtr=list=AII_NULL;
+    DSHeadHandleEntryPtr=DSNodeHandleEntryPtr=AII_NULL;
 
     if (IsHandleEmpty(HeadHandle)==True || IsHandleEmpty(NodeHandle)==True || IndexNum<0)
     {
@@ -706,12 +706,12 @@ int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr)
 	LIST_HEAD_PTR list;
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
 
-    CurrentNodePtr=InsertionNodePtr=NULL;
-    list = NULL;
-    DSHandleEntryPtr = NULL;
+    CurrentNodePtr=InsertionNodePtr=AII_NULL;
+    list = AII_NULL;
+    DSHandleEntryPtr = AII_NULL;
 
 	if (IsHandleEmpty(handle)
-        ||(DataPtr==NULL))
+        ||(DataPtr==AII_NULL))
 	{
 		return OSI_ERROR;
 	}
@@ -792,7 +792,7 @@ int InsertNodeHandle(
         IsHandleEmpty(HeadHandle) || 
         IsHandleEmpty(PosiNodeHandle) || 
         DataLength<0 || 
-        DataPtr==NULL
+        DataPtr==AII_NULL
         )
     {
         printf("Parameters check fail!\n");
@@ -812,7 +812,7 @@ int InsertNodeHandle(
     ListHeadPtr=(LIST_HEAD_PTR)HandleEntryPtr1->EntryPtr;
     ListNodePtr=(LIST_NODE_PTR)HandleEntryPtr2->EntryPtr;
     
-    if ((InsertNodePtr=(LIST_NODE_PTR)malloc(sizeof(LIST_NODE)))==NULL)
+    if ((InsertNodePtr=(LIST_NODE_PTR)malloc(sizeof(LIST_NODE)))==AII_NULL)
     {
         printf("Memory limited!\n");
         return OSI_ERROR;
@@ -915,15 +915,15 @@ int DeleteNodeSW(
 	void*			DataPtr;
 	int				retval;
 
-    HandleEntryPtr = NULL;
-    ListHeadPtr = NULL;
-    CurrentNodePtr=PreviousNodePtr=NextNodePtr=NULL;
-    handle = NULL;
-    DataPtr = NULL;
+    HandleEntryPtr = AII_NULL;
+    ListHeadPtr = AII_NULL;
+    CurrentNodePtr=PreviousNodePtr=NextNodePtr=AII_NULL;
+    handle = AII_NULL;
+    DataPtr = AII_NULL;
     retval = 0;
 
 	/* parameters check */
-	if (IsHandleEmpty(HeadHandle) || KeyWordPtrArray==NULL || CmpFcnIndex==0)
+	if (IsHandleEmpty(HeadHandle) || KeyWordPtrArray==AII_NULL || CmpFcnIndex==0)
 	{
 		return OSI_ERROR;
 	}
@@ -947,7 +947,7 @@ int DeleteNodeSW(
 	mutex_lock(ListHeadPtr->MutexHandle, OSI_WAIT_FOREVER);
 	CurrentNodePtr=(LIST_NODE_PTR)HandleEntry.EntryPtr;
 
-	if (CurrentNodePtr==NULL)
+	if (CurrentNodePtr==AII_NULL)
 	{
 		mutex_unlock(ListHeadPtr->MutexHandle);
 		return OSI_ERROR;
@@ -966,7 +966,7 @@ int DeleteNodeSW(
 	{
         if (CurrentNodePtr->NextNode == CurrentNodePtr) /* Only one node */
         {
-            ListHeadPtr->EntriesList=NULL;
+            ListHeadPtr->EntriesList=AII_NULL;
         }
         else
         {
@@ -986,10 +986,10 @@ int DeleteNodeSW(
 	ListHeadPtr->EntryAmount--;
 	mutex_unlock(ListHeadPtr->MutexHandle);
 	
-    if (CurrentNodePtr!=NULL)
+    if (CurrentNodePtr!=AII_NULL)
 	{
 		free(CurrentNodePtr);
-		CurrentNodePtr=NULL;
+		CurrentNodePtr=AII_NULL;
 	}
 
 	*DelNodeDataPtr=(void*)DataPtr;
@@ -1033,15 +1033,15 @@ int DeleteNodeMW(
     void*			DataPtr;
     int				retval;
 
-    HandleEntryPtr = NULL;
-    ListHeadPtr = NULL;
-    CurrentNodePtr=PreviousNodePtr=NextNodePtr=NULL;
-    handle = NULL;
-    DataPtr = NULL;
+    HandleEntryPtr = AII_NULL;
+    ListHeadPtr = AII_NULL;
+    CurrentNodePtr=PreviousNodePtr=NextNodePtr=AII_NULL;
+    handle = AII_NULL;
+    DataPtr = AII_NULL;
     retval = 0;
 
     /* parameters check */
-    if (IsHandleEmpty(HeadHandle) || KeyWordPtrArray==NULL || CmpFcnIndex==0)
+    if (IsHandleEmpty(HeadHandle) || KeyWordPtrArray==AII_NULL || CmpFcnIndex==0)
     {
         return OSI_ERROR;
     }
@@ -1065,7 +1065,7 @@ int DeleteNodeMW(
     mutex_lock(ListHeadPtr->MutexHandle, OSI_WAIT_FOREVER);
     CurrentNodePtr=(LIST_NODE_PTR)HandleEntry.EntryPtr;
 
-    if (CurrentNodePtr==NULL)
+    if (CurrentNodePtr==AII_NULL)
     {
         mutex_unlock(ListHeadPtr->MutexHandle);
         return OSI_ERROR;
@@ -1084,7 +1084,7 @@ int DeleteNodeMW(
     {
         if (CurrentNodePtr->NextNode == CurrentNodePtr) /* Only one node */
         {
-            ListHeadPtr->EntriesList=NULL;
+            ListHeadPtr->EntriesList=AII_NULL;
         }
         else
         {
@@ -1104,10 +1104,10 @@ int DeleteNodeMW(
     ListHeadPtr->EntryAmount--;
     mutex_unlock(ListHeadPtr->MutexHandle);
 
-    if (CurrentNodePtr!=NULL)
+    if (CurrentNodePtr!=AII_NULL)
     {
         free(CurrentNodePtr);
-        CurrentNodePtr=NULL;
+        CurrentNodePtr=AII_NULL;
     }
 
     *DelNodeDataPtr=(void*)DataPtr;
@@ -1135,9 +1135,9 @@ int DeleteNodes( LIST_HANDLE handle )
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
     int EntryAmount;
 
-    CurrentNodePtr=PreviousNodePtr=NULL;
-    list = NULL;
-    DSHandleEntryPtr = NULL;
+    CurrentNodePtr=PreviousNodePtr=AII_NULL;
+    list = AII_NULL;
+    DSHandleEntryPtr = AII_NULL;
 
 	if (IsHandleEmpty(handle))
 	{
@@ -1154,7 +1154,7 @@ int DeleteNodes( LIST_HANDLE handle )
 
 	mutex_lock(list->MutexHandle, OSI_WAIT_FOREVER);
 
-    if (list->EntriesList == NULL || list->EntryAmount <=0 )    /* Empty or invalid list */
+    if (list->EntriesList == AII_NULL || list->EntryAmount <=0 )    /* Empty or invalid list */
     {
         mutex_unlock(list->MutexHandle);
         return list->EntryAmount;
@@ -1172,7 +1172,7 @@ int DeleteNodes( LIST_HANDLE handle )
                 if (CurrentNodePtr->NextNode == CurrentNodePtr) /* Last unique node */
                 {
                     free(CurrentNodePtr);
-                    list->EntriesList=NULL;
+                    list->EntriesList=AII_NULL;
                     list->EntryAmount--;
                 }
                 else
@@ -1255,18 +1255,18 @@ int Delete(LIST_HANDLE handle)
     if (list->MutexHandle)
     {
         mutex_delete(list->MutexHandle);
-        list->MutexHandle=NULL;
+        list->MutexHandle=AII_NULL;
     }
 
     if (list->CmpFcnArray)
     {
         free(list->CmpFcnArray);
-        list->CmpFcnArray=NULL;
+        list->CmpFcnArray=AII_NULL;
     }
  
     free(list);
 
-    DSHandleEntryPtr->EntryPtr=NULL;
+    DSHandleEntryPtr->EntryPtr=AII_NULL;
 
     return OSI_OK;
 }
@@ -1289,8 +1289,8 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag)
 	LIST_NODE_PTR			NodePtr;
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
 
-    NodePtr = NULL;
-    HandleEntryPtr = NULL;
+    NodePtr = AII_NULL;
+    HandleEntryPtr = AII_NULL;
 
 	if (IsHandleEmpty(NodeHandle))
 	{
@@ -1350,8 +1350,8 @@ int PrintPermission(LIST_HANDLE NodeHandle)
 	LIST_NODE_PTR			NodePtr;
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
 
-    NodePtr = NULL;
-    HandleEntryPtr = NULL;
+    NodePtr = AII_NULL;
+    HandleEntryPtr = AII_NULL;
 
 	if (IsHandleEmpty(NodeHandle)==True)
 	{
@@ -1397,8 +1397,8 @@ int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag)
 	LIST_NODE_PTR			NodePtr;
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
 
-    NodePtr = NULL;
-    HandleEntryPtr = NULL;
+    NodePtr = AII_NULL;
+    HandleEntryPtr = AII_NULL;
 
 	if (IsHandleEmpty(NodeHandle)==True)
 	{
@@ -1461,13 +1461,13 @@ void* GetData( LIST_HANDLE NodeHandle )
 	LIST_HEAD_PTR				ListHeadPtr;
 	DS_HANDLE_ENTRY_PTR		HandleEntryPtr;
 
-    NodePtr = NULL;
-    ListHeadPtr = NULL;
-    HandleEntryPtr = NULL;
+    NodePtr = AII_NULL;
+    ListHeadPtr = AII_NULL;
+    HandleEntryPtr = AII_NULL;
 
 	if (IsHandleEmpty(NodeHandle)==True)
 	{
-		return NULL;
+		return AII_NULL;
 	}
 
 	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)NodeHandle;
@@ -1477,12 +1477,12 @@ void* GetData( LIST_HANDLE NodeHandle )
 		NodePtr=(LIST_NODE_PTR)HandleEntryPtr->EntryPtr;
 		return NodePtr->data;
 	case LIST_HEAD_TYPE:
-		return NULL;
+		return AII_NULL;
 	default:
 	    break;
 	}
 
-	return NULL;
+	return AII_NULL;
 }
 
 /*
@@ -1524,13 +1524,13 @@ int GetNextNode(
 	LIST_HEAD_PTR		HeadPtr;
 	DS_HANDLE_ENTRY_PTR	HeadHandleEntryPtr,CurrentHandleEntryPtr,NextHandleEntryPtr;
 
-    CurrentNodePtr=NextNodePtr=NULL;
-    HeadPtr = NULL;
-    HeadHandleEntryPtr=NULL;
-    HeadHandleEntryPtr=NULL;
-    NextHandleEntryPtr=NULL;
+    CurrentNodePtr=NextNodePtr=AII_NULL;
+    HeadPtr = AII_NULL;
+    HeadHandleEntryPtr=AII_NULL;
+    HeadHandleEntryPtr=AII_NULL;
+    NextHandleEntryPtr=AII_NULL;
 
-	if (IsHandleEmpty(HeadHandle) || IsHandleEmpty(CurrentHandle) || NextHandle==NULL)
+	if (IsHandleEmpty(HeadHandle) || IsHandleEmpty(CurrentHandle) || NextHandle==AII_NULL)
 	{
 		return OSI_ERROR;
 	}
@@ -1543,7 +1543,7 @@ int GetNextNode(
 
     HeadPtr= (LIST_HEAD_PTR) HeadHandleEntryPtr->EntryPtr;
     mutex_lock(HeadPtr->MutexHandle, OSI_WAIT_FOREVER);
-    if (HeadPtr->EntriesList == NULL) /* Empty list */
+    if (HeadPtr->EntriesList == AII_NULL) /* Empty list */
     {
         mutex_unlock(HeadPtr->MutexHandle);
         return OSI_ERROR;
@@ -1664,13 +1664,13 @@ int GetPreviousNode(
     LIST_HEAD_PTR		HeadPtr;
     DS_HANDLE_ENTRY_PTR	HeadHandleEntryPtr,CurrentHandleEntryPtr,PreviousHandleEntryPtr;
 
-    CurrentNodePtr=PreviousNodePtr=NULL;
-    HeadPtr = NULL;
-    HeadHandleEntryPtr=NULL;
-    HeadHandleEntryPtr=NULL;
-    PreviousHandleEntryPtr=NULL;
+    CurrentNodePtr=PreviousNodePtr=AII_NULL;
+    HeadPtr = AII_NULL;
+    HeadHandleEntryPtr=AII_NULL;
+    HeadHandleEntryPtr=AII_NULL;
+    PreviousHandleEntryPtr=AII_NULL;
 
-    if (IsHandleEmpty(HeadHandle) || IsHandleEmpty(CurrentHandle) || PreviousHandle==NULL)
+    if (IsHandleEmpty(HeadHandle) || IsHandleEmpty(CurrentHandle) || PreviousHandle==AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -1683,7 +1683,7 @@ int GetPreviousNode(
     
     HeadPtr= (LIST_HEAD_PTR) HeadHandleEntryPtr->EntryPtr;
     mutex_lock(HeadPtr->MutexHandle, OSI_WAIT_FOREVER);
-    if (HeadPtr->EntriesList == NULL) /* Empty list */
+    if (HeadPtr->EntriesList == AII_NULL) /* Empty list */
     {
         mutex_unlock(HeadPtr->MutexHandle);
         return OSI_ERROR;
@@ -1782,10 +1782,10 @@ int GetDataLen(LIST_HANDLE handle)
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
 	LIST_NODE_PTR NodePtr;
 
-    HandleEntryPtr = NULL;
-    NodePtr = NULL;
+    HandleEntryPtr = AII_NULL;
+    NodePtr = AII_NULL;
 
-	if (handle==NULL)
+	if (handle==AII_NULL)
 	{
 		return OSI_ERROR;
 	}
@@ -1797,7 +1797,7 @@ int GetDataLen(LIST_HANDLE handle)
 	}
 
 	NodePtr=(LIST_NODE_PTR)HandleEntryPtr->EntryPtr;
-	if (NodePtr==NULL)
+	if (NodePtr==AII_NULL)
 	{
 		return OSI_ERROR;
 	}
@@ -1819,14 +1819,14 @@ LOGICAL IsHandleEmpty(LIST_HANDLE handle)
 {
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
 
-    HandleEntryPtr = NULL;
+    HandleEntryPtr = AII_NULL;
 
-	if (handle==NULL)
+	if (handle==AII_NULL)
 	{
 		return True;
 	}
 	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
-    return (HandleEntryPtr->EntryPtr==NULL)?True:False;
+    return (HandleEntryPtr->EntryPtr==AII_NULL)?True:False;
 }
 
 /*
@@ -1844,7 +1844,7 @@ LOGICAL IsHandleEmpty(LIST_HANDLE handle)
  */
 void HandleCpy(LIST_HANDLE DesHandle,const LIST_HANDLE SrcHandle)
 {
-	if (DesHandle==NULL || IsHandleEmpty(SrcHandle))
+	if (DesHandle==AII_NULL || IsHandleEmpty(SrcHandle))
 	{
 		return;
 	}

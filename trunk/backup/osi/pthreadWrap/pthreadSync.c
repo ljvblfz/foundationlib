@@ -30,12 +30,12 @@ static inline void getTimespec(int wait_ms, struct timespec *tp)
 	if (clock_gettime(CLOCK_REALTIME, tp) == -1)
 	{
 		debug_info(DEBUG_LEVEL_3, "getTimespec: clock_gettime call fail\n");
-		tp->tv_sec = time(NULL) + 1;
+		tp->tv_sec = time(AII_NULL) + 1;
 		tp->tv_nsec = 0;
 	}
 	else
 	{
-		t = time(NULL) + 1;
+		t = time(AII_NULL) + 1;
 		if ((int)(tp->tv_sec - t) > 30) 
 		{
 			tp->tv_sec = t;
@@ -72,12 +72,12 @@ int Pthread_mutex_init(pthread_mutex_t *mutex)
 {
 	int	rval;
 	
-	if(mutex == NULL)
+	if(mutex == AII_NULL)
 	{
 		return -1;	
 	}
 
-	if((rval = pthread_mutex_init(mutex, NULL)) != 0)
+	if((rval = pthread_mutex_init(mutex, AII_NULL)) != 0)
 	{
 		debug_info(DEBUG_LEVEL_4, "Pthread_mutex_init() failed!\n");	
 	}
@@ -96,7 +96,7 @@ int Pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
 	int	rval;
 
-	if(mutex == NULL)
+	if(mutex == AII_NULL)
 	{
 		return -1;	
 	}
@@ -122,7 +122,7 @@ int Pthread_mutex_lock(pthread_mutex_t *mutex, int wait_ms)
 	int rval;
 	struct timespec timeout;
 	
-	if(mutex == NULL)
+	if(mutex == AII_NULL)
 	{
 		return -1;	
 	}
@@ -164,7 +164,7 @@ int Pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
 	int	rval;
 
-	if(mutex == NULL)
+	if(mutex == AII_NULL)
 	{
 		return -1;	
 	}
@@ -199,7 +199,7 @@ int Sem_init(sem_t *sem, unsigned value)
 {
 	int rval;
 
-	if(sem == NULL)
+	if(sem == AII_NULL)
 	{
 		return -1;	
 	}
@@ -224,7 +224,7 @@ int Sem_destroy(sem_t *sem)
 {
 	int rval;
 
-	if(sem == NULL)
+	if(sem == AII_NULL)
 	{
 		return -1;	
 	}
@@ -248,7 +248,7 @@ int Sem_post(sem_t *sem)
 {
 	int rval;
 
-	if(sem == NULL)
+	if(sem == AII_NULL)
 	{
 		return -1;	
 	}
@@ -274,7 +274,7 @@ int Sem_wait(sem_t *sem, int wait_ms)
 	int rval;
 	struct timespec timeout;
 
-	if(sem == NULL)
+	if(sem == AII_NULL)
 	{
 		return -1;	
 	}
@@ -357,12 +357,12 @@ int Pthread_rwlock_init(pthread_rwlock_t *rwlock)
 {
 	int	rval;
 
-	if(rwlock == NULL)
+	if(rwlock == AII_NULL)
 	{
 		return -1;	
 	}
 
-	if((rval = pthread_rwlock_init(rwlock, NULL)) != 0)
+	if((rval = pthread_rwlock_init(rwlock, AII_NULL)) != 0)
 	{
 		debug_info(DEBUG_LEVEL_4, "pthread_rwlock_init() failed!\n");	
 	}
@@ -381,7 +381,7 @@ int Pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
 {
 	int	rval;
 
-	if(rwlock == NULL)
+	if(rwlock == AII_NULL)
 	{
 		return -1;	
 	}
@@ -407,7 +407,7 @@ int Pthread_rwlock_rdlock(pthread_rwlock_t *rwlock, int wait_ms)
 	int	rval = 0;
 	//struct timespec timeout;
 
-	if(rwlock == NULL)
+	if(rwlock == AII_NULL)
 	{
 		return -1;	
 	}
@@ -453,7 +453,7 @@ int Pthread_rwlock_wrlock(pthread_rwlock_t *rwlock, int wait_ms)
 	int	rval = 0;
 	//struct timespec timeout;
 
-	if(rwlock == NULL)
+	if(rwlock == AII_NULL)
 	{
 		return -1;	
 	}
@@ -497,7 +497,7 @@ int Pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 {
 	int	rval;
 
-	if(rwlock == NULL)
+	if(rwlock == AII_NULL)
 	{
 		return -1;	
 	}
@@ -526,12 +526,12 @@ int Pthread_cond_init(pthread_cond_t *cond)
 {
 	int	rval;
 
-	if(cond == NULL)
+	if(cond == AII_NULL)
 	{
 		return -1;	
 	}
 
-	if((rval = pthread_cond_init(cond, NULL)) != 0)
+	if((rval = pthread_cond_init(cond, AII_NULL)) != 0)
 	{
 		debug_info(DEBUG_LEVEL_4, "pthread_cond_init() failed!\n");	
 	}
@@ -550,7 +550,7 @@ int Pthread_cond_destroy(pthread_cond_t *cond)
 {
 	int	rval;
 
-	if(cond == NULL)
+	if(cond == AII_NULL)
 	{
 		return -1;	
 	}
@@ -575,7 +575,7 @@ int Pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
 	int	rval;
 
-	if(cond == NULL || mutex == NULL)
+	if(cond == AII_NULL || mutex == AII_NULL)
 	{
 		return -1;	
 	}
@@ -602,7 +602,7 @@ int Pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, int wai
 	int	rval;
 	struct timespec timeout;
 
-	if(cond == NULL || mutex == NULL)
+	if(cond == AII_NULL || mutex == AII_NULL)
 	{
 		return -1;	
 	}
@@ -638,7 +638,7 @@ int Pthread_cond_signal(pthread_cond_t *cond)
 {
 	int	rval;
 
-	if(cond == NULL)
+	if(cond == AII_NULL)
 	{
 		return -1;	
 	}
@@ -662,7 +662,7 @@ int Pthread_cond_broadcast(pthread_cond_t *cond)
 {
 	int	rval;
 
-	if(cond == NULL)
+	if(cond == AII_NULL)
 	{
 		return -1;	
 	}

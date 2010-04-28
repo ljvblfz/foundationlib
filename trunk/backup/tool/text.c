@@ -30,22 +30,22 @@ LIST_HANDLE read_text(STRING text_filename)
 	LIST_HANDLE handle;
 	void* cmp_funs[1];
 
-    if (text_filename == NULL)
+    if (text_filename == AII_NULL)
     {
-        return NULL;
+        return AII_NULL;
     }
 
-    handle=NULL;
+    handle=AII_NULL;
 
     fp=fopen(text_filename,"r");
-    if (fp == NULL)
+    if (fp == AII_NULL)
     {
         printf("Open text file error!\n");
-        return NULL;
+        return AII_NULL;
     }
     
 	/* Create data base */
-	if ((handle=CreateHandle(LIST_HEAD_TYPE))==NULL)
+	if ((handle=CreateHandle(LIST_HEAD_TYPE))==AII_NULL)
 	{
 		goto ErrExit;
 	}
@@ -58,7 +58,7 @@ LIST_HANDLE read_text(STRING text_filename)
 	}
 	
 	fseek(fp,0,SEEK_SET);
-	line_ptr=NULL;
+	line_ptr=AII_NULL;
 	line_len=0;
 	count=0;
 	while ((nread=getline(&line_ptr,&line_len,fp)) != OSI_ERROR)
@@ -71,7 +71,7 @@ LIST_HANDLE read_text(STRING text_filename)
             fclose(fp);
 			return handle;
 		}
-		line_ptr=NULL;
+		line_ptr=AII_NULL;
 		line_len=0;
 	}
     
@@ -81,7 +81,7 @@ LIST_HANDLE read_text(STRING text_filename)
 ErrExit:
     
     fclose(fp);
-    return NULL;
+    return AII_NULL;
 }
 
 int find_keyword(
@@ -95,7 +95,7 @@ int find_keyword(
     int cmp_index, matched_index,retval;
     LIST_HANDLE line_node_handle; /* A handle represents matched line */
 
-    if (str_posi_ptr==NULL || IsHandleEmpty(text_handle))
+    if (str_posi_ptr==AII_NULL || IsHandleEmpty(text_handle))
     {
         printf("Parameter error!\n");
         return OSI_ERROR;
@@ -108,7 +108,7 @@ int find_keyword(
         return OSI_ERROR;
     }
     
-    if (keyword==NULL)
+    if (keyword==AII_NULL)
     {
         printf("No keyword for match!\n");
         return OSI_ERROR;
@@ -179,13 +179,13 @@ int replace_line_num(
     LINE_NODE_PTR line_node_ptr;
     int new_line_len, old_line_len;
 
-    if (IsHandleEmpty(text_handle) || line_num < 0 || new_line_str == NULL)
+    if (IsHandleEmpty(text_handle) || line_num < 0 || new_line_str == AII_NULL)
     {
         printf("Parameter error!\n");
         return OSI_ERROR;
     }
 
-    if ((line_handle=CreateHandle(LIST_NODE_TYPE))==NULL)
+    if ((line_handle=CreateHandle(LIST_NODE_TYPE))==AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -196,7 +196,7 @@ int replace_line_num(
         return OSI_ERROR;
     }
 
-    if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==NULL)
+    if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==AII_NULL)
     {
         ReleasePermission(line_handle,WRITE_PERMISSION_TAG);
         printf("Error: Empty node!\n");
@@ -234,13 +234,13 @@ int replace_line_kw(
 	STRING old_line_str;
     int retval, old_line_len, new_line_len;
 
-    if (IsHandleEmpty(text_handle) || new_line_str==NULL)
+    if (IsHandleEmpty(text_handle) || new_line_str==AII_NULL)
     {
         return OSI_ERROR;
     }
 
     line_handle=CreateHandle(LIST_NODE_TYPE);
-    if (line_handle==NULL)
+    if (line_handle==AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -254,7 +254,7 @@ int replace_line_kw(
         return OSI_ERROR;
     }
     
-    if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==NULL)
+    if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==AII_NULL)
     {
         printf("Error: Empty node!\n");
         DeleteHandle(line_handle);
@@ -292,14 +292,14 @@ int replace_kw(
     int retval, new_line_length,wib,wie,old_line_len,new_string_len;
     STRING old_line_str,new_line_str;
 
-    if (IsHandleEmpty(text_handle) || new_string==NULL)
+    if (IsHandleEmpty(text_handle) || new_string==AII_NULL)
     {
         return OSI_ERROR;
     }
 
 
     line_handle=CreateHandle(LIST_NODE_TYPE);
-    if (line_handle==NULL)
+    if (line_handle==AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -313,7 +313,7 @@ int replace_kw(
         return OSI_ERROR;
     }
 
-    if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==NULL)
+    if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==AII_NULL)
     {
         printf("Error: Empty node!\n");
         DeleteHandle(line_handle);
@@ -329,7 +329,7 @@ int replace_kw(
     new_line_length=old_line_len-(wie-wib+1)+new_string_len;
     if (new_line_length > old_line_len)
     {
-        if (realloc(line_node_ptr->line_ptr,new_line_length)==NULL)
+        if (realloc(line_node_ptr->line_ptr,new_line_length)==AII_NULL)
         {
             printf("Cannot reallocate enough space for new line!\n");
             DeleteHandle(line_handle);
@@ -360,10 +360,10 @@ int insert_line(
     int retval, ins_length;
     MATCH_WORD_POSITION str_posi;
     
-    line_node_ptr=line_handle=new_line=NULL;
+    line_node_ptr=line_handle=new_line=AII_NULL;
 
     if (IsHandleEmpty(text_handle) || 
-        keyword==NULL || ins_line==NULL)
+        keyword==AII_NULL || ins_line==AII_NULL)
     {
         printf("Parameters error!\n");
         return OSI_ERROR;
@@ -371,7 +371,7 @@ int insert_line(
 
     line_handle=CreateHandle(LIST_NODE_TYPE);
 
-    if (line_handle==NULL)
+    if (line_handle==AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -382,7 +382,7 @@ int insert_line(
         return OSI_ERROR;
     }
     
-    if ((line_node_ptr=(LINE_NODE_PTR)malloc(sizeof(LINE_NODE)))==NULL)
+    if ((line_node_ptr=(LINE_NODE_PTR)malloc(sizeof(LINE_NODE)))==AII_NULL)
     {
         ReleasePermission(line_handle,READ_PERMISSION_TAG);
         printf("Memory limited!\n");
@@ -391,7 +391,7 @@ int insert_line(
     
     ins_length=strlen(ins_line);
 
-    if ((new_line=(STRING)malloc(ins_length+2))==NULL) /* For extra '\r' '\0' chars */
+    if ((new_line=(STRING)malloc(ins_length+2))==AII_NULL) /* For extra '\r' '\0' chars */
     {
         printf("Memory limited!\n");
         goto ErrExit;
@@ -418,12 +418,12 @@ int insert_line(
 
 ErrExit:
 
-    if (line_node_ptr != NULL)
+    if (line_node_ptr != AII_NULL)
     {
         free(line_node_ptr);
     }
 
-    if (line_node_ptr != NULL)
+    if (line_node_ptr != AII_NULL)
     {
         free(line_node_ptr);
     }
@@ -438,14 +438,14 @@ int text_save(STRING config_filename, LIST_HANDLE text_handle)
     int amount, retval;
     LINE_NODE_PTR line_node_ptr;
 
-    if (config_filename == NULL)
+    if (config_filename == AII_NULL)
     {
         return OSI_ERROR;
     }
 
     fp=fopen(config_filename,"w");
 
-    if (fp==NULL)
+    if (fp==AII_NULL)
     {
         printf("Cannot open config file!\n");
         return OSI_ERROR;
@@ -467,7 +467,7 @@ int text_save(STRING config_filename, LIST_HANDLE text_handle)
         
         ReleasePermission(handle1,READ_PERMISSION_TAG);
         
-        if ((line_node_ptr=(LINE_NODE_PTR)GetData(handle2))==NULL)
+        if ((line_node_ptr=(LINE_NODE_PTR)GetData(handle2))==AII_NULL)
         {
             printf("Empty line!\n");
             HandleCpy(handle1,handle2);
@@ -475,7 +475,7 @@ int text_save(STRING config_filename, LIST_HANDLE text_handle)
             continue;
         }
 
-        if (line_node_ptr->line_ptr != NULL)
+        if (line_node_ptr->line_ptr != AII_NULL)
         {
             /* Write text */
             if (fwrite(line_node_ptr->line_ptr,line_node_ptr->line_len,1,fp)<0)

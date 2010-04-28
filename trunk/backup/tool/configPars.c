@@ -29,14 +29,14 @@ int get_config_value(LIST_HANDLE text_handle, STRING config_name, STRING* config
     STRING line_str, param_str, value_str;
     LINE_NODE_PTR line_node_ptr;
 
-    if (IsHandleEmpty(text_handle) || config_name==NULL || config_value_ptr==NULL)
+    if (IsHandleEmpty(text_handle) || config_name==AII_NULL || config_value_ptr==AII_NULL)
     {
         printf("Parameter error!\n");
         return OSI_ERROR;
     }
 
     line_handle=CreateHandle(LIST_NODE_TYPE);
-    if (line_handle == NULL)
+    if (line_handle == AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -48,7 +48,7 @@ int get_config_value(LIST_HANDLE text_handle, STRING config_name, STRING* config
         goto ErrExit;
     }
     
-    if ((line_node_ptr=(LINE_NODE_PTR)GetData(str_posi.line_node_handle))==NULL)
+    if ((line_node_ptr=(LINE_NODE_PTR)GetData(str_posi.line_node_handle))==AII_NULL)
     {
         goto ErrExit;
     }
@@ -74,7 +74,7 @@ int modify_config(LIST_HANDLE text_handle, STRING config_name, STRING config_val
     STRING new_line_str;
     int new_line_len, config_name_len, config_value_len;
 
-    if (IsHandleEmpty(text_handle) || config_name==NULL || config_value==NULL)
+    if (IsHandleEmpty(text_handle) || config_name==AII_NULL || config_value==AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -82,7 +82,7 @@ int modify_config(LIST_HANDLE text_handle, STRING config_name, STRING config_val
     config_value_len=strlen(config_value);
     new_line_len=config_name_len+config_value_len+1; /* For extra '=' */
 
-    if ((new_line_str=(STRING)malloc(new_line_len+1))==NULL)    /* For extra '\0' */
+    if ((new_line_str=(STRING)malloc(new_line_len+1))==AII_NULL)    /* For extra '\0' */
     {
         return OSI_ERROR;
     }
@@ -118,7 +118,7 @@ static int pars_config_line(
     STRING param_str, value_str;
     char c;
 
-    if (config_line_str==NULL || param_str_ptr==NULL || value_str_ptr==NULL)
+    if (config_line_str==AII_NULL || param_str_ptr==AII_NULL || value_str_ptr==AII_NULL)
     {
         return OSI_ERROR;
     }
@@ -130,9 +130,9 @@ static int pars_config_line(
         return OSI_ERROR;
     }
     
-    param_str=value_str=NULL;
+    param_str=value_str=AII_NULL;
 
-    if ((param_str=(STRING)malloc(deli_index+1))==NULL)
+    if ((param_str=(STRING)malloc(deli_index+1))==AII_NULL)
     {
         printf("Memory limited!\n");
         goto ErrExit;

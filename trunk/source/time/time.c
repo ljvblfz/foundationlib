@@ -64,7 +64,7 @@ int setCalendarTime(time_t calendarTime)
     newtime.tv_sec = calendarTime;
     newtime.tv_usec = 0;
 
-    return settimeofday((const struct timeval*)&newtime, NULL);
+    return settimeofday((const struct timeval*)&newtime, AII_NULL);
 #elif VXWORKS_OS
     struct timespec newtime;
 
@@ -88,12 +88,12 @@ int getCalendarTime(time_t* calendarTime)
 {
     time_t curCalendarTime; 
 
-    if (calendarTime == NULL)
+    if (calendarTime == AII_NULL)
     {
         return (-1);
     }
      
-    curCalendarTime = time(NULL);
+    curCalendarTime = time(AII_NULL);
     *calendarTime = curCalendarTime;
 
     return 0;
@@ -123,7 +123,7 @@ int setNormalTime(const TIME_NORMAL* normalTime)
     struct timeval newtime;
     unsigned long timeSec;
 
-    if (normalTime == NULL)
+    if (normalTime == AII_NULL)
     {
         return (-1);
     }
@@ -137,12 +137,12 @@ int setNormalTime(const TIME_NORMAL* normalTime)
                           normalTime->hour, normalTime->minite, normalTime->second);
     newtime.tv_sec = timeSec;
     newtime.tv_usec = 0;
-    return settimeofday((const struct timeval*)&newtime, NULL);
+    return settimeofday((const struct timeval*)&newtime, AII_NULL);
 #elif VXWORKS_OS
     struct timespec newtime;
     unsigned long timeSec;
 
-    if (normalTime == NULL)
+    if (normalTime == AII_NULL)
     {
         return (-1);
     }
@@ -195,12 +195,12 @@ int getNormalTime(TIME_NORMAL* normalTime)
     time_t curCalendarTime; 
     struct tm curGmTime;
 
-    if (normalTime == NULL)
+    if (normalTime == AII_NULL)
     {
         return (-1);
     }
      
-    curCalendarTime = time(NULL);
+    curCalendarTime = time(AII_NULL);
     gmtime_r((const time_t*)&curCalendarTime, (struct tm*)&curGmTime);
     normalTime->second = curGmTime.tm_sec;
     normalTime->minite = curGmTime.tm_min;

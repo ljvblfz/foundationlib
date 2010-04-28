@@ -26,7 +26,7 @@ static int Inet_pton(int family, const char *src, void *dst)
 {
 	int rval;
 	
-	if(src==NULL || dst==NULL)
+	if(src==AII_NULL || dst==AII_NULL)
 	{
 		return -1;	
 	}
@@ -51,12 +51,12 @@ static int Inet_pton(int family, const char *src, void *dst)
 *************************************************/
 static const char* Inet_ntop(int family, const void *src, char* dst, socklen_t len)
 {
-	if(src==NULL || dst==NULL)
+	if(src==AII_NULL || dst==AII_NULL)
 	{
-		return NULL;	
+		return AII_NULL;	
 	}
 
-	if(inet_ntop(family, src, dst, len) == NULL)
+	if(inet_ntop(family, src, dst, len) == AII_NULL)
 	{
 		debug_info(DEBUG_LEVEL_3, "inet_pton() failed!\n");	
 	}
@@ -85,9 +85,9 @@ static char *sock_ntop(const struct sockaddr *sa)
 			{
 				struct sockaddr_in	*sin = (struct sockaddr_in *) sa;
 
-				if (Inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) == NULL)
+				if (Inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) == AII_NULL)
                 {
-					return(NULL);
+					return(AII_NULL);
                 }
 				return(str);
 			}
@@ -97,9 +97,9 @@ static char *sock_ntop(const struct sockaddr *sa)
 				struct sockaddr_in6	*sin6 = (struct sockaddr_in6 *) sa;
 
 				str[0] = '[';
-				if (Inet_ntop(AF_INET6, &sin6->sin6_addr, str + 1, sizeof(str) - 1) == NULL)
+				if (Inet_ntop(AF_INET6, &sin6->sin6_addr, str + 1, sizeof(str) - 1) == AII_NULL)
                 {
-					return(NULL);
+					return(AII_NULL);
                 }
 				return (str + 1);
 			}
@@ -110,7 +110,7 @@ static char *sock_ntop(const struct sockaddr *sa)
 			return(str);
 	}
 
-	return (NULL);
+	return (AII_NULL);
 }
 
 /*************************************************
@@ -124,12 +124,12 @@ int Sock_ntop(const struct sockaddr *sa, char *ipStr)
 {
 	char	*ptr;
 	
-	if(sa==NULL || ipStr==NULL)
+	if(sa==AII_NULL || ipStr==AII_NULL)
 	{
 		return -1;	
 	}
 
-	if((ptr = sock_ntop(sa)) == NULL)
+	if((ptr = sock_ntop(sa)) == AII_NULL)
 	{
 		debug_info(DEBUG_LEVEL_3, "sock_ntop() failed!\n");			
 		return -1;
@@ -153,7 +153,7 @@ int Sock_ntop_v4(int ipaddr, char *ipStr)
 	char	ptr[INET_ADDRSTRLEN];
 	struct sockaddr_in sockaddrIn;
 
-	if(ipStr==NULL)
+	if(ipStr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -224,7 +224,7 @@ int Sock_pton(struct sockaddr *sa, const char *ipStr)
 {
 	int rval;
 
-	if(sa==NULL || ipStr==NULL)
+	if(sa==AII_NULL || ipStr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -248,7 +248,7 @@ int  Sock_pton_v4(const char *ipStr)
 {
 	struct sockaddr_in sockaddrIn;
 	
-	if(ipStr==NULL)
+	if(ipStr==AII_NULL)
 	{
 		return -1;	
 	}

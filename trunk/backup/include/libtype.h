@@ -29,46 +29,46 @@
 /* variable alias define */
 #ifndef TYPE_UINT8
 #define TYPE_UINT8
-typedef unsigned char uint8_t;
+typedef unsigned char UINT8_T;
 #endif
 #ifndef TYPE_UINT16
 #define TYPE_UINT16
-typedef unsigned short int uint16_t;
+typedef unsigned short int UINT16_T;
 #endif
 
 #ifndef TYPE_UINT32
 #define TYPE_UINT32
-typedef unsigned int uint32_t;
+typedef unsigned int UINT32_T;
 #endif
 
 #ifndef TYPE_ULONG
 #define TYPE_ULONG
-typedef unsigned long 	uint32_t;
+typedef unsigned long 	UINT32_T;
 #endif
 
 #ifndef TYPE_INT8
 #define TYPE_INT8
-typedef char 	int8_t;
+typedef char 	INT8_T;
 #endif
 
 #ifndef TYPE_INT16
 #define TYPE_INT16
-typedef short	int16_t;
+typedef short	INT16_T;
 #endif
 
 #ifndef TYPE_INT32
 #define TYPE_INT32
-typedef int	int32_t;
+typedef int	INT32_T;
 #endif
 
 #ifndef TYPE_INT
 #define TYPE_INT
-typedef int	int32_t;
+typedef int	INT32_T;
 #endif
 
 #ifndef TYPE_UINT
 #define TYPE_UINT
-typedef unsigned int	uint32_t;
+typedef unsigned int	UINT32_T;
 #endif
 
 #ifndef TYPE_PUINT8
@@ -93,10 +93,10 @@ typedef void*	PVOID;
 
 #ifndef TYPE_USHORT
 #define TYPE_USHORT
-typedef unsigned short uint16_t;
+typedef unsigned short UINT16_T;
 #endif
 typedef char * STRING;
-typedef uint8_t *	USTRING;
+typedef UINT8_T *	USTRING;
 typedef enum {False,True} LOGICAL;
 
 
@@ -120,8 +120,8 @@ typedef struct
 
 typedef struct  
 {
-	uint32_t	tv_sec;
-	uint32_t	tv_usec;
+	UINT32_T	tv_sec;
+	UINT32_T	tv_usec;
 }TIME_INTERVAL,*TIME_INTERVAL_PTR;
 
 

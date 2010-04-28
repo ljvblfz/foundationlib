@@ -13,6 +13,7 @@
 #define _MSGQ_API_H
 
 #include "foundationInclude.h"
+#include "libtype.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -23,6 +24,20 @@ extern "C"
 typedef mqd_t*          MSG_QUEUE_ID;
 #elif VXWORKS_OS
 typedef struct MSG_Q_ID MSG_QUEUE_ID; 
+#elif WIN32
+    typedef HANDLE WIN_HANDLE;
+    typedef struct  
+    {
+        WIN_HANDLE		ReadEnableHandle;
+        WIN_HANDLE		WriteEnableHandle;
+        DWORD			ReadTimeout;		/* Read wait Time-out interval, in milliseconds.  */
+        DWORD			WriteTimeout;		/* Write wait Time-out interval, in milliseconds.  */
+
+        UINT32_T		HeadIndex;
+        UINT32_T		RearIndex;
+        UINT32_T		MsgLength;
+        void*			MsgBuffer;
+    }MSG_HANDLE_ENTRY,*MSG_HANDLE_ENTRY_PTR;
 #endif
 
 #ifndef MSG_PRI_NORMAL

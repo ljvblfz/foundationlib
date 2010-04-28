@@ -40,9 +40,9 @@ typedef struct
 	DWORD			ReadTimeout;		/* Read wait Time-out interval, in milliseconds.  */
 	DWORD			WriteTimeout;		/* Write wait Time-out interval, in milliseconds.  */
 
-	UINT32_T			HeadIndex;
-	UINT32_T			RearIndex;
-	UINT32_T			MsgLength;
+	UINT32_T		HeadIndex;
+	UINT32_T		RearIndex;
+	UINT32_T		MsgLength;
 	void*			MsgBuffer;
 }MSG_HANDLE_ENTRY,*MSG_HANDLE_ENTRY_PTR;
 

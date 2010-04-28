@@ -1,12 +1,13 @@
 /**************************************************************************************
  *  Copyright (c) Artificial Intelligence Infinity.
- *  Filename: foundationDataType.h
+ *  Filename: libtype.h
  *  Description: this file contains basic types of foundation lib
  *  Author: caoyun
  *  Create:2010-01-25 
  *  Modification history:
  *  2010-01-25, created the file,           caoyun
- *  2010-03-09, refreshed the file,         chenwangxian
+ *  2010-03-09, modify the file,         chenwangxian
+ *  2010-04-28, modify the file,            Ben Shaw
  *
  *
  **************************************************************************************/ 

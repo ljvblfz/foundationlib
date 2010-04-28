@@ -46,7 +46,7 @@ int strcmplow(const char* s1,const char* s2);
 int lower (int c);
 int atomread(int fd,void* buf, int len);
 unsigned long byte_sum(unsigned char* buf, int len);
-int TCPLinkToServer(ULONG preAddr,UINT16 port,int bufsize);
+int TCPLinkToServer(uint32_t preAddr,uint16_t port,int bufsize);
 int findchar(char c, char* str, int case_sensitive);
 
 #ifndef min

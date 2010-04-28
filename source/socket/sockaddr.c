@@ -28,7 +28,7 @@ static int Inet_pton(int family, const char *src, void *dst)
 {
 	int rval;
 	
-	if(src==NULL || dst==NULL)
+	if(src==AII_NULL || dst==AII_NULL)
 	{
 		return -1;	
 	}
@@ -58,13 +58,13 @@ static int Inet_pton(int family, const char *src, void *dst)
 *************************************************/
 static const char* Inet_ntop(int family, const void *src, char* dst, socklen_t len)
 {
-	if(src==NULL || dst==NULL)
+	if(src==AII_NULL || dst==AII_NULL)
 	{
-		return NULL;	
+		return AII_NULL;	
 	}
 
 #ifdef LINUX_OS
-	if(inet_ntop(family, src, dst, len) == NULL)
+	if(inet_ntop(family, src, dst, len) == AII_NULL)
 	{
 		debug_info(DEBUG_LEVEL_3, "inet_ntop() failed!\n");	
 	}
@@ -72,7 +72,7 @@ static const char* Inet_ntop(int family, const void *src, char* dst, socklen_t l
 	return inet_ntop(family, src, dst, len);
 #elif VXWORKS_OS
     printf("This function is not yet available Vxworks!\n");
-    return NULL;
+    return AII_NULL;
 #endif
 }
 
@@ -91,9 +91,9 @@ static char *sock_ntop(const struct sockaddr *sa)
 {
     static char str[128];		/* Unix domain is largest */
 
-    if (sa == NULL)
+    if (sa == AII_NULL)
     {
-        return (NULL);
+        return (AII_NULL);
     }
      
 	switch (sa->sa_family) 
@@ -103,9 +103,9 @@ static char *sock_ntop(const struct sockaddr *sa)
 #ifdef LINUX_OS
 				struct sockaddr_in	*sin = (struct sockaddr_in *) sa;
 
-				if (Inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) == NULL)
+				if (Inet_ntop(AF_INET, &sin->sin_addr, str, sizeof(str)) == AII_NULL)
                 {
-					return(NULL);
+					return(AII_NULL);
                 }
 				return(str);
 #elif VXWORKS_OS
@@ -122,14 +122,14 @@ static char *sock_ntop(const struct sockaddr *sa)
 				struct sockaddr_in6	*sin6 = (struct sockaddr_in6 *) sa;
 
 				str[0] = '[';
-				if (Inet_ntop(AF_INET6, &sin6->sin6_addr, str + 1, sizeof(str) - 1) == NULL)
+				if (Inet_ntop(AF_INET6, &sin6->sin6_addr, str + 1, sizeof(str) - 1) == AII_NULL)
                 {
-					return(NULL);
+					return(AII_NULL);
                 }
 				return (str + 1);
 #elif VXWORKS_OS
                 printf("This function is not yet available Vxworks!\n");
-                return NULL;
+                return AII_NULL;
 #endif
 			}
             break;
@@ -139,7 +139,7 @@ static char *sock_ntop(const struct sockaddr *sa)
 			return(str);
 	}
 
-	return (NULL);
+	return (AII_NULL);
 }
 
 /*************************************************
@@ -153,12 +153,12 @@ int Sock_ntop(const struct sockaddr *sa, char *ipStr)
 {
 	char	*ptr;
 	
-	if(sa==NULL || ipStr==NULL)
+	if(sa==AII_NULL || ipStr==AII_NULL)
 	{
 		return -1;	
 	}
 
-	if((ptr = sock_ntop(sa)) == NULL)
+	if((ptr = sock_ntop(sa)) == AII_NULL)
 	{
 		debug_info(DEBUG_LEVEL_3, "sock_ntop() failed!\n");			
 		return -1;
@@ -183,7 +183,7 @@ int Sock_ntop_v4(int ipaddr, char *ipStr)
 	char	ptr[INET_ADDRSTRLEN];
 	struct sockaddr_in sockaddrIn;
 
-	if(ipStr==NULL)
+	if(ipStr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -204,7 +204,7 @@ int Sock_ntop_v4(int ipaddr, char *ipStr)
 #elif VXWORKS_OS
     struct in_addr inetaddr;
 
-	if(ipStr==NULL)
+	if(ipStr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -225,7 +225,7 @@ int Sock_ntop_v4(int ipaddr, char *ipStr)
 *************************************************/
 static int sock_pton(const char *ipStr,struct sockaddr *sa)
 {
-    if (ipStr == NULL || sa == NULL)
+    if (ipStr == AII_NULL || sa == AII_NULL)
     {
         return -1;
     }
@@ -262,7 +262,7 @@ static int sock_pton(const char *ipStr,struct sockaddr *sa)
                 }
 #elif VXWORKS_OS
                 printf("This function is not yet available Vxworks!\n");
-                return NULL;
+                return AII_NULL;
 #endif
 			}
             break;
@@ -286,7 +286,7 @@ int Sock_pton(const char *ipStr, struct sockaddr *sa)
 {
 	int rval;
 
-	if(sa==NULL || ipStr==NULL)
+	if(sa==AII_NULL || ipStr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -311,7 +311,7 @@ int  Sock_pton_v4(const char *ipStr)
 #ifdef LINUX_OS
 	struct sockaddr_in sockaddrIn;
 	
-	if(ipStr==NULL)
+	if(ipStr==AII_NULL)
 	{
 		return -1;	
 	}
@@ -326,7 +326,7 @@ int  Sock_pton_v4(const char *ipStr)
 	return sockaddrIn.sin_addr.s_addr; 
 
 #elif VXWORKS_OS
-	if(ipStr==NULL)
+	if(ipStr==AII_NULL)
 	{
 		return -1;	
 	}

@@ -39,13 +39,13 @@ struct sock_opts
 #ifdef	SO_REUSEPORT
 	{ "SO_REUSEPORT",		SOL_SOCKET,	SO_REUSEPORT,	sock_str_flag },
 #else
-	{ "SO_REUSEPORT",		0,			0,				NULL },
+	{ "SO_REUSEPORT",		0,			0,				AII_NULL },
 #endif
 	{ "SO_TYPE",			SOL_SOCKET,	SO_TYPE,		sock_str_int },
 #ifdef	SO_USELOOPBACK
 	{ "SO_USELOOPBACK",		SOL_SOCKET,	SO_USELOOPBACK,	sock_str_flag },
 #else
-	{ "SO_USELOOPBACK",		0,			0,				NULL },
+	{ "SO_USELOOPBACK",		0,			0,				AII_NULL },
 #endif
 	{ "IP_TOS",				IPPROTO_IP,	IP_TOS,			sock_str_int },
 	{ "IP_TTL",				IPPROTO_IP,	IP_TTL,			sock_str_int },
@@ -54,9 +54,9 @@ struct sock_opts
 	{ "IPV6_UNICAST_HOPS",	IPPROTO_IPV6,IPV6_UNICAST_HOPS,sock_str_int },
 	{ "IPV6_V6ONLY",		IPPROTO_IPV6,IPV6_V6ONLY,	sock_str_flag },
 #else
-	{ "IPV6_DONTFRAG",		0,			0,				NULL },
-	{ "IPV6_UNICAST_HOPS",	0,			0,				NULL },
-	{ "IPV6_V6ONLY",		0,			0,				NULL },
+	{ "IPV6_DONTFRAG",		0,			0,				AII_NULL },
+	{ "IPV6_UNICAST_HOPS",	0,			0,				AII_NULL },
+	{ "IPV6_V6ONLY",		0,			0,				AII_NULL },
 #endif
 	{ "TCP_MAXSEG",			IPPROTO_TCP,TCP_MAXSEG,		sock_str_int },
 	{ "TCP_NODELAY",		IPPROTO_TCP,TCP_NODELAY,	sock_str_flag },
@@ -66,12 +66,12 @@ struct sock_opts
 	{ "SCTP_MAXSEG",		IPPROTO_SCTP,SCTP_MAXSEG,	sock_str_int },
 	{ "SCTP_NODELAY",		IPPROTO_SCTP,SCTP_NODELAY,	sock_str_flag },
 #else
-	{ "SCTP_AUTOCLOSE",		0,			0,				NULL },
-	{ "SCTP_MAXBURST",		0,			0,				NULL },
-	{ "SCTP_MAXSEG",		0,			0,				NULL },
-	{ "SCTP_NODELAY",		0,			0,				NULL },
+	{ "SCTP_AUTOCLOSE",		0,			0,				AII_NULL },
+	{ "SCTP_MAXBURST",		0,			0,				AII_NULL },
+	{ "SCTP_MAXSEG",		0,			0,				AII_NULL },
+	{ "SCTP_NODELAY",		0,			0,				AII_NULL },
 #endif
-	{ NULL,					0,			0,				NULL }
+	{ AII_NULL,					0,			0,				AII_NULL }
 };
 
 int testDefSockopts(const char* recvBuf, char* sendBuf)
@@ -80,10 +80,10 @@ int testDefSockopts(const char* recvBuf, char* sendBuf)
 	socklen_t			len;
 	struct sock_opts	*ptr;
 
-	for (ptr = sock_opts; ptr->opt_str != NULL; ptr++) 
+	for (ptr = sock_opts; ptr->opt_str != AII_NULL; ptr++) 
 	{
 		printf("%s: ", ptr->opt_str);
-		if (ptr->opt_val_str == NULL)
+		if (ptr->opt_val_str == AII_NULL)
 		{
 			printf("(undefined)\n");
 		}

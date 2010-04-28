@@ -30,12 +30,12 @@ static inline void getTimespec(int wait_ms, struct timespec *tp)
 	if (clock_gettime(CLOCK_REALTIME, tp) == -1)
 	{
 		debug_info(DEBUG_LEVEL_1,"getTimespec: clock_gettime call fail, error %d(%s)\n", errno, strerror(errno));
-		tp->tv_sec = time(NULL) + 1;
+		tp->tv_sec = time(AII_NULL) + 1;
 		tp->tv_nsec = 0;
 	}
 	else
 	{
-		t = time(NULL) + 1;
+		t = time(AII_NULL) + 1;
 		if ((int)(tp->tv_sec - t) > 30) 
 		{
 			tp->tv_sec = t;

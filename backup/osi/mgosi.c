@@ -27,33 +27,33 @@ OSI_LIB_HANDLE msg_queue_create(
 
 	/* Create message handle entry */
 	if ((MsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)
-		malloc(sizeof(MSG_HANDLE_ENTRY)))==NULL)
+		malloc(sizeof(MSG_HANDLE_ENTRY)))==AII_NULL)
 	{
 		goto err;
 	}
 	/* Create message buffer readable event */
 	if ((MsgHandleEntryPtr->ReadEnableHandle=CreateEvent(
-		NULL,
-		TRUE,	/* Manually settable */
-		FALSE,	/* Initialized to non-signaled */
-		NULL	/* No name */
-		))==NULL)
+		AII_NULL,
+		AII_TRUE,	/* Manually settable */
+		AII_FALSE,	/* Initialized to non-signaled */
+		AII_NULL	/* No name */
+		))==AII_NULL)
 	{
 		printf("CreateEvent failed (%d)\n", GetLastError());
 		free(MsgHandleEntryPtr);
-		return NULL;
+		return AII_NULL;
 	}
 	/* Create message buffer writable event */
 	if ((MsgHandleEntryPtr->WriteEnableHandle=CreateEvent(
-		NULL,	// default security attributes
-		TRUE,	//	Manually settable
-		TRUE,	// Initialized to signaled
-		NULL	// No name
-		))==NULL)
+		AII_NULL,	// default security attributes
+		AII_TRUE,	//	Manually settable
+		AII_TRUE,	// Initialized to signaled
+		AII_NULL	// No name
+		))==AII_NULL)
 	{
 		printf("CreateEvent failed (%d)\n", GetLastError());
 		free(MsgHandleEntryPtr);
-		return NULL;
+		return AII_NULL;
 	}
 	MsgHandleEntryPtr->ReadTimeout=INFINITE;
 	MsgHandleEntryPtr->WriteTimeout=0;
@@ -62,14 +62,14 @@ OSI_LIB_HANDLE msg_queue_create(
 	MsgHandleEntryPtr->RearIndex=0;
 	/* Allocate memory space to store message */
 	if ((MsgHandleEntryPtr->MsgBuffer=
-		malloc(MsgHandleEntryPtr->MsgLength))==NULL)	
+		malloc(MsgHandleEntryPtr->MsgLength))==AII_NULL)	
 	{
 		goto err;
 	}
 	return (OSI_LIB_HANDLE)MsgHandleEntryPtr;
 err:
 	printf("Memory limited!\n");
-	return NULL;
+	return AII_NULL;
 #endif
 
 #ifdef VXWORKS_OS
@@ -109,7 +109,7 @@ LOGICAL is_msg_queue_full(OSI_LIB_HANDLE MgMsgHandle)
 
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	UINT32 RearIndex,HeadIndex,MsgLength;
+	uint32_t RearIndex,HeadIndex,MsgLength;
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MgMsgHandle;
 	RearIndex=MgMsgHandleEntryPtr->RearIndex;
@@ -129,12 +129,12 @@ LOGICAL is_msg_queue_full(OSI_LIB_HANDLE MgMsgHandle)
 }
 
 
-UINT32 msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle)
+uint32_t msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle)
 {
 
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	UINT32 RearIndex,HeadIndex,MsgLength;
+	uint32_t RearIndex,HeadIndex,MsgLength;
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MgMsgHandle;
 	MsgLength=MgMsgHandleEntryPtr->MsgLength;
@@ -162,11 +162,11 @@ UINT32 msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle)
 }
 
 
-UINT32 msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle)
+uint32_t msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle)
 {
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	UINT32 RearIndex,HeadIndex,MsgLength;
+	uint32_t RearIndex,HeadIndex,MsgLength;
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MgMsgHandle;
 	MsgLength=MgMsgHandleEntryPtr->MsgLength;
@@ -199,27 +199,27 @@ UINT32 msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle)
 
 int msg_send(
 			   OSI_LIB_HANDLE	MsgQHandle,		/* message queue handle on which to send */
-			   UINT8*			buffer,			/* message buffer to send */
-			   UINT32			MsgLength,		/* length of message */
+			   uint8_t*			buffer,			/* message buffer to send */
+			   uint32_t			MsgLength,		/* length of message */
 			   DWORD			timeout,			/* time to wait */
 			   int				priority		/* non useful in Windows platform */
 			   )
 {
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	UINT8*					msgbuffer;
-	UINT32					i=0;
+	uint8_t*					msgbuffer;
+	uint32_t					i=0;
 	DWORD					WaitReturn;
-	UINT32					MsgMaxLen,capacity;
+	uint32_t					MsgMaxLen,capacity;
 
-	if (MsgQHandle==NULL || buffer==NULL)
+	if (MsgQHandle==AII_NULL || buffer==AII_NULL)
 	{
 		return OSI_ERROR;
 	}
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MsgQHandle;
 	MgMsgHandleEntryPtr->WriteTimeout=timeout;
-	msgbuffer=(UINT8*)MgMsgHandleEntryPtr->MsgBuffer;
+	msgbuffer=(uint8_t*)MgMsgHandleEntryPtr->MsgBuffer;
 	MsgMaxLen=MgMsgHandleEntryPtr->MsgLength;
 
 	while (MsgLength)
@@ -298,26 +298,26 @@ int msg_send(
 
 int msg_receive(
 				  OSI_LIB_HANDLE		MsgQHandle,	/* message queue handle on which to send */
-				  UINT8*			buffer,		/* message buffer to receive */
-				  UINT32			MsgLength,	/* length of message */
+				  uint8_t*			buffer,		/* message buffer to receive */
+				  uint32_t			MsgLength,	/* length of message */
 				  DWORD				timeout		/* time to wait in milliseconds */
 				  )
 {
 
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	UINT8*					msgbuffer;
-	UINT32					i=0;
+	uint8_t*					msgbuffer;
+	uint32_t					i=0;
 	DWORD					ReadReturn;
-	UINT32					MsgQLen;
+	uint32_t					MsgQLen;
 
-	if (MsgQHandle==NULL || buffer==NULL)
+	if (MsgQHandle==AII_NULL || buffer==AII_NULL)
 	{
 		return OSI_ERROR;
 	}
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MsgQHandle;
 	MgMsgHandleEntryPtr->ReadTimeout=timeout;
-	msgbuffer=(UINT8*)MgMsgHandleEntryPtr->MsgBuffer;
+	msgbuffer=(uint8_t*)MgMsgHandleEntryPtr->MsgBuffer;
 	MsgQLen=MgMsgHandleEntryPtr->MsgLength;
 	while (MsgLength)
 	{
@@ -408,10 +408,10 @@ OSI_LIB_HANDLE mutex_create(
 	LPCRITICAL_SECTION MgCriticalSectionHandle;
 
 	if ((MgCriticalSectionHandle=(LPCRITICAL_SECTION)
-		malloc(sizeof(CRITICAL_SECTION)))==NULL)
+		malloc(sizeof(CRITICAL_SECTION)))==AII_NULL)
 	{
 		printf("Memory limited!\n");
-		return NULL;
+		return AII_NULL;
 	}
 	InitializeCriticalSection(MgCriticalSectionHandle);
 
@@ -427,7 +427,7 @@ OSI_LIB_HANDLE mutex_create(
 	mutex_t mutex;
 
 	posix_mutex=malloc(sizeof(pthread_mutex_t));
-	if (posix_mutex==NULL)
+	if (posix_mutex==AII_NULL)
 	{
 		return OSI_ERROR;
 	}
@@ -540,12 +540,12 @@ OSI_LIB_HANDLE task_create(
 	WIN_HANDLE WinThreadHandle;
 
 	WinThreadHandle=CreateThread(
-		NULL,	/* The handle cannot be inherited */
+		AII_NULL,	/* The handle cannot be inherited */
 		StackSize,
 		(LPTHREAD_START_ROUTINE)FcnPtr,
 		Parameters,
 		Options,
-		NULL
+		AII_NULL
 		);
 	SetThreadPriority(WinThreadHandle,Priority);
 	return (OSI_LIB_HANDLE)WinThreadHandle;

@@ -36,18 +36,18 @@ MSG_QUEUE_ID MsgQCreate(const char* mqname, int maxMsgs, int maxMsgLength)
 {
 #ifdef LINUX_OS
     struct mq_attr mqAttr = {0};
-    mqd_t* msgQId = NULL;
+    mqd_t* msgQId = AII_NULL;
 
-    if (mqname == NULL)
+    if (mqname == AII_NULL)
     {
-        return NULL;
+        return AII_NULL;
     }
     /* allocate memory in MsgQCreate
      * free memory later in MsgQDelete */
     msgQId = (mqd_t*)malloc(sizeof(mqd_t));
-    if (msgQId == NULL)
+    if (msgQId == AII_NULL)
     {
-        return NULL;
+        return AII_NULL;
     }
     
     mqAttr.mq_maxmsg = maxMsgs;
@@ -56,7 +56,7 @@ MSG_QUEUE_ID MsgQCreate(const char* mqname, int maxMsgs, int maxMsgLength)
     if (*msgQId == -1)
     {
         free(msgQId);
-        return NULL;
+        return AII_NULL;
     }
     return msgQId;
 
@@ -81,17 +81,17 @@ MSG_QUEUE_ID MsgQCreate(const char* mqname, int maxMsgs, int maxMsgLength)
 int MsgQDelete(const char* mqname, MSG_QUEUE_ID msgQId)
 {
 #ifdef LINUX_OS
-    if (mqname == NULL || msgQId == NULL)
+    if (mqname == AII_NULL || msgQId == AII_NULL)
     {
         return (-1);
     }
 
     free(msgQId);
-    msgQId = NULL;
+    msgQId = AII_NULL;
     return Mq_unlink(mqname);
 
 #elif VXWORKS_OS
-    if (msgQId == NULL)
+    if (msgQId == AII_NULL)
     {
         return (-1);
     }
@@ -120,14 +120,14 @@ int MsgQDelete(const char* mqname, MSG_QUEUE_ID msgQId)
 int MsgQSend(MSG_QUEUE_ID msgQId, const char* msgBuffer, int msgLength, int timeTick, int msgPriority)
 {
 #ifdef LINUX_OS
-    if (msgQId == NULL || msgBuffer == NULL)
+    if (msgQId == AII_NULL || msgBuffer == AII_NULL)
     {
         return (-1);
     }
     return Mq_send((mqd_t)(*msgQId), msgBuffer, msgLength, timeTick, msgPriority);
 
 #elif VXWORKS_OS
-    if (msgQId == NULL || msgBuffer == NULL)
+    if (msgQId == AII_NULL || msgBuffer == AII_NULL)
     {
         return (-1);
     }
@@ -153,14 +153,14 @@ int MsgQSend(MSG_QUEUE_ID msgQId, const char* msgBuffer, int msgLength, int time
 int MsgQReceive(MSG_QUEUE_ID msgQId, char* recvBuffer, int bufLength, int timeTick)
 {
 #ifdef LINUX_OS
-    if (msgQId == NULL || recvBuffer == NULL)
+    if (msgQId == AII_NULL || recvBuffer == AII_NULL)
     {
         return (-1);
     }
-    return Mq_receive((mqd_t)(*msgQId), recvBuffer, bufLength, timeTick, NULL);
+    return Mq_receive((mqd_t)(*msgQId), recvBuffer, bufLength, timeTick, AII_NULL);
 
 #elif VXWORKS_OS
-    if (msgQId == NULL || recvBuffer == NULL)
+    if (msgQId == AII_NULL || recvBuffer == AII_NULL)
     {
         return (-1);
     }
@@ -183,7 +183,7 @@ int MsgQNumMsgs(MSG_QUEUE_ID msgQId)
     struct mq_attr mqAttr = {0};
     int rval;
 
-    if (msgQId == NULL)
+    if (msgQId == AII_NULL)
     {
         return (-1);
     }
@@ -196,7 +196,7 @@ int MsgQNumMsgs(MSG_QUEUE_ID msgQId)
     }
     return mqAttr.mq_curmsgs;
 #elif VXWORKS_OS
-    if (msgQId == NULL)
+    if (msgQId == AII_NULL)
     {
         return (-1);
     }

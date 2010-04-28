@@ -46,7 +46,7 @@ int Pthread_create(
 {
 	int rval;
 
-	if(start_routine == NULL)
+	if(start_routine == AII_NULL)
 	{
 		return -1;	
 	}
@@ -209,7 +209,7 @@ static void *threadWrapper2(void *arg)
 	(*(func.entry))(func.arg[0], func.arg[1], func.arg[2], func.arg[3], func.arg[4],
 			func.arg[5], func.arg[6], func.arg[7], func.arg[8], func.arg[9]);
 
-	return NULL;
+	return AII_NULL;
 }
 
 /*************************************************
@@ -226,13 +226,13 @@ static void *threadWrapper2(void *arg)
 int pthreadSpawn(pthread_t *ptid, int priority, size_t stacksize, void *funcptr, unsigned args, ...)
 {
 	int i, rval;
-	void *arg[] = {[0 ... 9] = NULL};
+	void *arg[] = {[0 ... 9] = AII_NULL};
 	START_ROUTINE start;
 	pthread_t tid, *raw;
 	pthread_attr_t attr;
 	va_list ap;
 
-	if (funcptr == NULL || args > 10)
+	if (funcptr == AII_NULL || args > 10)
 	{
 		return EINVAL;
 	}
@@ -254,7 +254,7 @@ int pthreadSpawn(pthread_t *ptid, int priority, size_t stacksize, void *funcptr,
 	}
 
 	/*创建线程*/
-	raw = (ptid != NULL)? ptid:(&tid);
+	raw = (ptid != AII_NULL)? ptid:(&tid);
 	if (args <= 1)
 	{
 		rval = Pthread_create(raw, &attr, (START_ROUTINE)funcptr, arg[0]);
@@ -263,7 +263,7 @@ int pthreadSpawn(pthread_t *ptid, int priority, size_t stacksize, void *funcptr,
 	{
 		FUNC_WRAPPER2 *func;
 		func = (FUNC_WRAPPER2 *)malloc(sizeof(FUNC_WRAPPER2));
-		if (func == NULL)
+		if (func == AII_NULL)
 		{
 			(void) Pthread_attr_destroy(&attr);
 			return ENOMEM;

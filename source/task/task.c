@@ -36,13 +36,13 @@
 TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, int argnums, ...)
 {
 #ifdef LINUX_OS
-	void *arg[] = {[0 ... 9] = NULL};
+	void *arg[] = {[0 ... 9] = AII_NULL};
 	va_list ap;
     pthread_t pid;
     int rval;
     int i;
 
-	if (funcptr == NULL || argnums > 10) 
+	if (funcptr == AII_NULL || argnums > 10) 
 	{
         debug_info(DEBUG_LEVEL_4, "%s %s %d:input error!",__FILE__, __FUNCTION__, __LINE__);
 		return (-1);
@@ -66,12 +66,12 @@ TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, i
     return pid;
 
 #elif VXWORKS_OS
-	void *arg[] = {[0 ... 9] = NULL};
+	void *arg[] = {[0 ... 9] = AII_NULL};
 	va_list ap;
     int tid;
     int i;
 
-	if (funcptr == NULL || argnums > 10) 
+	if (funcptr == AII_NULL || argnums > 10) 
 	{
         debug_info(DEBUG_LEVEL_4, "%s %s %d:input error!",__FILE__, __FUNCTION__, __LINE__);
 		return (-1);
@@ -84,7 +84,7 @@ TASK_ID TaskCreate(char* taskname, int priority, int stacksize, void* funcptr, i
 	}
 	va_end(ap);
 
-    tid = taskSpawn(NULL, priority, 0, stacksize, funcptr, 
+    tid = taskSpawn(AII_NULL, priority, 0, stacksize, funcptr, 
                     arg[0], arg[1], arg[2], arg[3], arg[4],
                     arg[5], arg[6], arg[7], arg[8], arg[9]);
     if (tid == -1)

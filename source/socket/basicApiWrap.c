@@ -204,7 +204,7 @@ int ConnectWithTimeout(int sockfd, const struct sockaddr*addrs, int adrsLen,stru
     fd_set wset;
     struct timeval mytm;
 
-    if(tm!=NULL)
+    if(tm!=AII_NULL)
 	{
         memcpy(&mytm, tm, sizeof(struct timeval));
     }
@@ -221,21 +221,21 @@ int ConnectWithTimeout(int sockfd, const struct sockaddr*addrs, int adrsLen,stru
 	    {
 	    	FD_ZERO(&wset);
 	    	FD_SET(sockfd,&wset);
-		    if(select(sockfd+1,NULL,&wset,NULL,tm) > 0)
+		    if(select(sockfd+1,AII_NULL,&wset,AII_NULL,tm) > 0)
 		    {
 		    	getsockopt(sockfd,SOL_SOCKET,SO_ERROR,&err,(socklen_t*)&len);
 		    	if (0 == err)
 				{
-		    		ret = OK;
+		    		ret = AII_OK;
 				}
 		    	else
 				{
-		    		ret = ERROR;
+		    		ret = AII_ERROR;
 				}
 		    }
 		    else
 		    {
-		    	ret = ERROR;
+		    	ret = AII_ERROR;
 		    }
 	    }
     }
@@ -244,7 +244,7 @@ int ConnectWithTimeout(int sockfd, const struct sockaddr*addrs, int adrsLen,stru
     flag = 0;
     ioctl(sockfd,FIONBIO,&flag);
 
-    if(tm!=NULL)
+    if(tm!=AII_NULL)
 	{
         memcpy(tm, &mytm, sizeof(struct timeval));
     }
@@ -319,7 +319,7 @@ int Tcp_socket(int bufsize)
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-static int tcp_connect(int serverIp, UINT16 serverPort, int bufsize)
+static int tcp_connect(int serverIp, uint16_t serverPort, int bufsize)
 {
 	int sockfd;
 	struct sockaddr_in serverAddr;
@@ -366,7 +366,7 @@ static int tcp_connect(int serverIp, UINT16 serverPort, int bufsize)
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-int Tcp_connectToServer(int serverIp, UINT16 serverPort, int bufsize)
+int Tcp_connectToServer(int serverIp, uint16_t serverPort, int bufsize)
 {
 	int sockfd;
 
@@ -388,7 +388,7 @@ int Tcp_connectToServer(int serverIp, UINT16 serverPort, int bufsize)
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-static int tcp_timedconnect(int serverIp, UINT16 serverPort, int bufsize, struct timeval delaytime)
+static int tcp_timedconnect(int serverIp, uint16_t serverPort, int bufsize, struct timeval delaytime)
 {
 	int sockfd;
 	struct sockaddr_in serverAddr;
@@ -448,7 +448,7 @@ static int tcp_timedconnect(int serverIp, UINT16 serverPort, int bufsize, struct
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-int Tcp_timedconnectToServer(int serverIp, UINT16 serverPort, int bufsize, struct timeval timeout)
+int Tcp_timedconnectToServer(int serverIp, uint16_t serverPort, int bufsize, struct timeval timeout)
 {
 	int sockfd;
 

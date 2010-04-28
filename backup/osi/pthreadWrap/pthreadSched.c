@@ -80,7 +80,7 @@ int Sched_setscheduler(pid_t pid, int policy, struct sched_param *param)
 {
 	int rval;
 	
-	if(param == NULL)
+	if(param == AII_NULL)
 	{
 		return -1;	
 	}
@@ -104,7 +104,7 @@ int Sched_getparam(pid_t pid, struct sched_param *param)
 {
 	int rval;
 	
-	if(param == NULL)
+	if(param == AII_NULL)
 	{
 		return -1;	
 	}
@@ -130,7 +130,7 @@ int Sched_setparam(pid_t pid, struct sched_param *param)
 {
 	int rval;
 	
-	if(param == NULL)
+	if(param == AII_NULL)
 	{
 		return -1;	
 	}
@@ -155,7 +155,7 @@ int Sched_rr_get_interval(pid_t pid, struct timespec *tp)
 {
 	int rval;
 
-	if(tp == NULL)
+	if(tp == AII_NULL)
 	{
 		return -1;	
 	}

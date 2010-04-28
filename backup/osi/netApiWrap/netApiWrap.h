@@ -75,8 +75,8 @@ int Getsockname(int sockfd, struct sockaddr *localaddr, socklen_t *addrlen);
 int Getpeername(int sockfd, struct sockaddr *peeraddr, socklen_t *addrlen);
 //¸ß¼¶TCP API
 int connectWithTimeout(int sock, struct sockaddr*addrs, int adrsLen,struct timeval* tm);
-int Tcp_connect(int serverIp, uint16_t serverPort, int bufsize);
-int Tcp_connect_nb(int serverIp, uint16_t serverPort, int bufsize, struct timeval delaytime);
+int Tcp_connect(int serverIp, UINT16_T serverPort, int bufsize);
+int Tcp_connect_nb(int serverIp, UINT16_T serverPort, int bufsize, struct timeval delaytime);
 
 /*=====================================================
  *					UDP API

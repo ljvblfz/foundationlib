@@ -109,7 +109,7 @@ LOGICAL is_msg_queue_full(OSI_LIB_HANDLE MgMsgHandle)
 
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	uint32_t RearIndex,HeadIndex,MsgLength;
+	UINT32_T RearIndex,HeadIndex,MsgLength;
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MgMsgHandle;
 	RearIndex=MgMsgHandleEntryPtr->RearIndex;
@@ -129,12 +129,12 @@ LOGICAL is_msg_queue_full(OSI_LIB_HANDLE MgMsgHandle)
 }
 
 
-uint32_t msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle)
+UINT32_T msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle)
 {
 
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	uint32_t RearIndex,HeadIndex,MsgLength;
+	UINT32_T RearIndex,HeadIndex,MsgLength;
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MgMsgHandle;
 	MsgLength=MgMsgHandleEntryPtr->MsgLength;
@@ -162,11 +162,11 @@ uint32_t msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle)
 }
 
 
-uint32_t msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle)
+UINT32_T msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle)
 {
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	uint32_t RearIndex,HeadIndex,MsgLength;
+	UINT32_T RearIndex,HeadIndex,MsgLength;
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MgMsgHandle;
 	MsgLength=MgMsgHandleEntryPtr->MsgLength;
@@ -199,18 +199,18 @@ uint32_t msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle)
 
 int msg_send(
 			   OSI_LIB_HANDLE	MsgQHandle,		/* message queue handle on which to send */
-			   uint8_t*			buffer,			/* message buffer to send */
-			   uint32_t			MsgLength,		/* length of message */
+			   UINT8_T*			buffer,			/* message buffer to send */
+			   UINT32_T			MsgLength,		/* length of message */
 			   DWORD			timeout,			/* time to wait */
 			   int				priority		/* non useful in Windows platform */
 			   )
 {
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	uint8_t*					msgbuffer;
-	uint32_t					i=0;
+	UINT8_T*					msgbuffer;
+	UINT32_T					i=0;
 	DWORD					WaitReturn;
-	uint32_t					MsgMaxLen,capacity;
+	UINT32_T					MsgMaxLen,capacity;
 
 	if (MsgQHandle==AII_NULL || buffer==AII_NULL)
 	{
@@ -219,7 +219,7 @@ int msg_send(
 
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MsgQHandle;
 	MgMsgHandleEntryPtr->WriteTimeout=timeout;
-	msgbuffer=(uint8_t*)MgMsgHandleEntryPtr->MsgBuffer;
+	msgbuffer=(UINT8_T*)MgMsgHandleEntryPtr->MsgBuffer;
 	MsgMaxLen=MgMsgHandleEntryPtr->MsgLength;
 
 	while (MsgLength)
@@ -298,18 +298,18 @@ int msg_send(
 
 int msg_receive(
 				  OSI_LIB_HANDLE		MsgQHandle,	/* message queue handle on which to send */
-				  uint8_t*			buffer,		/* message buffer to receive */
-				  uint32_t			MsgLength,	/* length of message */
+				  UINT8_T*			buffer,		/* message buffer to receive */
+				  UINT32_T			MsgLength,	/* length of message */
 				  DWORD				timeout		/* time to wait in milliseconds */
 				  )
 {
 
 #ifdef WINDOWS_OS
 	MSG_HANDLE_ENTRY_PTR MgMsgHandleEntryPtr;
-	uint8_t*					msgbuffer;
-	uint32_t					i=0;
+	UINT8_T*					msgbuffer;
+	UINT32_T					i=0;
 	DWORD					ReadReturn;
-	uint32_t					MsgQLen;
+	UINT32_T					MsgQLen;
 
 	if (MsgQHandle==AII_NULL || buffer==AII_NULL)
 	{
@@ -317,7 +317,7 @@ int msg_receive(
 	}
 	MgMsgHandleEntryPtr=(MSG_HANDLE_ENTRY_PTR)MsgQHandle;
 	MgMsgHandleEntryPtr->ReadTimeout=timeout;
-	msgbuffer=(uint8_t*)MgMsgHandleEntryPtr->MsgBuffer;
+	msgbuffer=(UINT8_T*)MgMsgHandleEntryPtr->MsgBuffer;
 	MsgQLen=MgMsgHandleEntryPtr->MsgLength;
 	while (MsgLength)
 	{

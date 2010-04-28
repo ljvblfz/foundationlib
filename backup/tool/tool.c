@@ -141,7 +141,7 @@ int findstr(char* original_str, char* match_str)
 
 
 
-int TCPLinkToServer(uint32_t preAddr,uint16_t port,int bufsize)
+int TCPLinkToServer(UINT32_T preAddr,UINT16_T port,int bufsize)
 {
 #ifdef LINUX_OS
 	int s;

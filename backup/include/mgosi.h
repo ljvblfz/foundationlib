@@ -40,9 +40,9 @@ typedef struct
 	DWORD			ReadTimeout;		/* Read wait Time-out interval, in milliseconds.  */
 	DWORD			WriteTimeout;		/* Write wait Time-out interval, in milliseconds.  */
 
-	uint32_t			HeadIndex;
-	uint32_t			RearIndex;
-	uint32_t			MsgLength;
+	UINT32_T			HeadIndex;
+	UINT32_T			RearIndex;
+	UINT32_T			MsgLength;
 	void*			MsgBuffer;
 }MSG_HANDLE_ENTRY,*MSG_HANDLE_ENTRY_PTR;
 
@@ -72,16 +72,16 @@ OSI_LIB_HANDLE msg_queue_create(
 
 int msg_send(
 			OSI_LIB_HANDLE	MsgQHandle,		/* message queue handle on which to send */
-			uint8_t*			buffer,			/* message buffer */
-			uint32_t			MsgLength,		/* length of message */
+			UINT8_T*			buffer,			/* message buffer */
+			UINT32_T			MsgLength,		/* length of message */
 			DWORD			timeout,		/* time to wait in milliseconds */
 			int				priority		/* non useful in Windows platform */
 			);
 
 int msg_receive(
 				OSI_LIB_HANDLE	MsgQHandle,	/* message queue handle on which to send */
-				uint8_t*			buffer,		/* message buffer */
-				uint32_t			MsgLength,	/* length of message */
+				UINT8_T*			buffer,		/* message buffer */
+				UINT32_T			MsgLength,	/* length of message */
 				DWORD			timeout		/* time to wait in milliseconds */
 			   );
 
@@ -89,9 +89,9 @@ void msg_queue_delete(
 					  OSI_LIB_HANDLE	MsgQHandle		/* message queue to delete */
 				     );
 
-uint32_t msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle);
+UINT32_T msg_queue_contain(OSI_LIB_HANDLE MgMsgHandle);
 
-uint32_t msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle);
+UINT32_T msg_queue_capacity(OSI_LIB_HANDLE MgMsgHandle);
 
 /*
 *	Use critical section

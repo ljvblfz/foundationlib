@@ -318,7 +318,7 @@ int Udp_socket(int bufsize);
  * Return:  A socket descriptor, or ERROR. 
  *======================================================================
  */
-int Tcp_connectToServer(int serverIp, uint16_t serverPort, int bufsize);
+int Tcp_connectToServer(int serverIp, UINT16_T serverPort, int bufsize);
 
 /*
  * =====================================================================
@@ -332,7 +332,7 @@ int Tcp_connectToServer(int serverIp, uint16_t serverPort, int bufsize);
  * Return:  A socket descriptor, or ERROR. 
  *======================================================================
  */
-int Tcp_timedconnectToServer(int serverIp, uint16_t serverPort, int bufsize, struct timeval delaytime);
+int Tcp_timedconnectToServer(int serverIp, UINT16_T serverPort, int bufsize, struct timeval delaytime);
 
 /*
  * =====================================================================

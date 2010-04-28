@@ -53,66 +53,36 @@ extern "C"
     /*
      *	Basic type definition, compliant with ISO (POSIX)
      */
-#ifndef char_t
-    typedef char                char_t;
-#endif
+    typedef char                CHART_T;
     
-#ifndef int8_t
-    typedef signed char         int8_t;
-#endif
+    typedef signed char         INT8_T;
 
-#ifndef uint8_t
-    typedef unsigned char       uint8_t;
-#endif
+    typedef unsigned char       UINT8_T;
 
-#ifndef int16_t
-    typedef signed short        int16_t;
-#endif
+    typedef signed short        INT16_T;
 
-#ifndef uint16_t
-    typedef unsigned short      uint16_t;
-#endif
+    typedef unsigned short      UINT16_T;
 
-#ifndef int32_t
-    typedef signed int          int32_t;
-#endif
+    typedef signed int          INT32_T;
 
-#ifndef uint32_t
-    typedef unsigned int        uint32_t;
-#endif
+    typedef unsigned int        UINT32_T;
 
-#ifndef int64_t
-    typedef signed long long    int64_t;
-#endif
+    typedef signed long long    INT64_T;
 
-#ifndef uint64_t
-    typedef unsigned long long  uint64_t;
-#endif
+    typedef unsigned long long  UINT64_T;
 
-#ifndef float32_t
-    typedef float               float32_t;
-#endif
+    typedef float               FLOAT32_T;
 
-#ifndef float64_t
-    typedef double              float64_t;
-#endif
+    typedef double              FLOAT64_T;
 
-#ifndef float128_t
-    typedef long double         float128_t;
-#endif
+    typedef long double         FLOAT128_T;
     
     /* Convenient type definition */
-#ifndef STRING
     typedef char * STRING;
-#endif
 
-#ifndef USTRING
     typedef unsigned char * USTRING;
-#endif
 
-#ifndef BOOL
     typedef enum {False, True}BOOL;
-#endif
 
 #ifdef __cplusplus
 }

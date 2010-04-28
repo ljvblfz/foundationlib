@@ -319,7 +319,7 @@ int Tcp_socket(int bufsize)
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-static int tcp_connect(int serverIp, uint16_t serverPort, int bufsize)
+static int tcp_connect(int serverIp, UINT16_T serverPort, int bufsize)
 {
 	int sockfd;
 	struct sockaddr_in serverAddr;
@@ -366,7 +366,7 @@ static int tcp_connect(int serverIp, uint16_t serverPort, int bufsize)
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-int Tcp_connectToServer(int serverIp, uint16_t serverPort, int bufsize)
+int Tcp_connectToServer(int serverIp, UINT16_T serverPort, int bufsize)
 {
 	int sockfd;
 
@@ -388,7 +388,7 @@ int Tcp_connectToServer(int serverIp, uint16_t serverPort, int bufsize)
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-static int tcp_timedconnect(int serverIp, uint16_t serverPort, int bufsize, struct timeval delaytime)
+static int tcp_timedconnect(int serverIp, UINT16_T serverPort, int bufsize, struct timeval delaytime)
 {
 	int sockfd;
 	struct sockaddr_in serverAddr;
@@ -448,7 +448,7 @@ static int tcp_timedconnect(int serverIp, uint16_t serverPort, int bufsize, stru
   * Output:         N/A 
   * Return:         0---success/-1---fail
 *************************************************/
-int Tcp_timedconnectToServer(int serverIp, uint16_t serverPort, int bufsize, struct timeval timeout)
+int Tcp_timedconnectToServer(int serverIp, UINT16_T serverPort, int bufsize, struct timeval timeout)
 {
 	int sockfd;
 

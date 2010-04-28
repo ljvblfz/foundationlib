@@ -297,14 +297,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\..\..\backup\osi\timeApiWrap\debug.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\..\..\backup\osi\netApiWrap\debug.c"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\..\..\backup\osi\ioApiWrap\debug.c"
 						>
 					</File>
@@ -314,6 +306,14 @@
 					</File>
 					<File
 						RelativePath="..\..\..\..\..\backup\osi\pthreadWrap\debug.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\..\backup\osi\timeApiWrap\debug.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\..\backup\osi\netApiWrap\debug.c"
 						>
 					</File>
 					<File
@@ -485,6 +485,10 @@
 				</File>
 				<File
 					RelativePath="..\..\..\..\..\include\foundationInclude.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\..\..\include\libtype.h"
 					>
 				</File>
 				<File

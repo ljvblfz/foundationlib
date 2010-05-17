@@ -10,7 +10,7 @@
  *
  *
  **************************************************************************************/ 
-#include "foundationPthread.h"
+#include "pthread.h"
 #include "foundationDbg.h"
 
 

@@ -180,7 +180,7 @@ int Count(LIST_HANDLE handle)
     DSHandleEntryPtr = AII_NULL;
     amount = 0;
 
-	if (IsHandleEmpty(handle)==True)
+	if (IsHandleEmpty(handle)==TRUE)
 	{
 		return OSI_ERROR;
 	}
@@ -223,9 +223,9 @@ int IsEmpty(LIST_HANDLE HeadHandle)
 
     list = AII_NULL;
     DSHandleEntryPtr = AII_NULL;
-    logi = False;
+    logi = FALSE;
 
-	if (IsHandleEmpty(HeadHandle)==True)
+	if (IsHandleEmpty(HeadHandle)==TRUE)
 	{
 		return OSI_ERROR;
 	}
@@ -246,7 +246,7 @@ int IsEmpty(LIST_HANDLE HeadHandle)
     }
 
 	mutex_lock(list->MutexHandle, OSI_WAIT_FOREVER);
-	logi=(list->EntryAmount==0)?True:False;
+	logi=(list->EntryAmount==0)?TRUE:FALSE;
 	mutex_unlock(list->MutexHandle);
 	
 	return logi;
@@ -451,7 +451,7 @@ int FindMW(
     logi=i=MaskTmp=CompareCnt=0;
 
 	if (
-        IsHandleEmpty(HeadHandle)==True || IsHandleEmpty(NodeHandle)==True 
+        IsHandleEmpty(HeadHandle)==TRUE || IsHandleEmpty(NodeHandle)==TRUE 
         || KeyWordPtrArray==AII_NULL 
         )
 	{
@@ -599,7 +599,7 @@ int FindNodeNum(
     CurrentNodePtr=list=AII_NULL;
     DSHeadHandleEntryPtr=DSNodeHandleEntryPtr=AII_NULL;
 
-    if (IsHandleEmpty(HeadHandle)==True || IsHandleEmpty(NodeHandle)==True || IndexNum<0)
+    if (IsHandleEmpty(HeadHandle)==TRUE || IsHandleEmpty(NodeHandle)==TRUE || IndexNum<0)
     {
         printf("Parameter error!\n");
         return OSI_ERROR;
@@ -1353,7 +1353,7 @@ int PrintPermission(LIST_HANDLE NodeHandle)
     NodePtr = AII_NULL;
     HandleEntryPtr = AII_NULL;
 
-	if (IsHandleEmpty(NodeHandle)==True)
+	if (IsHandleEmpty(NodeHandle)==TRUE)
 	{
 		return OSI_ERROR;
 	}
@@ -1400,7 +1400,7 @@ int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag)
     NodePtr = AII_NULL;
     HandleEntryPtr = AII_NULL;
 
-	if (IsHandleEmpty(NodeHandle)==True)
+	if (IsHandleEmpty(NodeHandle)==TRUE)
 	{
 		return OSI_ERROR;
 	}
@@ -1465,7 +1465,7 @@ void* GetData( LIST_HANDLE NodeHandle )
     ListHeadPtr = AII_NULL;
     HandleEntryPtr = AII_NULL;
 
-	if (IsHandleEmpty(NodeHandle)==True)
+	if (IsHandleEmpty(NodeHandle)==TRUE)
 	{
 		return AII_NULL;
 	}
@@ -1823,10 +1823,10 @@ LOGICAL IsHandleEmpty(LIST_HANDLE handle)
 
 	if (handle==AII_NULL)
 	{
-		return True;
+		return TRUE;
 	}
 	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
-    return (HandleEntryPtr->EntryPtr==AII_NULL)?True:False;
+    return (HandleEntryPtr->EntryPtr==AII_NULL)?TRUE:FALSE;
 }
 
 /*

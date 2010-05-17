@@ -97,7 +97,7 @@ typedef unsigned short UINT16_T;
 #endif
 typedef char * STRING;
 typedef UINT8_T *	USTRING;
-typedef enum {False,True} LOGICAL;
+typedef enum {FALSE,TRUE} LOGICAL;
 
 
 typedef struct  

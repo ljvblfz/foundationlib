@@ -19,16 +19,14 @@ extern "C"
 {
 #endif
 
-#if 1
+#if 0
 #ifndef WIN32
 #define WIN32
 #endif
 #endif
 
-#if 0
 #ifndef LINUX_OS
 #define LINUX_OS
-#endif
 #endif
 
 #if 0
@@ -36,7 +34,6 @@ extern "C"
 #define VXWORKS_OS
 #endif
 #endif
-
 
     /* Especial macro definition */
     #define AII_FOREVER for(;;)
@@ -77,11 +74,11 @@ extern "C"
     typedef double              FLOAT64_T;
 
     /* Convenient type definition */
-    typedef char * STRING;
+    typedef char *              STRING;
 
-    typedef unsigned char * USTRING;
+    typedef unsigned char *     USTRING;
 
-    typedef enum {False, True}BOOL;
+    typedef enum {FALSE, TRUE}  BOOL;
 
 #ifdef __cplusplus
 }

@@ -29,11 +29,12 @@ extern "C"
 #define LINUX_OS
 #endif
 
-#if 0
+#if 1
 #ifndef VXWORKS_OS
 #define VXWORKS_OS
 #endif
 #endif
+
 
     /* Especial macro definition */
     #define AII_FOREVER for(;;)

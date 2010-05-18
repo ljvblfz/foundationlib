@@ -15,9 +15,9 @@ typedef void* thread_handle;
 
 typedef enum 
 {
-    FCFS        = 0,
-    PRIORITY    = 1,
-    RR          = 2,
+    FCFS_SCHED      = 0,
+    OTHER_SCHED     = 1,
+    RR_SCHED        = 2,
 }SCHEDULE_POLICY_T;
 
 typedef struct
@@ -33,6 +33,8 @@ typedef struct
 
 typedef struct
 {
+    BOOL                is_initialized;
+    BOOL                is_created;
     THREAD_PARAM_PTR    thread_params;
     UINT32_T            thread_id;
     void*               thread_attr;

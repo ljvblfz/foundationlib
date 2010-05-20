@@ -131,26 +131,25 @@ typedef void* THREAD_HANDLE;
      nels,  they  can make arbitrary changes to scheduling policy and prior-
      ity.
  */
-
 typedef enum 
 {
     FCFS_SCHED      = 0,
     OTHER_SCHED     = 1,
     RR_SCHED        = 2,
-}SCHEDULE_POLICY_T;
+}LINUX_PTHREAD_SCHEDULE_POLICY_T;
 
 typedef struct
 {
-    CHAR_T              thread_name[THREAD_NAME_LEN];             
-    INT32_T             stack_size;
-    INT32_T             priority;
-    SCHEDULE_POLICY_T   schedule_policy;
-    void*               route_ptr;
-    void*               args;
+    CHAR_T                              thread_name[THREAD_NAME_LEN];             
+    INT32_T                             stack_size;
+    INT32_T                             priority;
+    LINUX_PTHREAD_SCHEDULE_POLICY_T     schedule_policy;
+    void*                               route_ptr;
+    void*                               args;
     /*
      *	Reserve for vxWorks option flag.
      */
-    UINT32_T            vxworks_option_flag;
+    UINT32_T                            vxworks_option_flag;
     /*
      *
 	 *	For windows, Options implemented as dwCreationFlags.
@@ -164,7 +163,7 @@ typedef struct
 	 *	specifies the initial reserve size of the stack. 
 	 *	Otherwise, dwStackSize specifies the commit size.
      */
-    UINT32_T            win_create_flag;
+    UINT32_T                            win_create_flag;
 }THREAD_PARAM,*THREAD_PARAM_PTR;
 
 typedef struct
@@ -175,4 +174,223 @@ typedef struct
     UINT32_T            thread_id;
     void*               thread_attr;
 }THREAD_PROPERTY,*THREAD_PROPERTY_PTR;
+
+
+/*
+ *	Description:
+ *	Initialize a thread handle, allocate THREAD_PROPERTY structure, allocate
+ *  THREAD_PARAM structure, allocate thread_attr if the thread is Linux pthread.
+ *  After all the structures are initialized, the is_initialized flag will be set
+ *  to TRUE.
+ *  
+ *  thread_handle_init function only initialize all the data structures of thread handle,
+ *  the thread has not created yet. The function thread_create should be called after
+ *  thread_handle_init if user want to create the thread.
+ *  
+ *  Platform scope:
+ *  Linux, no limit
+ *  vxWorks, no limit
+ *  win32, no limit
+ *  
+ *	Parameters:
+ *	None.
+ *  
+ *  Return value:
+ *  If the function succeeds, the return value is a handle to the thread.
+ *  If the function fails, the return value is NULL.
+ */
+THREAD_HANDLE thread_handle_init(void);
+
+/*
+ *	Description:
+ *  Create thread under platform: Linux pthread, vxWorks task, WIN32 thread.
+ *  The is_created flag will be set to TRUE after the thread is successfully created.
+ *  
+ *	Platform scope:
+ *	Linux: create a pthread with attribute: no inherit attribute from father thread;
+ *          system CPU scope; detached. 
+ *  vxWorks: create a task with specific parameters.
+ *  win32: create win32 thread. Note: win32 CreateThread function return a handle to represent
+ *  a thread rather than a integer id. 
+ *  
+ *	Parameters:
+ *	1. THREAD_HANDLE thread_handle [input] (valid void pointer), a thread_handle initialized by funtion thread_handle_init.
+ *  2. THREAD_PARAM_PTR thread_param_ptr [input] (valid pointer), a pointer points to thread parameter data structure.
+ *  
+ *	Return value:
+ *	If the function succeeds, it returns AII_OK.
+ *  If the function fails, it returns AII_ERROR.
+ *  
+ */
+INT32_T thread_create(
+                      THREAD_HANDLE thread_handle, 
+                      THREAD_PARAM_PTR thread_param_ptr
+                      );
+
+/*
+ *	Description:
+ *  This function suspend a specific thread. Note: this function cannot supported
+ *  in Linux OS.
+ *  
+ *  This function is primary designed for debugger, should not use in formal
+ *  program. 
+ *
+ *	Platform scope:
+ *  Linux OS: unsupported.
+ *  vxWorks: Refer to Tornado 5.5.1 document: Care should be taken with asynchronous
+ *  use of this facility. The specified task is suspended regardless of its 
+ *  current state. The task could, for instance, have mutual exclusion to 
+ *  some system resource, such as the network * or system memory partition. 
+ *  If suspended during such a time, the facilities engaged are unavailable, 
+ *  and the situation often ends in deadlock. 
+ *
+ *  This routine is the basis of the debugging and exception handling packages. 
+ *  However, as a synchronization mechanism, this facility should be rejected 
+ *  in favor of the more general semaphore facility. 
+ *
+ *  win32:  Refer to Windows Visual Studio MSDN:
+ *  This function is primarily designed for use by debuggers. It is not intended 
+ *  to be used for thread synchronization. Calling SuspendThread on a thread 
+ *  that owns a synchronization object, such as a mutex or critical section, 
+ *  can lead to a deadlock if the calling thread tries to obtain a 
+ *  synchronization object owned by a suspended thread. To avoid this situation, 
+ *  a thread within an application that is not a debugger should signal the other 
+ *  thread to suspend itself. The target thread must be designed to watch 
+ *  for this signal and respond appropriately.
+ *
+ *	Parameters:
+ *	THREAD_HANDLE thread_handle [input] (valid thread handle), thread handle.
+ *
+ *	Return value:
+ *  If the function succeeds, it returns AII_OK.
+ *  If the function fails, it returns AII_ERROR.
+ *  
+ */
+INT32_T thread_suspend(THREAD_HANDLE thread_handle);
+
+/*
+ *	Description:
+ *  This function resume a specific thread which has been suspended. Note: this function cannot supported
+ *  in Linux OS.
+ *  
+ *  This function is primary designed for debugger, should not use in formal
+ *  program. 
+ *  
+ *	Platform scope:
+ *	Linux: unsupported.
+ *  vxWorks: supported.
+ *  win32: supported.
+ *  
+ *	Parameters:
+ *	THREAD_HANDLE thread_handle [input] (valid thread handle), thread handle.
+ *  
+ *	Return value:
+ *  If the function succeeds, it returns AII_OK.
+ *  If the function fails, it returns AII_ERROR.
+ *
+ */
+INT32_T thread_resume(THREAD_HANDLE thread_handle);
+
+/*
+ *	Description:
+ *  Sleep the thread for several milliseconds. 
+ *  
+ *	Platform scope:
+ *	Linux: invoke usleep, adjust microsecond to millisecond.
+ *  vxWorks: invoke taskDelay, adjust ticket to millisecond, maybe loss some precision.
+ *          since the unite of taskDelay is ticket which equals 1/60 second, then 
+ *          if millisecond == 0, ticket of taskDelay = 0, if millisecond > 0 but less
+ *          than 1 ticket, ticket of taskDelay = 1. This facility guarantee at least
+ *          1 ticket sleep for taskDelay.
+ *  win32: invoke sleep under unite millisecond.
+ *  
+ *	Parameters:
+ *	UINT32_T millisecond [input] (>0) sleep duration in millisecond unite.
+ *  
+ *	Return value:
+ *  None.
+ */
+void thread_sleep(UINT32_T millisecond);
+
+/*
+ *	Description:
+ *  This function changes a thread priority when a thread is running. 
+ *  
+ *	Platform scope:
+ *	Linux: supported. Bigger priority number with higher priority schedule.
+ *  vxWorks: supported. Smaller priority number with higher priority schedule.
+ *  win32: supported. Bigger priority number with higher priority schedule. Please
+ *  refer to Visual Studio MSDN document for more information.
+ *  
+ *	Parameters:
+ *	THREAD_HANDLE thread_handle [input] (valid thread handle) thread handle.
+ *  INT32_T priority [input] (valid priority value for specific platform) priority of thread.
+ *  
+ *	Return value:
+ *	If the function succeeds, it returns AII_OK.
+ *  if the function fails, it returns AII_ERROR.
+ *  
+ */
+INT32_T thread_priority_set(THREAD_HANDLE thread_handle, INT32_T priority);
+
+/*
+ *	Description:
+ *  Get real time priority of a specific thread.
+ *  
+ *	Platform scope:
+ *	Linux: supported.
+ *  vxWorks: supported.
+ *  win32: supported.
+ *  
+ *	Parameters:
+ *	THREAD_HANDLE thread_handle [input] (valid thread handle) thread handle.
+ *  INT32_T* priority_ptr [output] (valid initialized pointer) priority pointer for return.
+ *  
+ *	Return value:
+ *	If the function succeeds, it returns AII_OK.
+ *  if the function fails, it returns AII_ERROR.
+ */
+INT32_T thread_priority_get(THREAD_HANDLE thread_handle, INT32_T* priority_ptr);
+
+/*
+ *	Description:
+ *  This function cancels/deletes/terminates a specific thread. Note: This function
+ *      cannot guarantee identical behavior on all platforms. 
+ *  
+ *	Platform scope:
+ *	Linux: supported. This function invokes pthread_cancel function in Linux OS 
+ *          to cancel a thread. 
+ *  vxWorks: supported. This function invokes taskDelete function in vxWorks OS
+ *          to delete a task.
+ *  win32: supported. This function invokes TerminateThread function in win32
+ *          to terminate a win32 thread.
+ *  
+ *	Parameters:
+ *	THREAD_HANDLE thread_handle [input] (valid thread handle) thread handle.
+ *  
+ *	Return value:
+ *	If the function succeeds, it returns AII_OK.
+ *  if the function fails, it returns AII_ERROR.
+ *  
+ */
+INT32_T thread_cancel (THREAD_HANDLE thread_handle);
+
+/*
+ *	Description:
+ *  This function destroys a specific thread. Free the handle data structure 
+ *      along with all the attribute data structure and parameter data structure.
+ *  
+ *	Platform scope:
+ *	    Linux: supported.
+ *      vxWorks: supported.
+ *      win32: supported.
+ *	Parameters:
+ *	THREAD_HANDLE thread_handle [input] (valid thread handle) thread handle.
+ *  
+ *	Return value:
+ *	If the function succeeds, it returns AII_OK.
+ *  if the function fails, it returns AII_ERROR.
+ *	
+ */
+INT32_T thread_handle_destroy (THREAD_HANDLE thread_handle);
 

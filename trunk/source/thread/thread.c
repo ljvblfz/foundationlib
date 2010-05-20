@@ -407,7 +407,183 @@ INT32_T thread_priority_set(THREAD_HANDLE thread_handle, INT32_T priority)
 #endif
 
 #ifdef VXWORKS_OS
+    if (taskPrioritySet(thread_property_ptr->thread_id, priority) == ERROR)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    /*
+    	If the function succeeds, the return value is nonzero.
+        If the function fails, the return value is zero. 
+     */
+    if (SetThreadPriority((HANDLE)thread_property_ptr->thread_id, priority) == 0)
+    {
+        return AII_ERROR;
+    }
+#endif
+    
+    thread_property_ptr->thread_params->priority = priority;
+    return AII_OK;
+}
+
+INT32_T thread_priority_get(THREAD_HANDLE thread_handle, INT32_T* priority_ptr)
+{
+    THREAD_PROPERTY_PTR thread_property_ptr;
+#ifdef LINUX_OS
+    struct sched_param	param;
+#endif
+
+    if (thread_handle == AII_NULL)
+    {
+        return AII_ERROR;
+    }
+    thread_property_ptr = (THREAD_PROPERTY_PTR)thread_handle;
+    if (thread_property_ptr->is_initialized == FALSE || thread_property_ptr->is_created == FALSE)
+    {
+        return AII_ERROR;
+    }
+
+#ifdef LINUX_OS
+    if (pthread_attr_getschedparam(thread_property_ptr->thread_attr, &param) != 0)
+    {
+        return AII_ERROR;
+    }
+    *priority_ptr = param.__sched_priority;
+#endif
+
+#ifdef VXWORKS_OS
+    if (taskPriorityGet(thread_property_ptr->thread_id,priority_ptr) == ERROR)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    /* 
+        If the function succeeds, the return value is the thread's priority level.
+        If the function fails, the return value is THREAD_PRIORITY_ERROR_RETURN.
+     */
+    if ((*priority_ptr = GetThreadPriority((HANDLE)thread_property_ptr->thread_id)) == THREAD_PRIORITY_ERROR_RETURN)
+    {
+        return AII_ERROR;
+    }
 
 #endif
+
+    if (*priority_ptr != thread_property_ptr->thread_params->priority)
+    {
+        thread_property_ptr->thread_params->priority = *priority_ptr;
+    }
+
+    return AII_OK;
+}
+
+INT32_T thread_cancel (THREAD_HANDLE thread_handle)
+{
+    THREAD_PROPERTY_PTR thread_property_ptr;
+#ifdef WINDOWS_OS_32
+    INT32_T ExitCode;
+#endif
+
+    if (thread_handle == AII_NULL)
+    {
+        return AII_ERROR;
+    }
+
+    thread_property_ptr = (THREAD_PROPERTY_PTR)thread_handle;
+    if (thread_property_ptr->is_initialized == FALSE || 
+        thread_property_ptr->is_created == FALSE)
+    {
+        return AII_ERROR;
+    }
+
+#ifdef LINUX_OS
+    if (pthread_cancel((pthread_t)thread_property_ptr->thread_id) != 0)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef VXWORKS_OS
+    if (taskDelete(thread_property_ptr->thread_id) == ERROR)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    if (GetExitCodeThread((HANDLE)thread_property_ptr->thread_id, &ExitCode) == 0)
+    {
+        return AII_ERROR;
+    }
+
+    if (TerminateThread((HANDLE)thread_property_ptr->thread_id, ExitCode) == 0)
+    {
+        return AII_ERROR;
+    }
+#endif
+    
+    thread_property_ptr->is_created = FALSE;
+
+    return AII_OK;
+}
+
+INT32_T thread_delete (THREAD_HANDLE thread_handle)
+{
+    THREAD_PROPERTY_PTR thread_property_ptr;
+
+    if (thread_handle == AII_NULL)
+    {
+        return AII_ERROR;
+    }
+    
+    thread_property_ptr = (THREAD_PROPERTY_PTR) thread_handle;
+
+    if (thread_property_ptr->is_initialized == FALSE)
+    {
+        return AII_ERROR;
+    }
+
+    if (thread_property_ptr->is_created == TRUE)
+    {
+        if (thread_cancel(thread_handle) == AII_ERROR)
+        {
+            return AII_ERROR;
+        }
+    }
+
+#ifdef LINUX_OS
+    pthread_attr_destroy(thread_property_ptr->thread_attr);
+
+    if (thread_property_ptr->thread_attr)
+    {
+        free(thread_property_ptr->thread_attr);
+    }
+    if (thread_property_ptr->thread_params)
+    {
+        free(thread_property_ptr->thread_params);
+    }
+
+#endif
+
+#ifdef VXWORKS_OS
+    if (thread_property_ptr->thread_params)
+    {
+        free(thread_property_ptr->thread_params);
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    if (thread_property_ptr->thread_params)
+    {
+        free(thread_property_ptr->thread_params);
+    }
+#endif
+    
+    thread_property_ptr->is_initialized = FALSE;
+
+    return AII_OK;
 }
 

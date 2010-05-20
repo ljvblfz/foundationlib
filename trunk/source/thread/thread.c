@@ -20,7 +20,15 @@
 #include <bits/local_lim.h>
 #endif
 
-thread_handle thread_handle_init(void)
+#ifdef WINDOWS_OS_32
+#include <Windows.h>
+#endif
+
+#ifdef VXWORKS_OS
+#include <taskLib.h>
+#endif
+
+THREAD_HANDLE thread_handle_init(void)
 {
     THREAD_PROPERTY_PTR thread_property_ptr;
 
@@ -53,7 +61,7 @@ thread_handle thread_handle_init(void)
     
     thread_property_ptr->is_initialized = TRUE;
 
-    return (thread_handle) thread_property_ptr;
+    return (THREAD_HANDLE) thread_property_ptr;
 
 ErrExit:
     if (thread_property_ptr->thread_attr)
@@ -78,10 +86,8 @@ ErrExit:
 }
 
 INT32_T thread_create(
-                      thread_handle thread_id, 
-                      THREAD_PARAM_PTR thread_param_ptr,
-                      void* route_ptr,
-                      void* args  
+                      THREAD_HANDLE thread_id, 
+                      THREAD_PARAM_PTR thread_param_ptr
                       )
 {
     INT32_T retval;
@@ -94,8 +100,11 @@ INT32_T thread_create(
 #ifdef VXWORKS_OS
     INT32_T argi, task_id;
 #endif
+#ifdef WINDOWS_OS_32
+    HANDLE WinThreadHandle;
+#endif
     
-    if (thread_id == AII_NULL || thread_param_ptr == AII_NULL || route_ptr == AII_NULL)
+    if (thread_id == AII_NULL || thread_param_ptr == AII_NULL)
     {
         return AII_ERROR;
     }
@@ -207,29 +216,61 @@ INT32_T thread_create(
         goto ErrExit;
     }
     
-    memcpy(thread_property_ptr->thread_params, thread_param_ptr, sizeof(THREAD_PARAM));
 
     /* Create thread */
     retval = pthread_create((pthread_t*)&thread_property_ptr->thread_id, thread_property_ptr->thread_attr,
-        route_ptr, args);
+        thread_param_ptr->route_ptr, thread_param_ptr->args);
     if (retval != 0)
     {
         goto ErrExit;
     }
     
-    /* Release pthread attribute data, but must not free the attribute structure */
-    pthread_attr_destroy(thread_property_ptr->thread_attr);
-
     thread_property_ptr->is_created = TRUE;
 
-    return AII_OK;
-    
 #endif
 
 #ifdef VXWORKS_OS
-    argi = (INT32_T) args;
-    task_id = 
+    argi = (INT32_T) thread_param_ptr->args;
+    task_id = taskSpawn(
+        thread_param_ptr->thread_name,
+        thread_param_ptr->priority,
+        thread_param_ptr->vxworks_option_flag,
+        thread_param_ptr->stack_size,
+        thread_param_ptr->route_ptr,	
+        argi,0,0,0,0,0,0,0,0,0
+        );
+
+    if (task_id == -1)
+    {
+        goto ErrExit;
+    }
+    
+    thread_property_ptr->is_created = TRUE;
+    thread_property_ptr->thread_id = task_id;
+    
 #endif
+
+#ifdef WINDOWS_OS_32
+    WinThreadHandle = CreateThread(
+        AII_NULL,
+        thread_param_ptr->stack_size,
+        (LPTHREAD_START_ROUTINE)thread_param_ptr->route_ptr,
+        (LPVOID)thread_param_ptr->args,
+        thread_param_ptr->win_create_flag,
+        AII_NULL
+        );
+    if (WinThreadHandle == AII_NULL)
+    {
+        goto ErrExit;
+    }
+    
+    SetThreadPriority(WinThreadHandle, thread_param_ptr->priority);
+    thread_property_ptr->thread_id = (UINT32_T) WinThreadHandle;
+    
+#endif
+    
+    memcpy(thread_property_ptr->thread_params, thread_param_ptr, sizeof(THREAD_PARAM));
+    return AII_OK;
 
 ErrExit:
 #ifdef LINUX_OS
@@ -238,3 +279,135 @@ ErrExit:
     
     return AII_ERROR;
 }
+
+
+INT32_T thread_suspend(THREAD_HANDLE thread_handle)
+{
+    THREAD_PROPERTY_PTR thread_property_ptr;
+
+    if (thread_handle == AII_NULL)
+    {
+        return AII_ERROR;
+    }
+    
+    thread_property_ptr = (THREAD_PROPERTY_PTR) thread_handle;
+    if (thread_property_ptr->is_initialized == FALSE || 
+        thread_property_ptr->is_created == FALSE)
+    {
+        return AII_ERROR;
+    }
+
+#ifdef LINUX_OS
+    
+#endif
+
+#ifdef VXWORKS_OS
+    if (taskSuspend(thread_property_ptr->thread_id) == ERROR)
+    {
+        return AII_ERROR;
+    }
+#endif
+    
+#ifdef WINDOWS_OS_32
+    if (SuspendThread((HANDLE)thread_property_ptr->thread_id) == -1)
+    {
+        return AII_ERROR;
+    }
+#endif
+    
+    return AII_OK;
+}
+
+INT32_T thread_resume(THREAD_HANDLE thread_handle)
+{
+    THREAD_PROPERTY_PTR thread_property_ptr;
+
+    if (thread_handle == AII_NULL)
+    {
+        return AII_ERROR;
+    }
+
+    thread_property_ptr = (THREAD_PROPERTY_PTR) thread_handle;
+    if (thread_property_ptr->is_initialized == FALSE || 
+        thread_property_ptr->is_created == FALSE)
+    {
+        return AII_ERROR;
+    }
+
+#ifdef LINUX_OS
+
+#endif
+
+#ifdef VXWORKS_OS
+    if (taskResume(thread_property_ptr->thread_id) == ERROR)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    if (ResumeThread((HANDLE)thread_property_ptr->thread_id) == -1)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+    return AII_OK;
+}
+
+void thread_sleep(UINT32_T millisecond)
+{
+#ifdef LINUX_OS
+    usleep(millisecond*1000);
+#endif
+
+#ifdef VXWORKS_OS
+    INT32_T sleep_tick;
+    
+    sleep_tick = millisecond>>4;
+    if (millisecond == 0)
+    {
+        sleep_tick = 0;
+    }
+    else if (sleep_tick == 0)
+    {
+        sleep_tick = 1;
+    }
+
+    taskDelay(sleep_tick);
+#endif
+#ifdef WINDOWS_OS_32
+    sleep(millisecond);
+#endif
+}
+
+INT32_T thread_priority_set(THREAD_HANDLE thread_handle, INT32_T priority)
+{
+    THREAD_PROPERTY_PTR thread_property_ptr;
+#ifdef LINUX_OS
+    struct sched_param	param;
+#endif
+
+    if (thread_handle == AII_NULL)
+    {
+        return AII_ERROR;
+    }
+    thread_property_ptr = (THREAD_PROPERTY_PTR)thread_handle;
+    if (thread_property_ptr->is_initialized == FALSE || thread_property_ptr->is_created == FALSE)
+    {
+        return AII_ERROR;
+    }
+
+#ifdef LINUX_OS
+    param.__sched_priority = priority;
+    if (pthread_attr_setschedparam(thread_property_ptr->thread_attr, &param) != 0)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef VXWORKS_OS
+
+#endif
+}
+

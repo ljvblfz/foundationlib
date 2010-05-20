@@ -19,9 +19,9 @@ extern "C"
 {
 #endif
 
-#if 0
-#ifndef WIN32
-#define WIN32
+#if 1
+#ifndef WINDOWS_OS_32
+#define WINDOWS_OS_32
 #endif
 #endif
 
@@ -52,7 +52,7 @@ extern "C"
     /*
      *	Basic type definition
      */
-    typedef char                CHART_T;
+    typedef char                CHAR_T;
     
     typedef signed char         INT8_T;
 

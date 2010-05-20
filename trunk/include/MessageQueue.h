@@ -24,7 +24,7 @@ extern "C"
 typedef mqd_t*          MSG_QUEUE_ID;
 #elif VXWORKS_OS
 typedef struct MSG_Q_ID MSG_QUEUE_ID; 
-#elif WIN32
+#elif WINDOWS_OS_32
     typedef HANDLE WIN_HANDLE;
     typedef struct  
     {

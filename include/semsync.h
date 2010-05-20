@@ -12,6 +12,7 @@
 #ifndef _SEM_API_H
 #define _SEM_API_H
 
+#include "libtype.h"
 
 #ifdef __cplusplus
 extern "C"

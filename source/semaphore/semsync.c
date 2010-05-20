@@ -6,22 +6,32 @@
  *  Create:2010-03-15
  *  Modification history:
  *  2010-03-15, created the file,           chenwangxian
+ *  2010-05-20, modification base on OS interfaces, Ben Shaw
  *
  *
  **************************************************************************************/
 
-#include "foundationInclude.h"
-#include "foundationPthread.h"
-#include "foundationSem.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "semsync.h"
+
+#ifdef LINUX_OS
+#include <semaphore.h>
+#endif
+
+#ifdef VXWORKS_OS
+#include <semLib.h>
+#endif
 
 /*
  * =====================================================================
  * Function:SemCreate()
- * Description: create a semaphore to synchromism. 
+ * Description: create a semaphore to synchronization. 
  * Input:   initValue -- SEM_INIT_LOCK or SEM_INIT_UNLOCK
  * Output:  N/A
  * Return:  On success semId; on failure NULL.
- *======================================================================
+ * ======================================================================
  */
 SEM_ID SemCreate(unsigned initValue)
 {

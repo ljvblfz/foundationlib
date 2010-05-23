@@ -17,5 +17,5 @@ Programmed by shaobin.
 int main(void)
 {
 
-    return OSI_OK;
+    return AII_OK;
 }

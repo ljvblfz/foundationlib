@@ -78,7 +78,7 @@ int getline(char** lineptr, int* n, FILE* fp)
 	
 	if (count == 0)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	
 	count++; /* For storing extra '\0' char */
@@ -86,7 +86,7 @@ int getline(char** lineptr, int* n, FILE* fp)
 	{
 		if ((*lineptr=(char*)realloc(*lineptr,count))==AII_NULL)
 		{
-			return OSI_ERROR;
+			return AII_ERROR;
 		}
 	}
 	*n=count;
@@ -121,7 +121,7 @@ int findstr(char* original_str, char* match_str)
 
 	if (original_str==AII_NULL || match_str==AII_NULL)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	while (original_str[index]!='\0')
@@ -136,7 +136,7 @@ int findstr(char* original_str, char* match_str)
 		index++;
 	}
 
-	return OSI_ERROR;
+	return AII_ERROR;
 }
 
 
@@ -153,18 +153,18 @@ int TCPLinkToServer(UINT32_T preAddr,UINT16_T port,int bufsize)
 	*/
 	if (preAddr==0 || port==0)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
-	if ((s=socket(AF_INET,SOCK_STREAM,0))==OSI_ERROR)
+	if ((s=socket(AF_INET,SOCK_STREAM,0))==AII_ERROR)
 	{
 		printf("Create socket fail!\n");
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	if (bufsize>0)
 	{
-		if (setsockopt (s, SOL_SOCKET, SO_RCVBUF, (char *)&bufsize, sizeof (bufsize))==OSI_ERROR)
+		if (setsockopt (s, SOL_SOCKET, SO_RCVBUF, (char *)&bufsize, sizeof (bufsize))==AII_ERROR)
 		{
 			printf("Set socket buffer size error, use the default buffer size!\n");
 		}
@@ -178,15 +178,15 @@ int TCPLinkToServer(UINT32_T preAddr,UINT16_T port,int bufsize)
 	{
 		printf("bind error\n");
 		close (s);
-		return OSI_ERROR;
+		return AII_ERROR;
 	}	
 	peeraddr_in.sin_addr.s_addr = preAddr;/*(int) inet_addr (preAddr);*/
 	peeraddr_in.sin_port        = htons (port);	
 
-	if (connect (s, (struct sockaddr *)&peeraddr_in, sizeof(peeraddr_in)) == OSI_ERROR)
+	if (connect (s, (struct sockaddr *)&peeraddr_in, sizeof(peeraddr_in)) == AII_ERROR)
 	{
 		close(s);    
-		return OSI_ERROR;    
+		return AII_ERROR;    
 	}
 
 	return s;
@@ -194,7 +194,7 @@ int TCPLinkToServer(UINT32_T preAddr,UINT16_T port,int bufsize)
 	
 #ifdef WINDOWS_OS
 
-	return OSI_OK;
+	return AII_OK;
 #endif
 }
 
@@ -219,7 +219,7 @@ int atomread(int fd,void* buf, int len)
 			ret=read(fd,buf+rlen,remlen);
 			if (ret<=0)
 			{
-				return OSI_ERROR;
+				return AII_ERROR;
 			}
 			remlen-=ret;
 			rlen+=ret;
@@ -227,14 +227,14 @@ int atomread(int fd,void* buf, int len)
 	}
 	if (remlen==0)
 	{
-		return OSI_OK;
+		return AII_OK;
 	}
-	return OSI_ERROR;
+	return AII_ERROR;
 
 #endif
 
 #ifdef WINDOWS_OS
-	return OSI_OK;
+	return AII_OK;
 #endif
 }
 
@@ -258,11 +258,11 @@ int atomwrite(int fd, void* buf, int len)
 
 	if (len<0)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	if (len==0)
 	{
-		return OSI_OK;
+		return AII_OK;
 	}
 
 	remlen=len;
@@ -276,9 +276,9 @@ int atomwrite(int fd, void* buf, int len)
 		if (select(fd+1,AII_NULL,&wset,AII_NULL,&select_timeout)>0)
 		{
 			ret=write(fd,buf+wlen,remlen);
-			if (ret==OSI_ERROR)
+			if (ret==AII_ERROR)
 			{
-				return OSI_ERROR;
+				return AII_ERROR;
 			}
 			remlen-=ret;
 			wlen+=ret;
@@ -287,15 +287,15 @@ int atomwrite(int fd, void* buf, int len)
 
 	if (remlen==0)
 	{
-		return OSI_OK;
+		return AII_OK;
 	}
 
-	return OSI_ERROR;
+	return AII_ERROR;
 #endif
 
 #ifdef WINDOWS_OS
 
-	return OSI_OK;
+	return AII_OK;
 #endif
 }
 
@@ -340,7 +340,7 @@ int strmatch (int n,STRING strarray[], STRING cs)
 			return n;
 		}
 	}
-	return OSI_ERROR;
+	return AII_ERROR;
 }
 
 void bezeros (int n,void * p)
@@ -392,7 +392,7 @@ unsigned long byte_sum(unsigned char* buf, int len)
 
 	if (buf==AII_NULL || len<0)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	sum=0;
@@ -411,7 +411,7 @@ int findchar(char c, char* str, int case_sensitive)
 
 	if (str==AII_NULL)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	
 	while (str[index])
@@ -433,6 +433,6 @@ int findchar(char c, char* str, int case_sensitive)
 		index++;
 	}
 
-	return OSI_ERROR;
+	return AII_ERROR;
 }
 

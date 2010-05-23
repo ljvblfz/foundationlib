@@ -24,16 +24,12 @@
 #include <semLib.h>
 #endif
 
-/*
- * =====================================================================
- * Function:SemCreate()
- * Description: create a semaphore to synchronization. 
- * Input:   initValue -- SEM_INIT_LOCK or SEM_INIT_UNLOCK
- * Output:  N/A
- * Return:  On success semId; on failure NULL.
- * ======================================================================
- */
-SEM_ID SemCreate(unsigned initValue)
+#ifdef WINDOWS_OS_32
+#include <Windows.h>
+#endif
+
+
+SEM_ID sem_create(unsigned initValue)
 {
 #ifdef LINUX_OS
     sem_t* semId = AII_NULL;

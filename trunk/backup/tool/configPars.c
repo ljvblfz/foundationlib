@@ -32,17 +32,17 @@ int get_config_value(LIST_HANDLE text_handle, STRING config_name, STRING* config
     if (IsHandleEmpty(text_handle) || config_name==AII_NULL || config_value_ptr==AII_NULL)
     {
         printf("Parameter error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     line_handle=CreateHandle(LIST_NODE_TYPE);
     if (line_handle == AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     str_posi.line_node_handle=line_handle;
-    if (find_keyword(text_handle,config_name,&str_posi,READ_PERMISSION_TAG)==OSI_ERROR)
+    if (find_keyword(text_handle,config_name,&str_posi,READ_PERMISSION_TAG)==AII_ERROR)
     {
         printf("Cannot find keyword:%s!\n", config_name);
         goto ErrExit;
@@ -55,18 +55,18 @@ int get_config_value(LIST_HANDLE text_handle, STRING config_name, STRING* config
 
     line_str=line_node_ptr->line_ptr;
 
-    if (pars_config_line(line_str,&param_str,&value_str)==OSI_ERROR)
+    if (pars_config_line(line_str,&param_str,&value_str)==AII_ERROR)
     {
         printf("Pars config string error!\n");
         goto ErrExit;
     }
     
     *config_value_ptr=value_str;
-    return OSI_OK;
+    return AII_OK;
 
 ErrExit:
     DeleteHandle(line_handle);
-    return OSI_ERROR;
+    return AII_ERROR;
 }
 
 int modify_config(LIST_HANDLE text_handle, STRING config_name, STRING config_value)
@@ -76,7 +76,7 @@ int modify_config(LIST_HANDLE text_handle, STRING config_name, STRING config_val
 
     if (IsHandleEmpty(text_handle) || config_name==AII_NULL || config_value==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     config_name_len=strlen(config_name);
     config_value_len=strlen(config_value);
@@ -84,7 +84,7 @@ int modify_config(LIST_HANDLE text_handle, STRING config_name, STRING config_val
 
     if ((new_line_str=(STRING)malloc(new_line_len+1))==AII_NULL)    /* For extra '\0' */
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     memcpy(new_line_str, config_name, config_name_len);
@@ -92,20 +92,20 @@ int modify_config(LIST_HANDLE text_handle, STRING config_name, STRING config_val
     memcpy(new_line_str+config_name_len+1,config_value,config_value_len);
     new_line_str[new_line_len]='\0';
     
-    if (replace_line_kw(text_handle,config_name,new_line_str)==OSI_ERROR)
+    if (replace_line_kw(text_handle,config_name,new_line_str)==AII_ERROR)
     {
         printf("Replace line error!\n");
         goto ErrExit;
     }
 
-    return OSI_OK;
+    return AII_OK;
 
 ErrExit:
     if (new_line_str)
     {
         free(new_line_str);
     }
-    return OSI_ERROR;
+    return AII_ERROR;
 }
 
 static int pars_config_line(
@@ -120,14 +120,14 @@ static int pars_config_line(
 
     if (config_line_str==AII_NULL || param_str_ptr==AII_NULL || value_str_ptr==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     deli_index=findstr(config_line_str,"=");
-    if (deli_index==OSI_ERROR)
+    if (deli_index==AII_ERROR)
     {
         printf("Cannot find delimiter of config line!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     param_str=value_str=AII_NULL;
@@ -182,7 +182,7 @@ static int pars_config_line(
     *param_str_ptr=param_str;
     *value_str_ptr=value_str;
 
-    return OSI_OK;
+    return AII_OK;
 
 ErrExit:
     if (param_str)
@@ -193,7 +193,7 @@ ErrExit:
     {
         free(value_str);
     }
-    return OSI_ERROR;
+    return AII_ERROR;
 }
 
 

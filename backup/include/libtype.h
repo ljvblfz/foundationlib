@@ -18,12 +18,12 @@
 #endif
 */
 
-#ifndef OSI_ERROR
-#define OSI_ERROR						-1
+#ifndef AII_ERROR
+#define AII_ERROR						-1
 #endif
 
-#ifndef OSI_OK
-#define OSI_OK							0
+#ifndef AII_OK
+#define AII_OK							0
 #endif
 
 /* variable alias define */

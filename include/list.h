@@ -30,18 +30,6 @@
 
 #define LIST_PERMISSION_DENY			-2
 
-#ifndef OSI_ERROR
-#define OSI_ERROR              -1
-#endif
-
-#ifndef OSI_OK
-#define OSI_OK                 0
-#endif
-
-#ifndef AII_NULL
-#define AII_NULL               ((void*) 0)
-#endif
-
 typedef void*   LIST_HANDLE;
 /*
  *	Description: 
@@ -54,7 +42,7 @@ typedef void*   LIST_HANDLE;
  *  Return:
  *  handle pointer, a valid pointer or NULL when memory limits
  */
-LIST_HANDLE CreateHandle(int HandleType);
+LIST_HANDLE CreateHandle(INT32_T HandleType);
 /*
  *  Description:
  *	Function "DeleteHandle" deletes a handle. Note: It just deletes the handle descriptor.
@@ -81,9 +69,9 @@ void DeleteHandle(LIST_HANDLE handle);
 *	Return:
 *	Function Execution Status, (OSI_OK, OSI_ERROR)
 */
-int Initialize(
+INT32_T Initialize(
                LIST_HANDLE handle,
-               int	CmpFcnAmount,
+               INT32_T	CmpFcnAmount,
                void** CmpFcnArray
                );
 /*
@@ -95,7 +83,7 @@ int Initialize(
 *	Return:
 *	Function Execution Status, (OSI_ERROR, OSI_OK).
 */
-int Count(LIST_HANDLE handle);
+INT32_T Count(LIST_HANDLE handle);
 
 /*
 *	Description:
@@ -108,7 +96,7 @@ int Count(LIST_HANDLE handle);
 *	OSI_ERROR if an error occur. False if the list is not empty, True if 
 *	the list is empty. 
 */
-int IsEmpty(LIST_HANDLE HeadHandle);
+INT32_T IsEmpty(LIST_HANDLE HeadHandle);
 
 /*
 *	Description:
@@ -130,12 +118,12 @@ int IsEmpty(LIST_HANDLE HeadHandle);
 *	process want to write it.
 *  3. >0 Successfully find specific node and return the index of node.
 */
-int FindSW(
+INT32_T FindSW(
            LIST_HANDLE HeadHandle,
            void** KeyWordPtrArray,
-           int CmpFcnIndex,
+           INT32_T CmpFcnIndex,
            LIST_HANDLE NodeHandle,
-           int PermissionTag,
+           INT32_T PermissionTag,
            void* UserData
            );
 
@@ -162,12 +150,12 @@ int FindSW(
 *	process want to write it.
 *  3. >0 Successfully find specific node and return the index of node.
 */
-int FindMW(
+INT32_T FindMW(
            LIST_HANDLE HeadHandle,
            void** KeyWordPtrArray,
-           int CmpFcnIndex,
+           INT32_T CmpFcnIndex,
            LIST_HANDLE NodeHandle,
-           int PermissionTag,
+           INT32_T PermissionTag,
            void** UserDataArray
            );
 
@@ -189,11 +177,11 @@ int FindMW(
 *	want to read or write it, or the matched node is being read by another process when the current
 *	process want to write it.
 */
-int FindNodeNum(
+INT32_T FindNodeNum(
                 LIST_HANDLE HeadHandle,
-                int IndexNum,
+                INT32_T IndexNum,
                 LIST_HANDLE NodeHandle,
-                int PermissionTag
+                INT32_T PermissionTag
                 );
 
 /*
@@ -210,7 +198,7 @@ int FindNodeNum(
  *  OSI_OK: Successfully inserted.
  *  
  */
-int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr);
+INT32_T InsertNodeHead(LIST_HANDLE handle,INT32_T DataLength,void* DataPtr);
 
 /*
 *	Description:
@@ -230,10 +218,10 @@ int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr);
 */
 #define INSERT_BEFORE_NODE  0
 #define INSERT_AFTER_NODE   1
-int InsertNodeHandle( LIST_HANDLE HeadHandle, 
+INT32_T InsertNodeHandle( LIST_HANDLE HeadHandle, 
                      LIST_HANDLE PosiNodeHandle, 
-                     int InsertPosition, 
-                     int DataLength, void* DataPtr );
+                     INT32_T InsertPosition, 
+                     INT32_T DataLength, void* DataPtr );
 /*
 *	Description:
 *	Delete a node from list with single word matching.
@@ -253,10 +241,10 @@ int InsertNodeHandle( LIST_HANDLE HeadHandle,
 *	want to read or write it, or the matched node is being read by another process when the current
 *	process want to write it.
 */
-int DeleteNodeSW(
+INT32_T DeleteNodeSW(
                  LIST_HANDLE HeadHandle,
                  void** KeyWordPtrArray,
-                 int CmpFcnIndex,
+                 INT32_T CmpFcnIndex,
                  void** DelNodeDataPtr
                  );
 
@@ -279,10 +267,10 @@ int DeleteNodeSW(
 *	want to read or write it, or the matched node is being read by another process when the current
 *	process want to write it.
 */
-int DeleteNodeMW(
+INT32_T DeleteNodeMW(
                  LIST_HANDLE HeadHandle,
                  void** KeyWordPtrArray,
-                 int CmpFcnIndex,
+                 INT32_T CmpFcnIndex,
                  void** DelNodeDataPtr
                  );
 
@@ -299,7 +287,7 @@ int DeleteNodeMW(
 *	OSI_ERROR: When an error occur
 *  EntryAmount: left nodes amount.
 */
-int DeleteNodes( LIST_HANDLE handle );
+INT32_T DeleteNodes( LIST_HANDLE handle );
 
 /*
 *	Description:
@@ -317,7 +305,7 @@ int DeleteNodes( LIST_HANDLE handle );
 *  OSI_OK: When this routine successfully deletes all the nodes and list head.
 */
 
-int Delete(LIST_HANDLE handle);
+INT32_T Delete(LIST_HANDLE handle);
 
 /*
 *	Description:
@@ -332,7 +320,7 @@ int Delete(LIST_HANDLE handle);
 *	OSI_ERROR: When an error occurs.
 *  OSI_OK: Successfully release specific permission tag of the node.
 */
-int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag);
+INT32_T ReleasePermission(LIST_HANDLE NodeHandle,INT32_T PermissionTag);
 
 /*
 *	Description:
@@ -345,7 +333,7 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag);
 *	OSI_ERROR: When an error occurs.
 *  OSI_OK: Successfully printed the permission tag.
 */
-int PrintPermission(LIST_HANDLE NodeHandle);
+INT32_T PrintPermission(LIST_HANDLE NodeHandle);
 
 /*
 *	Description:
@@ -367,7 +355,7 @@ int PrintPermission(LIST_HANDLE NodeHandle);
 *  has been obtained read permission by another process.
 *	
 */
-int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag);
+INT32_T GetPermisssion(LIST_HANDLE NodeHandle,INT32_T PermissionTag);
 
 /*
 *	Description:
@@ -409,12 +397,12 @@ void* GetData( LIST_HANDLE NodeHandle );
 *  has been obtained read permission by another process.
 *		
 */
-int GetNextNode( 
+INT32_T GetNextNode( 
                 LIST_HANDLE HeadHandle, 
                 LIST_HANDLE CurrentHandle, 
                 LIST_HANDLE NextHandle, 
-                int SkipTag, 
-                int PermissionTag 
+                INT32_T SkipTag, 
+                INT32_T PermissionTag 
                 );
 /*
 *	Description:
@@ -443,12 +431,12 @@ int GetNextNode(
 *  has been obtained read permission by another process.
 * 		
 */
-int GetPreviousNode( 
+INT32_T GetPreviousNode( 
                     LIST_HANDLE HeadHandle, 
                     LIST_HANDLE CurrentHandle, 
                     LIST_HANDLE PreviousHandle, 
-                    int SkipTag, 
-                    int PermissionTag 
+                    INT32_T SkipTag, 
+                    INT32_T PermissionTag 
                     );
 /*
 *	Description:
@@ -461,7 +449,7 @@ int GetPreviousNode(
 *	OSI_ERROR: When an error occurs.
 *  Data length: When the node includes valid data block.
 */
-int GetDataLen(LIST_HANDLE handle);
+INT32_T GetDataLen(LIST_HANDLE handle);
 
 /*
 *	Description:

@@ -51,7 +51,7 @@ LIST_HANDLE read_text(STRING text_filename)
 	}
 
 	cmp_funs[0]=(void*)line_kw_cmp_fun;
-	if (Initialize(handle,1,cmp_funs)==OSI_ERROR)
+	if (Initialize(handle,1,cmp_funs)==AII_ERROR)
 	{
 		DeleteHandle(handle);
 		goto ErrExit;
@@ -61,11 +61,11 @@ LIST_HANDLE read_text(STRING text_filename)
 	line_ptr=AII_NULL;
 	line_len=0;
 	count=0;
-	while ((nread=getline(&line_ptr,&line_len,fp)) != OSI_ERROR)
+	while ((nread=getline(&line_ptr,&line_len,fp)) != AII_ERROR)
 	{
 		line_node.line_ptr=line_ptr;
 		line_node.line_len=nread;
-		if (InsertNodeHead(handle,sizeof(line_node),&line_node)==OSI_ERROR)
+		if (InsertNodeHead(handle,sizeof(line_node),&line_node)==AII_ERROR)
 		{
 			printf("Insert text line error, maybe memory limited!\n");
             fclose(fp);
@@ -98,20 +98,20 @@ int find_keyword(
     if (str_posi_ptr==AII_NULL || IsHandleEmpty(text_handle))
     {
         printf("Parameter error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     line_node_handle=str_posi_ptr->line_node_handle;
     if (IsHandleEmpty(line_node_handle))
     {
         printf("Empty handle!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     if (keyword==AII_NULL)
     {
         printf("No keyword for match!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     keyword_ptr_array[0]=(void*)keyword;
@@ -122,14 +122,14 @@ int find_keyword(
     if (retval < 0)
     {
         printf("Find keyword error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     str_posi_ptr->line_num=retval;
     str_posi_ptr->word_index_begin=matched_index;
     str_posi_ptr->word_index_end=matched_index+strlen(keyword)-1;
     str_posi_ptr->permi_tag=permi_tag;
-    return OSI_OK;
+    return AII_OK;
 }
 
 int find_line_num(
@@ -144,29 +144,29 @@ int find_line_num(
     if (IsHandleEmpty(text_handle) || IsHandleEmpty(line_node) || line_num<0)
     {
         printf("Parameter error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     retval=FindNodeNum(text_handle,line_num,line_node,permi_tag);
     
     switch (retval)
     {
-    case OSI_ERROR:
+    case AII_ERROR:
         printf("Cannot find specific line!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
         break;
     case LIST_PERMISSION_DENY:
         printf("Permission deny!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
         break;
-    case OSI_OK:
-        return OSI_OK;
+    case AII_OK:
+        return AII_OK;
         break;
     default:
         break;
     }
 
-    return OSI_ERROR;
+    return AII_ERROR;
 }
 
 int replace_line_num(
@@ -182,25 +182,25 @@ int replace_line_num(
     if (IsHandleEmpty(text_handle) || line_num < 0 || new_line_str == AII_NULL)
     {
         printf("Parameter error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     if ((line_handle=CreateHandle(LIST_NODE_TYPE))==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
-    if (find_line_num(text_handle,line_num,line_handle,WRITE_PERMISSION_TAG)==OSI_ERROR)
+    if (find_line_num(text_handle,line_num,line_handle,WRITE_PERMISSION_TAG)==AII_ERROR)
     {
         printf("Find line with number tag error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==AII_NULL)
     {
         ReleasePermission(line_handle,WRITE_PERMISSION_TAG);
         printf("Error: Empty node!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     new_line_len=strlen(new_line_str)+1;    /* For extra '\r' char */
@@ -219,7 +219,7 @@ int replace_line_num(
     ReleasePermission(line_handle,WRITE_PERMISSION_TAG);
     DeleteHandle(line_handle);
 
-    return OSI_OK;
+    return AII_OK;
 }
 
 int replace_line_kw(
@@ -236,29 +236,29 @@ int replace_line_kw(
 
     if (IsHandleEmpty(text_handle) || new_line_str==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     line_handle=CreateHandle(LIST_NODE_TYPE);
     if (line_handle==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     str_posi.line_node_handle=line_handle;
     retval=find_keyword(text_handle,keyword,&str_posi,WRITE_PERMISSION_TAG);
-    if (retval==OSI_ERROR)
+    if (retval==AII_ERROR)
     {
         printf("Cannot find keyword!\n");
         DeleteHandle(line_handle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==AII_NULL)
     {
         printf("Error: Empty node!\n");
         DeleteHandle(line_handle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     old_line_str=line_node_ptr->line_ptr;
@@ -277,7 +277,7 @@ int replace_line_kw(
 
     ReleasePermission(line_handle,WRITE_PERMISSION_TAG);
     DeleteHandle(line_handle);
-    return OSI_OK;
+    return AII_OK;
 }
 
 int replace_kw(
@@ -294,30 +294,30 @@ int replace_kw(
 
     if (IsHandleEmpty(text_handle) || new_string==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
 
     line_handle=CreateHandle(LIST_NODE_TYPE);
     if (line_handle==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     str_posi.line_node_handle=line_handle;
     retval=find_keyword(text_handle,keyword,&str_posi,WRITE_PERMISSION_TAG);
-    if (retval==OSI_ERROR)
+    if (retval==AII_ERROR)
     {
         printf("Cannot find keyword!\n");
         DeleteHandle(line_handle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     if ((line_node_ptr=(LINE_NODE_PTR)GetData(line_handle))==AII_NULL)
     {
         printf("Error: Empty node!\n");
         DeleteHandle(line_handle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     old_line_str=line_node_ptr->line_ptr;
@@ -333,7 +333,7 @@ int replace_kw(
         {
             printf("Cannot reallocate enough space for new line!\n");
             DeleteHandle(line_handle);
-            return OSI_ERROR;
+            return AII_ERROR;
         }
     }
     new_line_str=line_node_ptr->line_ptr;
@@ -344,7 +344,7 @@ int replace_kw(
     line_node_ptr->line_len=new_line_length;
     
     DeleteHandle(line_handle);
-    return OSI_OK;
+    return AII_OK;
 }
 
 int insert_line(
@@ -366,27 +366,27 @@ int insert_line(
         keyword==AII_NULL || ins_line==AII_NULL)
     {
         printf("Parameters error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     line_handle=CreateHandle(LIST_NODE_TYPE);
 
     if (line_handle==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     str_posi.line_node_handle=line_handle;
-    if (find_keyword(text_handle,keyword,&str_posi,READ_PERMISSION_TAG)==OSI_ERROR)
+    if (find_keyword(text_handle,keyword,&str_posi,READ_PERMISSION_TAG)==AII_ERROR)
     {
         printf("Cannot find keyword!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     if ((line_node_ptr=(LINE_NODE_PTR)malloc(sizeof(LINE_NODE)))==AII_NULL)
     {
         ReleasePermission(line_handle,READ_PERMISSION_TAG);
         printf("Memory limited!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     ins_length=strlen(ins_line);
@@ -407,14 +407,14 @@ int insert_line(
     
     retval=InsertNodeHandle(text_handle,line_handle,ins_posi,sizeof(LINE_NODE),(void*)line_node_ptr);
     
-    if (retval == OSI_ERROR)
+    if (retval == AII_ERROR)
     {
         printf("Insert node to list error!\n");
         goto ErrExit;
     }
 
     ReleasePermission(line_handle,READ_PERMISSION_TAG);
-    return OSI_OK;
+    return AII_OK;
 
 ErrExit:
 
@@ -428,7 +428,7 @@ ErrExit:
         free(line_node_ptr);
     }
     ReleasePermission(line_handle,READ_PERMISSION_TAG);
-    return OSI_ERROR;
+    return AII_ERROR;
 }
 
 int text_save(STRING config_filename, LIST_HANDLE text_handle)
@@ -440,7 +440,7 @@ int text_save(STRING config_filename, LIST_HANDLE text_handle)
 
     if (config_filename == AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     fp=fopen(config_filename,"w");
@@ -448,7 +448,7 @@ int text_save(STRING config_filename, LIST_HANDLE text_handle)
     if (fp==AII_NULL)
     {
         printf("Cannot open config file!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     handle1=CreateHandle(LIST_NODE_TYPE);
@@ -460,7 +460,7 @@ int text_save(STRING config_filename, LIST_HANDLE text_handle)
     while (amount>0)
     {
         retval=GetNextNode(text_handle,handle1,handle2,0,READ_PERMISSION_TAG);
-        if (retval == OSI_ERROR || retval == LIST_PERMISSION_DENY)
+        if (retval == AII_ERROR || retval == LIST_PERMISSION_DENY)
         {
             break;
         }
@@ -502,7 +502,7 @@ int text_save(STRING config_filename, LIST_HANDLE text_handle)
 
     fclose(fp);
 
-    return OSI_OK;
+    return AII_OK;
 }
 
 static int line_kw_cmp_fun(void* node_data_ptr, void* keyword, void* userdata)
@@ -517,9 +517,9 @@ static int line_kw_cmp_fun(void* node_data_ptr, void* keyword, void* userdata)
 
     index=findstr(line_node_ptr->line_ptr,keywordstr);
     
-    if (index == OSI_ERROR)
+    if (index == AII_ERROR)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 	
 	if (userdata)
@@ -527,5 +527,5 @@ static int line_kw_cmp_fun(void* node_data_ptr, void* keyword, void* userdata)
 		index_ptr=(int*)userdata;
 		*index_ptr=index;
 	}
-    return OSI_OK;
+    return AII_OK;
 }

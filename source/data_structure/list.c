@@ -21,34 +21,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mgosi.h"
 #include "list.h"
 #include "tool.h"
 
 typedef struct  
 {
-	int		HandleType;
-	void*   EntryPtr;
+	INT32_T		HandleType;
+	void*       EntryPtr;
 }DS_HANDLE_ENTRY,*DS_HANDLE_ENTRY_PTR;
 
 typedef struct  
 {
-	OSI_LIB_HANDLE	MutexHandle;
-	int				CmpFcnAmount;
-	void**			CmpFcnArray;
-	unsigned int	EntryAmount;
-	void*			EntriesList;
+	OSI_LIB_HANDLE	    MutexHandle;
+	INT32_T				CmpFcnAmount;
+	void**			    CmpFcnArray;
+	unsigned INT32_T	EntryAmount;
+	void*			    EntriesList;
 }LIST_HEAD,*LIST_HEAD_PTR;
 
 typedef struct _Node 
 {
-	int				length;
-	void*			data;
-	int				ReadPermission;
-	int				WritePermission;
-	LIST_HEAD_PTR	HeadPtr;
-	struct _Node*	PreviousNode;
-	struct _Node*	NextNode;
+	INT32_T				length;
+	void*			    data;
+	INT32_T				ReadPermission;
+	INT32_T				WritePermission;
+	LIST_HEAD_PTR	    HeadPtr;
+	struct _Node*	    PreviousNode;
+	struct _Node*	    NextNode;
 }LIST_NODE,*LIST_NODE_PTR;
 
 /*
@@ -62,7 +61,7 @@ typedef struct _Node
  *  Return:
  *  handle pointer, a valid pointer or NULL when memory limits
  */
-LIST_HANDLE CreateHandle(int HandleType)
+LIST_HANDLE CreateHandle(INT32_T HandleType)
 {
 	DS_HANDLE_ENTRY_PTR HandleEntryPtr;
 
@@ -112,27 +111,27 @@ void DeleteHandle(LIST_HANDLE handle)
  *	Return:
  *	Function Execution Status, (OSI_OK, OSI_ERROR)
  */
-int Initialize(
-               LIST_HANDLE handle,
-				int	CmpFcnAmount,
+INT32_T Initialize(
+                LIST_HANDLE handle,
+				INT32_T	CmpFcnAmount,
 				void** CmpFcnArray
 			   )
 {
 	LIST_HEAD_PTR	ListHeadPtr;
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
-    int         opt;
+    INT32_T         opt;
 
 	ListHeadPtr = AII_NULL;
     DSHandleEntryPtr = AII_NULL;
 
 	if ((handle == AII_NULL)||(CmpFcnAmount == 0))
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	/* Allocate list head */
 	if ((ListHeadPtr=(LIST_HEAD_PTR)malloc(sizeof(LIST_HEAD)))==0)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	memset((void *)ListHeadPtr, 0, sizeof(LIST_HEAD));
 
@@ -146,7 +145,7 @@ int Initialize(
             free(ListHeadPtr);
             ListHeadPtr = AII_NULL;
 		}
-        return OSI_ERROR;
+        return AII_ERROR;
 	}
 
 	memcpy(ListHeadPtr->CmpFcnArray,CmpFcnArray,CmpFcnAmount*sizeof(void*));
@@ -158,7 +157,7 @@ int Initialize(
 	DSHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
 	DSHandleEntryPtr->EntryPtr=(void*)ListHeadPtr;
 	DSHandleEntryPtr->HandleType=LIST_HEAD_TYPE;
-	return OSI_OK;
+	return AII_OK;
 }
 
 /*
@@ -170,11 +169,11 @@ int Initialize(
  *	Return:
  *	Function Execution Status, (OSI_ERROR, OSI_OK).
  */
-int Count(LIST_HANDLE handle)
+INT32_T Count(LIST_HANDLE handle)
 {
 	LIST_HEAD_PTR	ListHeadPtr;
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
-	int amount;
+	INT32_T amount;
 	
     ListHeadPtr = AII_NULL;
     DSHandleEntryPtr = AII_NULL;
@@ -182,19 +181,19 @@ int Count(LIST_HANDLE handle)
 
 	if (IsHandleEmpty(handle)==TRUE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	DSHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
 	if (DSHandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
 	{
 		printf("List class error: DS HeadHandle type error!\n");
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	ListHeadPtr=(LIST_HEAD_PTR)DSHandleEntryPtr->EntryPtr;
     if (ListHeadPtr == AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
 	mutex_lock(ListHeadPtr->MutexHandle, OSI_WAIT_FOREVER);
@@ -215,7 +214,7 @@ int Count(LIST_HANDLE handle)
  *	OSI_ERROR if an error occur. False if the list is not empty, True if 
  *	the list is empty. 
  */
-int IsEmpty(LIST_HANDLE HeadHandle)
+INT32_T IsEmpty(LIST_HANDLE HeadHandle)
 {
 	LIST_HEAD_PTR list;
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
@@ -227,13 +226,13 @@ int IsEmpty(LIST_HANDLE HeadHandle)
 
 	if (IsHandleEmpty(HeadHandle)==TRUE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	DSHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
 	if (DSHandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
     if (DSHandleEntryPtr->EntryPtr)
@@ -242,7 +241,7 @@ int IsEmpty(LIST_HANDLE HeadHandle)
     }
     else
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
 	mutex_lock(list->MutexHandle, OSI_WAIT_FOREVER);
@@ -272,22 +271,22 @@ int IsEmpty(LIST_HANDLE HeadHandle)
  *	process want to write it.
  *  3. >0 Successfully find specific node and return the index of node.
  */
-int FindSW(
+INT32_T FindSW(
 		   LIST_HANDLE HeadHandle,
 		   void** KeyWordPtrArray,
-		   int CmpFcnIndex,
+		   INT32_T CmpFcnIndex,
 		   LIST_HANDLE NodeHandle,
-		   int PermissionTag,
+		   INT32_T PermissionTag,
 		   void* UserData
 		   )
 {
 	LIST_NODE_PTR CurrentNodePtr;
-	int (*CmpFcnPtr)(void*,void*);
+	INT32_T (*CmpFcnPtr)(void*,void*);
 	void** CmpFcnArray;
 	LIST_HEAD_PTR list;
 	DS_HANDLE_ENTRY_PTR DSHeadHandleEntryPtr;
 	DS_HANDLE_ENTRY_PTR DSNodeHandleEntryPtr;
-	int logi,i,MaskTmp,NodeIndex;
+	INT32_T logi,i,MaskTmp,NodeIndex;
 
     CurrentNodePtr = AII_NULL;
     CmpFcnArray = AII_NULL;
@@ -298,7 +297,7 @@ int FindSW(
 
 	if (IsEmpty(HeadHandle) || KeyWordPtrArray==AII_NULL || NodeHandle==AII_NULL)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	DSHeadHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
@@ -306,7 +305,7 @@ int FindSW(
 	if (DSHeadHandleEntryPtr->HandleType!=LIST_HEAD_TYPE || DSNodeHandleEntryPtr->HandleType!=LIST_NODE_TYPE)
 	{
 		printf("List class error: DS handle type error!\n");
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
     list=(LIST_HEAD_PTR)DSHeadHandleEntryPtr->EntryPtr;
@@ -317,7 +316,7 @@ int FindSW(
     } 
     else
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
 	mutex_lock(list->MutexHandle, OSI_WAIT_FOREVER);
@@ -329,7 +328,7 @@ int FindSW(
     else
     {
 		mutex_unlock(list->MutexHandle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 	
     /* Get a temporary read permission */
@@ -345,7 +344,7 @@ int FindSW(
 			if ((MaskTmp & 0x1) && KeyWordPtrArray[i])
 			{
 				CmpFcnPtr=CmpFcnArray[i];
-				if (((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),UserData)==OSI_OK)
+				if (((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),UserData)==AII_OK)
 				{
 					mutex_lock(list->MutexHandle, OSI_WAIT_FOREVER);
 					CurrentNodePtr->ReadPermission--;	/* Release temporary permission */
@@ -399,7 +398,7 @@ int FindSW(
 		mutex_unlock(list->MutexHandle);
 	}
 
-	return OSI_ERROR;
+	return AII_ERROR;
 }
 
 /*
@@ -425,22 +424,22 @@ int FindSW(
  *	process want to write it.
  *  3. >0 Successfully find specific node and return the index of node.
  */
-int FindMW(
+INT32_T FindMW(
 		   LIST_HANDLE HeadHandle,
 		   void** KeyWordPtrArray,
-		   int CmpFcnIndex,
+		   INT32_T CmpFcnIndex,
 		   LIST_HANDLE NodeHandle,
-		   int PermissionTag,
+		   INT32_T PermissionTag,
 		   void** UserDataArray
 		   )
 {
 	LIST_NODE_PTR CurrentNodePtr;
-	int (*CmpFcnPtr)(void*,void*);
+	INT32_T (*CmpFcnPtr)(void*,void*);
 	void** CmpFcnArray;
 	LIST_HEAD_PTR list;
 	DS_HANDLE_ENTRY_PTR DSHeadHandleEntryPtr;
 	DS_HANDLE_ENTRY_PTR DSNodeHandleEntryPtr;
-	int logi,i,MaskTmp,CompareCnt, NodeIndex;
+	INT32_T logi,i,MaskTmp,CompareCnt, NodeIndex;
 	void* CurrentUserData;
 
     CurrentNodePtr = AII_NULL;
@@ -455,14 +454,14 @@ int FindMW(
         || KeyWordPtrArray==AII_NULL 
         )
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	DSHeadHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
 	DSNodeHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)NodeHandle;
 	if (DSHeadHandleEntryPtr->HandleType!=LIST_HEAD_TYPE || DSNodeHandleEntryPtr->HandleType!=LIST_NODE_TYPE)
 	{
 		printf("List class error: DS handle type error!\n");
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	list=(LIST_HEAD_PTR)DSHeadHandleEntryPtr->EntryPtr;
@@ -473,7 +472,7 @@ int FindMW(
     }
     else
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
 	mutex_lock(list->MutexHandle, OSI_WAIT_FOREVER);
@@ -484,7 +483,7 @@ int FindMW(
     else
     {
 		mutex_unlock(list->MutexHandle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 	/* Get a temporary read permission */
 	CurrentNodePtr->ReadPermission++;
@@ -510,7 +509,7 @@ int FindMW(
 				}
 				
 				CmpFcnPtr=CmpFcnArray[i];
-				logi+=(((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),CurrentUserData)==OSI_OK);
+				logi+=(((*CmpFcnPtr)(CurrentNodePtr->data,KeyWordPtrArray[i]),CurrentUserData)==AII_OK);
 				CompareCnt++;
 			}
 			MaskTmp>>=1;
@@ -563,7 +562,7 @@ int FindMW(
         CurrentNodePtr->ReadPermission++;
 		mutex_unlock(list->MutexHandle);
 	}
-	return OSI_ERROR;
+	return AII_ERROR;
 }
 
 /*
@@ -584,11 +583,11 @@ int FindMW(
  *	want to read or write it, or the matched node is being read by another process when the current
  *	process want to write it.
  */
-int FindNodeNum(
+INT32_T FindNodeNum(
                 LIST_HANDLE HeadHandle,
-                int IndexNum,
+                INT32_T IndexNum,
                 LIST_HANDLE NodeHandle,
-                int PermissionTag
+                INT32_T PermissionTag
                 )
 {
     LIST_NODE_PTR CurrentNodePtr;
@@ -602,7 +601,7 @@ int FindNodeNum(
     if (IsHandleEmpty(HeadHandle)==TRUE || IsHandleEmpty(NodeHandle)==TRUE || IndexNum<0)
     {
         printf("Parameter error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     DSHeadHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
@@ -612,7 +611,7 @@ int FindNodeNum(
         DSNodeHandleEntryPtr->HandleType!=LIST_NODE_TYPE)
     {
         printf("Handle type error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     list=(LIST_HEAD_PTR)DSHeadHandleEntryPtr->EntryPtr;
@@ -625,7 +624,7 @@ int FindNodeNum(
     else
     {
         mutex_unlock(list->MutexHandle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     /* Get a temporary read permission */
     CurrentNodePtr->ReadPermission++;
@@ -652,7 +651,7 @@ int FindNodeNum(
 
     if (CurrentNodePtr == list->EntriesList)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     mutex_lock(list->MutexHandle,OSI_WAIT_FOREVER);
@@ -683,7 +682,7 @@ int FindNodeNum(
     }
     mutex_unlock(list->MutexHandle);
 
-    return OSI_OK;
+    return AII_OK;
 }
 
 /*
@@ -700,7 +699,7 @@ int FindNodeNum(
  *  OSI_OK: Successfully inserted.
  *  
  */
-int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr)
+INT32_T InsertNodeHead(LIST_HANDLE handle,INT32_T DataLength,void* DataPtr)
 {
 	LIST_NODE_PTR CurrentNodePtr,InsertionNodePtr;
 	LIST_HEAD_PTR list;
@@ -713,19 +712,19 @@ int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr)
 	if (IsHandleEmpty(handle)
         ||(DataPtr==AII_NULL))
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	DSHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
 
 	if (DSHandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
 	{
 		printf("List class error: DS handle type error!\n");
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	if ((InsertionNodePtr=(LIST_NODE_PTR)malloc(sizeof(LIST_NODE)))==0)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	memset(InsertionNodePtr,0,sizeof(LIST_NODE));
@@ -757,7 +756,7 @@ int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr)
 	list->EntryAmount++;
 	mutex_unlock(list->MutexHandle);
 
-	return OSI_OK;
+	return AII_OK;
 }
 
 /*
@@ -776,11 +775,11 @@ int InsertNodeHead(LIST_HANDLE handle,int DataLength,void* DataPtr)
  *	OSI_ERROR: When an error occurs.
  *  OSI_OK: When successfully inserted a node.
  */
-int InsertNodeHandle(
+INT32_T InsertNodeHandle(
                      LIST_HANDLE HeadHandle, 
                      LIST_HANDLE PosiNodeHandle, 
-                     int InsertPosition,
-                     int DataLength, 
+                     INT32_T InsertPosition,
+                     INT32_T DataLength, 
                      void* DataPtr
                      )
 {
@@ -796,7 +795,7 @@ int InsertNodeHandle(
         )
     {
         printf("Parameters check fail!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     HandleEntryPtr1=(DS_HANDLE_ENTRY_PTR)HeadHandle;
@@ -806,7 +805,7 @@ int InsertNodeHandle(
         HandleEntryPtr2->HandleType != LIST_NODE_TYPE)
     {
         printf("Handle type error!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     ListHeadPtr=(LIST_HEAD_PTR)HandleEntryPtr1->EntryPtr;
@@ -815,7 +814,7 @@ int InsertNodeHandle(
     if ((InsertNodePtr=(LIST_NODE_PTR)malloc(sizeof(LIST_NODE)))==AII_NULL)
     {
         printf("Memory limited!\n");
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     memset(InsertNodePtr,0,sizeof(LIST_NODE));
@@ -867,14 +866,14 @@ int InsertNodeHandle(
         printf("Insert position error!\n");
         mutex_unlock(ListHeadPtr->MutexHandle);
         free(InsertNodePtr);
-        return OSI_ERROR;
+        return AII_ERROR;
         break;
     }
 
     ListHeadPtr->EntryAmount++;
     mutex_unlock(ListHeadPtr->MutexHandle);
 
-    return OSI_OK;
+    return AII_OK;
 }
 
 
@@ -899,10 +898,10 @@ int InsertNodeHandle(
  *	want to read or write it, or the matched node is being read by another process when the current
  *	process want to write it.
  */
-int DeleteNodeSW(
+INT32_T DeleteNodeSW(
 				 LIST_HANDLE HeadHandle,
 				 void** KeyWordPtrArray,
-				 int CmpFcnIndex,
+				 INT32_T CmpFcnIndex,
 				 void** DelNodeDataPtr,
 				 void* UserData
 				 )
@@ -913,7 +912,7 @@ int DeleteNodeSW(
 	LIST_NODE_PTR		CurrentNodePtr,PreviousNodePtr,NextNodePtr;
 	LIST_HANDLE		handle;
 	void*			DataPtr;
-	int				retval;
+	INT32_T				retval;
 
     HandleEntryPtr = AII_NULL;
     ListHeadPtr = AII_NULL;
@@ -925,12 +924,12 @@ int DeleteNodeSW(
 	/* parameters check */
 	if (IsHandleEmpty(HeadHandle) || KeyWordPtrArray==AII_NULL || CmpFcnIndex==0)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
 	if (HandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
     
     ListHeadPtr = HandleEntryPtr->EntryPtr;
@@ -939,7 +938,7 @@ int DeleteNodeSW(
 	handle=(LIST_HANDLE)&HandleEntry;
 
 	retval=FindSW(HeadHandle,KeyWordPtrArray,CmpFcnIndex,handle,WRITE_PERMISSION_TAG, UserData);
-	if (retval==OSI_ERROR || retval==LIST_PERMISSION_DENY)
+	if (retval==AII_ERROR || retval==LIST_PERMISSION_DENY)
 	{
 		return retval;
 	}
@@ -950,14 +949,14 @@ int DeleteNodeSW(
 	if (CurrentNodePtr==AII_NULL)
 	{
 		mutex_unlock(ListHeadPtr->MutexHandle);
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	CurrentNodePtr->WritePermission--;	/* Release write permission */
 	if (CurrentNodePtr->ReadPermission>0 || CurrentNodePtr->WritePermission>0)
 	{
 		mutex_unlock(ListHeadPtr->MutexHandle);
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	PreviousNodePtr=CurrentNodePtr->PreviousNode;
@@ -994,7 +993,7 @@ int DeleteNodeSW(
 
 	*DelNodeDataPtr=(void*)DataPtr;
 
-	return OSI_OK;
+	return AII_OK;
 }
 
 /*
@@ -1017,10 +1016,10 @@ int DeleteNodeSW(
  *	want to read or write it, or the matched node is being read by another process when the current
  *	process want to write it.
  */
-int DeleteNodeMW(
+INT32_T DeleteNodeMW(
 				 LIST_HANDLE HeadHandle,
 				 void** KeyWordPtrArray,
-				 int CmpFcnIndex,
+				 INT32_T CmpFcnIndex,
 				 void** DelNodeDataPtr,
 				 void** UserDataArray
 				 )
@@ -1031,7 +1030,7 @@ int DeleteNodeMW(
     LIST_NODE_PTR		CurrentNodePtr,PreviousNodePtr,NextNodePtr;
     LIST_HANDLE		handle;
     void*			DataPtr;
-    int				retval;
+    INT32_T				retval;
 
     HandleEntryPtr = AII_NULL;
     ListHeadPtr = AII_NULL;
@@ -1043,12 +1042,12 @@ int DeleteNodeMW(
     /* parameters check */
     if (IsHandleEmpty(HeadHandle) || KeyWordPtrArray==AII_NULL || CmpFcnIndex==0)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
     if (HandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     ListHeadPtr = HandleEntryPtr->EntryPtr;
@@ -1057,7 +1056,7 @@ int DeleteNodeMW(
     handle=(LIST_HANDLE)&HandleEntry;
 
     retval=FindMW(HeadHandle,KeyWordPtrArray,CmpFcnIndex,handle,WRITE_PERMISSION_TAG, UserDataArray);
-    if (retval==OSI_ERROR || retval==LIST_PERMISSION_DENY)
+    if (retval==AII_ERROR || retval==LIST_PERMISSION_DENY)
     {
         return retval;
     }
@@ -1068,14 +1067,14 @@ int DeleteNodeMW(
     if (CurrentNodePtr==AII_NULL)
     {
         mutex_unlock(ListHeadPtr->MutexHandle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     CurrentNodePtr->WritePermission--;	/* Release write permission */
     if (CurrentNodePtr->ReadPermission>0 || CurrentNodePtr->WritePermission>0)
     {
         mutex_unlock(ListHeadPtr->MutexHandle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     PreviousNodePtr=CurrentNodePtr->PreviousNode;
@@ -1112,7 +1111,7 @@ int DeleteNodeMW(
 
     *DelNodeDataPtr=(void*)DataPtr;
 
-    return OSI_OK;
+    return AII_OK;
 }
 
 /*
@@ -1128,12 +1127,12 @@ int DeleteNodeMW(
  *	OSI_ERROR: When an error occur
  *  EntryAmount: left nodes amount.
  */
-int DeleteNodes( LIST_HANDLE handle )
+INT32_T DeleteNodes( LIST_HANDLE handle )
 {
 	LIST_NODE_PTR	CurrentNodePtr,PreviousNodePtr,LastNodePtr;
 	LIST_HEAD_PTR list;
 	DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
-    int EntryAmount;
+    INT32_T EntryAmount;
 
     CurrentNodePtr=PreviousNodePtr=AII_NULL;
     list = AII_NULL;
@@ -1141,13 +1140,13 @@ int DeleteNodes( LIST_HANDLE handle )
 
 	if (IsHandleEmpty(handle))
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	DSHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
 	if (DSHandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
 	{
 		printf("List class error: DS handle type error!\n");
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	list=(LIST_HEAD_PTR)DSHandleEntryPtr->EntryPtr;
@@ -1237,9 +1236,9 @@ int DeleteNodes( LIST_HANDLE handle )
  *  OSI_OK: When this routine successfully deletes all the nodes and list head.
  */
 
-int Delete(LIST_HANDLE handle)
+INT32_T Delete(LIST_HANDLE handle)
 {
-    int retval;
+    INT32_T retval;
     LIST_HEAD_PTR list;
     DS_HANDLE_ENTRY_PTR DSHandleEntryPtr;
 
@@ -1268,7 +1267,7 @@ int Delete(LIST_HANDLE handle)
 
     DSHandleEntryPtr->EntryPtr=AII_NULL;
 
-    return OSI_OK;
+    return AII_OK;
 }
 
 /*
@@ -1284,7 +1283,7 @@ int Delete(LIST_HANDLE handle)
  *	OSI_ERROR: When an error occurs.
  *  OSI_OK: Successfully release specific permission tag of the node.
  */
-int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag)
+INT32_T ReleasePermission(LIST_HANDLE NodeHandle,INT32_T PermissionTag)
 {
 	LIST_NODE_PTR			NodePtr;
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
@@ -1294,13 +1293,13 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag)
 
 	if (IsHandleEmpty(NodeHandle))
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)NodeHandle;
 	if (HandleEntryPtr->HandleType!=LIST_NODE_TYPE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	if (HandleEntryPtr->EntryPtr)
@@ -1309,7 +1308,7 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag)
 	}
 	else
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	mutex_lock(NodePtr->HeadPtr->MutexHandle, OSI_WAIT_FOREVER);
@@ -1331,7 +1330,7 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag)
 	    break;
 	}
 	mutex_unlock(NodePtr->HeadPtr->MutexHandle);
-	return OSI_OK;
+	return AII_OK;
 }
 
 /*
@@ -1345,7 +1344,7 @@ int ReleasePermission(LIST_HANDLE NodeHandle,int PermissionTag)
  *	OSI_ERROR: When an error occurs.
  *  OSI_OK: Successfully printed the permission tag.
  */
-int PrintPermission(LIST_HANDLE NodeHandle)
+INT32_T PrintPermission(LIST_HANDLE NodeHandle)
 {
 	LIST_NODE_PTR			NodePtr;
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
@@ -1355,12 +1354,12 @@ int PrintPermission(LIST_HANDLE NodeHandle)
 
 	if (IsHandleEmpty(NodeHandle)==TRUE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)NodeHandle;
 	if (HandleEntryPtr->HandleType!=LIST_NODE_TYPE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	NodePtr=(LIST_NODE_PTR)HandleEntryPtr->EntryPtr;
 	
@@ -1369,7 +1368,7 @@ int PrintPermission(LIST_HANDLE NodeHandle)
     printf("Write Permission Tag:%d\n", NodePtr->WritePermission);
     mutex_unlock(NodePtr->HeadPtr->MutexHandle);
 
-	return OSI_OK;
+	return AII_OK;
 }
 
 /*
@@ -1392,7 +1391,7 @@ int PrintPermission(LIST_HANDLE NodeHandle)
  *  has been obtained read permission by another process.
  *	
  */
-int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag)
+INT32_T GetPermisssion(LIST_HANDLE NodeHandle,INT32_T PermissionTag)
 {
 	LIST_NODE_PTR			NodePtr;
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
@@ -1402,12 +1401,12 @@ int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag)
 
 	if (IsHandleEmpty(NodeHandle)==TRUE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)NodeHandle;
 	if (HandleEntryPtr->HandleType!=LIST_NODE_TYPE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	NodePtr=(LIST_NODE_PTR)HandleEntryPtr->EntryPtr;
 
@@ -1441,7 +1440,7 @@ int GetPermisssion(LIST_HANDLE NodeHandle,int PermissionTag)
 	}
 	mutex_unlock(NodePtr->HeadPtr->MutexHandle);
 	
-	return OSI_OK;
+	return AII_OK;
 }
 
 /*
@@ -1512,12 +1511,12 @@ void* GetData( LIST_HANDLE NodeHandle )
  *  has been obtained read permission by another process.
  *		
  */
-int GetNextNode(
+INT32_T GetNextNode(
 				LIST_HANDLE HeadHandle,
 				LIST_HANDLE CurrentHandle, 
 				LIST_HANDLE NextHandle,
-                int SkipTag,
-				int PermissionTag
+                INT32_T SkipTag,
+				INT32_T PermissionTag
 				)
 {
 	LIST_NODE_PTR		NextNodePtr, CurrentNodePtr;
@@ -1532,13 +1531,13 @@ int GetNextNode(
 
 	if (IsHandleEmpty(HeadHandle) || IsHandleEmpty(CurrentHandle) || NextHandle==AII_NULL)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	
 	HeadHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
 	if (HeadHandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
     HeadPtr= (LIST_HEAD_PTR) HeadHandleEntryPtr->EntryPtr;
@@ -1546,7 +1545,7 @@ int GetNextNode(
     if (HeadPtr->EntriesList == AII_NULL) /* Empty list */
     {
         mutex_unlock(HeadPtr->MutexHandle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
 	CurrentHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)CurrentHandle;
@@ -1574,7 +1573,7 @@ int GetNextNode(
                 NextHandleEntryPtr->HandleType=LIST_NODE_TYPE;
                 NextHandleEntryPtr->EntryPtr=NextNodePtr;
                 mutex_unlock(HeadPtr->MutexHandle);
-                return OSI_OK;
+                return AII_OK;
             }
             else /* Pointer to next node */
             {
@@ -1597,7 +1596,7 @@ int GetNextNode(
                 NextHandleEntryPtr->HandleType=LIST_NODE_TYPE;
                 NextHandleEntryPtr->EntryPtr=NextNodePtr;
                 mutex_unlock(HeadPtr->MutexHandle);
-                return OSI_OK;
+                return AII_OK;
             }
             else
             {
@@ -1616,13 +1615,13 @@ int GetNextNode(
         {
             printf("Permission tag error!\n");
             mutex_unlock(HeadPtr->MutexHandle);
-            return OSI_ERROR;
+            return AII_ERROR;
         }
 
     }while (NextNodePtr != CurrentNodePtr);
 	
 	mutex_unlock(HeadPtr->MutexHandle);
-	return OSI_ERROR;
+	return AII_ERROR;
 }
 
 /*
@@ -1652,12 +1651,12 @@ int GetNextNode(
  *  has been obtained read permission by another process.
  * 		
  */
-int GetPreviousNode(
+INT32_T GetPreviousNode(
 				LIST_HANDLE HeadHandle,
 				LIST_HANDLE CurrentHandle, 
 				LIST_HANDLE PreviousHandle,
-                int SkipTag,
-				int PermissionTag
+                INT32_T SkipTag,
+				INT32_T PermissionTag
 				)
 {
     LIST_NODE_PTR		PreviousNodePtr, CurrentNodePtr;
@@ -1672,13 +1671,13 @@ int GetPreviousNode(
 
     if (IsHandleEmpty(HeadHandle) || IsHandleEmpty(CurrentHandle) || PreviousHandle==AII_NULL)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
 
     HeadHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)HeadHandle;
     if (HeadHandleEntryPtr->HandleType!=LIST_HEAD_TYPE)
     {
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     HeadPtr= (LIST_HEAD_PTR) HeadHandleEntryPtr->EntryPtr;
@@ -1686,7 +1685,7 @@ int GetPreviousNode(
     if (HeadPtr->EntriesList == AII_NULL) /* Empty list */
     {
         mutex_unlock(HeadPtr->MutexHandle);
-        return OSI_ERROR;
+        return AII_ERROR;
     }
     
     CurrentHandleEntryPtr=(DS_HANDLE_ENTRY_PTR)CurrentHandle;
@@ -1714,7 +1713,7 @@ int GetPreviousNode(
                 PreviousHandleEntryPtr->HandleType=LIST_NODE_TYPE;
                 PreviousHandleEntryPtr->EntryPtr=PreviousNodePtr;
                 mutex_unlock(HeadPtr->MutexHandle);
-                return OSI_OK;
+                return AII_OK;
             }
             else /* Pointer to previous node */
             {
@@ -1737,7 +1736,7 @@ int GetPreviousNode(
                 PreviousHandleEntryPtr->HandleType=LIST_NODE_TYPE;
                 PreviousHandleEntryPtr->EntryPtr=PreviousNodePtr;
                 mutex_unlock(HeadPtr->MutexHandle);
-                return OSI_OK;
+                return AII_OK;
             }
             else
             {
@@ -1756,13 +1755,13 @@ int GetPreviousNode(
         {
             printf("Permission tag error!\n");
             mutex_unlock(HeadPtr->MutexHandle);
-            return OSI_ERROR;
+            return AII_ERROR;
         }
 
     }while (PreviousNodePtr != CurrentNodePtr);
 
     mutex_unlock(HeadPtr->MutexHandle);
-    return OSI_ERROR;
+    return AII_ERROR;
 }
 
 
@@ -1777,7 +1776,7 @@ int GetPreviousNode(
  *	OSI_ERROR: When an error occurs.
  *  Data length: When the node includes valid data block.
  */
-int GetDataLen(LIST_HANDLE handle)
+INT32_T GetDataLen(LIST_HANDLE handle)
 {
 	DS_HANDLE_ENTRY_PTR	HandleEntryPtr;
 	LIST_NODE_PTR NodePtr;
@@ -1787,19 +1786,19 @@ int GetDataLen(LIST_HANDLE handle)
 
 	if (handle==AII_NULL)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	HandleEntryPtr=(DS_HANDLE_ENTRY_PTR)handle;
 	if (HandleEntryPtr->HandleType==LIST_HEAD_TYPE)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 
 	NodePtr=(LIST_NODE_PTR)HandleEntryPtr->EntryPtr;
 	if (NodePtr==AII_NULL)
 	{
-		return OSI_ERROR;
+		return AII_ERROR;
 	}
 	return NodePtr->length;
 }

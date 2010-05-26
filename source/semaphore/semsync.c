@@ -18,6 +18,7 @@
 
 #ifdef LINUX_OS
 #include <semaphore.h>
+#include <time.h>
 #endif
 
 #ifdef VXWORKS_OS
@@ -29,118 +30,174 @@
 #endif
 
 
-SEM_ID sem_create(unsigned initValue)
+SEM_HANDLE sem_create(INT32_T option, INT32_T init_count, INT32_T max_count)
 {
-#ifdef LINUX_OS
-    sem_t* semId = AII_NULL;
-    int rval;
+    SEM_HANDLE sem_handle = AII_NULL;
 
-    semId = (sem_t*)malloc(sizeof(sem_t));
-    if (semId == AII_NULL)
+#ifdef LINUX_OS
+    sem_handle = (SEM_HANDLE)malloc(sizeof(sem_t));
+    if (sem_handle == AII_NULL)
     {
         return AII_NULL;
     }
-
-    rval = Sem_init((sem_t*)semId, initValue);
-    if (rval != 0)
+    
+    if (sem_init((sem_t*)sem_handle, option, init_count) != 0)
     {
-        free(semId);
+        free(sem_handle);
         return AII_NULL;
     }
-    return semId;
-
-#elif VXWORKS_OS
-    return semBCreate(SEM_Q_FIFO, initValue);
+    
 #endif
+
+#ifdef VXWORKS_OS
+    sem_handle = (SEM_HANDLE) semCCreate(option, init_count);
+    if (sem_handle == NULL)
+    {
+        return AII_NULL;
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    sem_handle = (SEM_HANDLE) CreateSemaphore( 
+        NULL,        /* default security attributes */
+        init_count,  /* initial count */
+        max_count,   /* maximum count */
+        NULL);       /* unnamed semaphore */
+    if (sem_handle == NULL)
+    {
+        return AII_NULL;
+    }
+#endif
+
+    return sem_handle;
 }
 
-/*
- * =====================================================================
- * Function:SemDelete()
- * Description: delete a semaphore. 
- * Input:   semId -- sync semaphore id
- * Output:  N/A
- * Return:  On success zero; on failure -1.
- *======================================================================
- */
-int SemDelete(SEM_ID semId)
+
+INT32_T sem_delete(SEM_HANDLE sem_handle)
 {
+    if (sem_handle == AII_NULL)
+    {
+        return AII_ERROR;
+    }
+
 #ifdef LINUX_OS
-    int rval;
-
-    if (semId == AII_NULL)
+    if (sem_destroy((sem_t*)sem_handle) != 0)
     {
-        return (-1);
+        /* Do not free semaphore handle memory block */
+        return AII_ERROR;
     }
-    rval = Sem_destroy((sem_t*)semId);
-    free(semId);
-    semId = AII_NULL;
-    return rval;
-
-#elif VXWORKS_OS
-    if (semId == AII_NULL)
-    {
-        return (-1);
-    }
-    return semDelete(semId);
+    free(sem_handle);
 #endif
+
+#ifdef VXWORKS_OS
+    if (semDelete((SEM_ID)sem_handle) == ERROR)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    if (CloseHandle((HANDLE)sem_handle) == 0)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+    return AII_OK;
 }
 
-/*
- * =====================================================================
- * Function:SemLock()
- * Description: lock a semaphore. 
- * Input:   semId -- sync semaphore id
- *          timeTick -- waiting time while blocking
- *              WAIT_FOREVER,   this routine block until semaphore available 
- *              NO_WAIT,        this routine return immediately with errorno
- *              wait time,      this routine block until semaphore available or time up
- * Output:  N/A
- * Return:  On success zero; on failure -1.
- *======================================================================
- */
-int SemLock(SEM_ID semId, int timeTick)
+
+INT32_T sem_take(SEM_HANDLE sem_handle, INT32_T millisecond)
 {
 #ifdef LINUX_OS
-    if (semId == AII_NULL)
-    {
-        return (-1);
-    }
-    return Sem_wait((sem_t*)semId, timeTick);
+    struct timespec wait_time;
 
-#elif VXWORKS_OS
-    if (semId == AII_NULL)
+    if (millisecond == WAIT_FOREVER)
     {
-        return (-1);
+        if (sem_wait((sem_t*)sem_handle) != 0)
+        {
+            return AII_ERROR;
+        }
     }
-    return semTake(semId, timeTick);
+    else
+    {
+        wait_time.tv_sec = millisecond/1000;
+        wait_time.tv_nsec = (millisecond - wait_time.tv_sec*1000)*1000000;
+        if (sem_timedwait((sem_t*)sem_handle, &wait_time) != 0)
+        {
+            return AII_ERROR;
+        }
+    }
+
 #endif
+
+#ifdef VXWORKS_OS
+    INT32_T tick;
+
+    if (millisecond == WAIT_FOREVER)
+    {
+        semTake((SEM_ID)sem_handle, WAIT_FOREVER);
+    }
+    else
+    {
+        tick = millisecond>>4;
+        if (millisecond == 0)
+        {
+            tick = 0;
+        }
+        else if (tick == 0)
+        {
+            tick = 1;
+        }
+
+        semTake((SEM_ID) sem_handle, tick);
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    UINT32_T dwWaitResult;
+
+    if (millisecond == WAIT_FOREVER)
+    {
+        millisecond = INFINITE;
+    }
+
+    dwWaitResult = WaitForSingleObject(sem_handle, millisecond);
+
+    if (dwWaitResult == WAIT_ABANDONED)
+    {
+        return AII_ERROR;
+    }
+
+#endif
+
+    return AII_OK;
 }
 
-/*
- * =====================================================================
- * Function:SemUnLock()
- * Description: unlock a semaphore. 
- * Input:   semId -- sync semaphore id
- * Output:  N/A
- * Return:  On success zero; on failure -1.
- *======================================================================
- */
-int SemUnlock(SEM_ID semId)
+
+INT32_T sem_give(SEM_HANDLE sem_handle)
 {
 #ifdef LINUX_OS
-    if (semId == AII_NULL)
+    if (sem_post((sem_t*)sem_handle) != 0)
     {
-        return (-1);
+        return AII_ERROR;
     }
-    return Sem_post((sem_t*)semId);
-
-#elif VXWORKS_OS
-    if (semId == AII_NULL)
-    {
-        return (-1);
-    }
-    return semGive(semId);
 #endif
+
+#ifdef VXWORKS_OS
+    if (semGive((SEM_ID)sem_handle) == ERROR)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef WINDOWS_OS_32
+    if (ReleaseSemaphore((HANDLE)sem_handle,1,NULL) == 0)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+    return AII_OK;
 }
 

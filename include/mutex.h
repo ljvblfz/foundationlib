@@ -25,9 +25,6 @@ extern "C"
 
 typedef void* MUTEX_HANDLE;
 
-#ifndef WAIT_FOREVER
-#define WAIT_FOREVER (-1)
-#endif
 
 /*
  *	Description:

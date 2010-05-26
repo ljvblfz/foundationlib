@@ -1,18 +1,69 @@
 /**************************************************************************************
  *  Copyright (c) Artificial Intelligence Infinity.
- *  Filename: foundationTime.c
- *  Description: this file contains api list of posix time operations
+ *  Filename: timeutil.c
+ *  Description: This file contains API for time utilities.
  *  Author: caoyun
  *  Create:2010-01-25 
  *  Modification history:
  *  2009-04-25, created the file,           caoyun
  *  2010-03-09, refreshed the file,         chenwangxian
+ *  2010-05-26, modify all the APIs,        Ben Shaw 
  *
  *
  **************************************************************************************/ 
-#include "foundationInclude.h"
-#include "foundationTime.h"
+#include "timeutil.h"
 
+#ifdef LINUX_OS
+#include <time.h>
+#include <sys/time.h>
+#endif
+
+#ifdef VXWORKS_OS
+#endif
+
+#ifdef WINDOWS_OS_32
+#endif
+
+static UINT64_T gregorian2sec_64(DATE_TIME_PTR date_time_ptr)
+{
+    UINT64_T dt_sec, days, years, year_64, hour_64, minute_64,second_64;
+    UINT32_T year_32;
+
+    if ((date_time_ptr->month -= 2) <= 0)
+    {
+        date_time_ptr->month += 12;
+        date_time_ptr->year -= 1;
+    }
+    
+    year_64 = date_time_ptr->year;
+    year_32 = date_time_ptr->year;
+    hour_64 = date_time_ptr->hour;
+    minute_64 = date_time_ptr->minute;
+    second_64 = date_time_ptr->second;
+
+    years = year_32/4 - year_32/100 + year_32/400 + 367*date_time_ptr->month/12 + date_time_ptr->mday;
+    days = years + year_64*365-719499;
+    dt_sec = ((days*24+hour_64)*60+minute_64)*60+second_64;
+    
+    return dt_sec;
+}
+
+static UINT32_T gregorian2sec_32(DATE_TIME_PTR date_time_ptr)
+{
+    UINT32_T year, month, day, hour, minute, second;
+
+    if ((INT32_T)(month -= 2) <= 0)
+    {
+        month += 12;
+        year -= 1;
+    }
+
+    return ((((UINT32_T)(year/4 - year/100 + year/400 + 367*month/12 + day)
+        + year*365 - 719499
+        )*24 + hour           
+        )*60 + minute 
+        )*60 + second; 
+}
 
 /* Converts Gregorian date to seconds since 1970-01-01 00:00:00.
  * Assumes input in normal date format, i.e. 1980-12-31 23:59:59
@@ -25,27 +76,24 @@
  *
  * This algorithm was first published by Gauss (I think).
  *
- * WARNING: this function will overflow on 2106-02-07 06:28:16 on
- * machines were long is 32-bit! (However, as time_t is signed, we
- * will already get problems at other places on 2038-01-19 03:14:08)
+ * WARNING: Even though this function support 64bit computing, however some machine
+ *  does not support 64bit integer computing. Thus this function will overflow on 
+ *  2106-02-07 06:28:16 on machines were long is 32-bit! (However, as time_t is signed, we
+ *  will already get problems at other places on 2038-01-19 03:14:08)
+ * 
  */
-unsigned long convertTime (unsigned int year, unsigned int mon,
-	       	unsigned int day, unsigned int hour,
-	       	unsigned int minute, unsigned int sec)
+UINT64_T gregorian2sec(DATE_TIME_PTR date_time_ptr)
 {
-
-	if ( 0 >= (int) (mon -= 2) ) {        /* 1..12 -> 11,12,1..10 */
-		mon += 12;      /* Puts Feb last since it has leap day */
-		year -= 1;
-	}
-
-	return
-		((((unsigned long)((year/4 - year/100) + year/400 + 367*mon/12 + day)
-		   + year*365 - 719499
-		  )*24 + hour 		/* now have hours */
-		 )*60 + minute 		/* now have minutes */
-		)*60 + sec; 		/* finally seconds */
+    if (sizeof(UINT64_T) == 8)
+    {
+        return gregorian2sec_64(date_time_ptr);
+    }
+    else
+    {
+        return gregorian2sec_32(date_time_ptr);
+    }
 }
+
 
 /*
  * =====================================================================

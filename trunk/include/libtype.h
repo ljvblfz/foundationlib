@@ -48,6 +48,14 @@ extern "C"
     #define AII_TRUE    1
 
     #define AII_FALSE   0
+    
+#ifndef WAIT_FOREVER
+#define WAIT_FOREVER (-1)
+#endif
+
+#ifndef NO_WAIT
+#define NO_WAIT         0
+#endif
 
     /*
      *	Basic type definition

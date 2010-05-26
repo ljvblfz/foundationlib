@@ -19,6 +19,7 @@ extern "C"
 {
 #endif
 
+typedef void* SEM_HANDLE;
 
 
 #ifdef __cplusplus

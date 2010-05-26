@@ -13,6 +13,8 @@
 #ifndef _TIME_API_H
 #define _TIME_API_H
 
+#include "libtype.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -20,13 +22,17 @@ extern "C"
 
 typedef struct
 {
-    int second;     /* [0,59] */
-    int minite;     /* [0,59] */
-    int hour;       /* [0,23] */
-    int day;        /* [1,31] */
-    int month;      /* [1,12] */
-    int year;       /* [1900,2308] */
-}TIME_NORMAL;
+    INT32_T second;  /* seconds after the minute - [0,59] */
+    INT32_T minute;  /* minutes after the hour - [0,59] */
+    INT32_T hour;    /* hours since midnight - [0,23] */
+    INT32_T mday;    /* day of the month - [1,31] */
+    INT32_T month;   /* months since January - [0,11] */
+    INT32_T year;    /* years since 0000 */
+    INT32_T week;    /* days since Sunday - [0,6] */
+    INT32_T yday;    /* days since January 1 - [0,365] */
+    INT32_T isdst;   /* daylight savings time flag */
+}DATE_TIME,*DATE_TIME_PTR;
+
 
 /*
  * =====================================================================

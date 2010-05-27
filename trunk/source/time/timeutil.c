@@ -11,6 +11,8 @@
  *
  *
  **************************************************************************************/ 
+#include <stdio.h>
+#include <stdlib.h>
 #include "timeutil.h"
 
 #ifdef LINUX_OS
@@ -19,12 +21,15 @@
 #endif
 
 #ifdef VXWORKS_OS
+#include <timers.h>
 #endif
 
 #ifdef WINDOWS_OS_32
+#include <sys/timeb.h>
+#include <time.h>
 #endif
 
-static UINT64_T gregorian2sec_64(DATE_TIME_PTR date_time_ptr)
+static UINT64_T gregorian2sec_64(GRE_DATE_TIME_PTR date_time_ptr)
 {
     UINT64_T dt_sec, days, years, year_64, hour_64, minute_64,second_64;
     UINT32_T year_32;
@@ -48,9 +53,16 @@ static UINT64_T gregorian2sec_64(DATE_TIME_PTR date_time_ptr)
     return dt_sec;
 }
 
-static UINT32_T gregorian2sec_32(DATE_TIME_PTR date_time_ptr)
+static UINT32_T gregorian2sec_32(GRE_DATE_TIME_PTR date_time_ptr)
 {
     UINT32_T year, month, day, hour, minute, second;
+
+    year = date_time_ptr->year;
+    month = date_time_ptr->month;
+    day = date_time_ptr->mday;
+    hour = date_time_ptr->hour;
+    minute = date_time_ptr->minute;
+    second = date_time_ptr->second;
 
     if ((INT32_T)(month -= 2) <= 0)
     {
@@ -82,7 +94,7 @@ static UINT32_T gregorian2sec_32(DATE_TIME_PTR date_time_ptr)
  *  will already get problems at other places on 2038-01-19 03:14:08)
  * 
  */
-UINT64_T gregorian2sec(DATE_TIME_PTR date_time_ptr)
+UINT64_T gregorian2sec(GRE_DATE_TIME_PTR date_time_ptr)
 {
     if (sizeof(UINT64_T) == 8)
     {
@@ -94,16 +106,104 @@ UINT64_T gregorian2sec(DATE_TIME_PTR date_time_ptr)
     }
 }
 
+INT32_T get_systime_sec(TIME_T* tm_sec_ptr)
+{
+#ifdef LINUX_OS
+    struct timespec tp;
 
-/*
- * =====================================================================
- * Function:setCalendarTime()
- * Description: Set time in second
- * Input:  calendarTime -- time in second
- * Output:   N/A
- * Return:  0 on SUCCESS, -1 otherwise.
- *======================================================================
- */
+    if (clock_gettime(CLOCK_REALTIME, &tp) != 0)
+    {
+        return AII_ERROR;
+    }
+    *tm_sec_ptr = tp.tv_sec;
+#endif
+
+#ifdef VXWORKS_OS
+    struct timespec tp;
+
+    if (clock_gettime(CLOCK_REALTIME, &tp) != OK)
+    {
+        return AII_ERROR;
+    }
+    *tm_sec_ptr = tp.tv_sec;
+#endif
+#ifdef WINDOWS_OS_32
+    FILETIME WinFileTime;
+    TIME_T tm_sec;
+
+    GetSystemTimeAsFileTime(&WinFileTime);
+    memcpy(&tm_sec, &WinFileTime, min(sizeof(TIME_T), sizeof(FILETIME)));
+    tm_sec /= 10000000;
+    *tm_sec_ptr = tm_sec;
+
+#endif
+
+    return AII_OK;
+}
+
+INT32_T set_systime_sec(const TIME_T* tm_sec_ptr)
+{
+#ifdef LINUX_OS
+    struct timespec tp;
+
+    tp.tv_sec = *tm_sec_ptr;
+    tp.tv_nsec = 0;
+    if (clock_settime(CLOCK_REALTIME, &tp) != 0)
+    {
+        return AII_ERROR;
+    }
+#endif
+
+#ifdef VXWORKS_OS
+    struct timespec tp;
+
+    tp.tv_sec = *tm_sec_ptr;
+    tp.tv_nsec = 0;
+    if (clock_settime(CLOCK_REALTIME, &tp) != OK)
+    {
+        return AII_ERROR;
+    }
+#endif
+#ifdef WINDOWS_OS_32
+    FILETIME WinFileTime;
+    SYSTEMTIME WinSysTime;
+    TIME_T hund_nano_num;
+    
+    hund_nano_num = *tm_sec_ptr * 10000000;
+    memcpy(&WinFileTime, &hund_nano_num, min(sizeof(FILETIME), sizeof(TIME_T)));
+    if (FileTimeToSystemTime(&WinFileTime, &WinSysTime) == 0)
+    {
+        return AII_ERROR;
+    }
+
+    if (SetSystemTime(&WinSysTime) == 0)
+    {
+        return AII_ERROR;
+    }
+    
+#endif
+}
+
+int set_systime(GRE_DATE_TIME_PTR tm_ptr)
+{
+#ifdef LINUX_OS
+    struct tm tp;
+
+    memset(&tp, 0x00, sizeof(tp));
+    tp.tm_year = tm_ptr->year - 1900;
+    tp.tm_mon = tm_ptr->month + 1;
+    tp.tm_mday = tm_ptr->mday;
+    tp.tm_hour = tm_ptr->hour;
+    tp.tm_min = tm_ptr->minute;
+    tp.tm_sec = tm_ptr->second;
+
+#endif
+#ifdef VXWORKS_OS
+#endif
+#ifdef WINDOWS_OS_32
+#endif
+}
+
 int setCalendarTime(time_t calendarTime)
 {
 #ifdef LINUX_OS

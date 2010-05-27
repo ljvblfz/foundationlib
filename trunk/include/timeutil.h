@@ -26,13 +26,20 @@ typedef struct
     INT32_T minute;  /* minutes after the hour - [0,59] */
     INT32_T hour;    /* hours since midnight - [0,23] */
     INT32_T mday;    /* day of the month - [1,31] */
-    INT32_T month;   /* months since January - [0,11] */
+    INT32_T month;   /* months since January - [1,12] */
     INT32_T year;    /* years since 0000 */
     INT32_T week;    /* days since Sunday - [0,6] */
     INT32_T yday;    /* days since January 1 - [0,365] */
     INT32_T isdst;   /* daylight savings time flag */
-}DATE_TIME,*DATE_TIME_PTR;
+}GRE_DATE_TIME,*GRE_DATE_TIME_PTR;
 
+typedef struct
+{
+    INT64_T tv_sec;     /* seconds */
+    INT32_T tv_nsec;    /* nanoseconds (0 - 1,000,000,000) */
+}TIMESPEC,*TIMESPEC_PTR;
+
+typedef INT64_T TIME_T;
 
 /*
  * =====================================================================

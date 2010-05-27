@@ -19,20 +19,12 @@ extern "C"
 {
 #endif
 
-#if 1
 #ifndef WINDOWS_OS_32
 #define WINDOWS_OS_32
-#endif
 #endif
 
 #ifndef LINUX_OS
 #define LINUX_OS
-#endif
-
-#if 1
-#ifndef VXWORKS_OS
-#define VXWORKS_OS
-#endif
 #endif
 
 

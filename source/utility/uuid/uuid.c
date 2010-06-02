@@ -14,7 +14,7 @@ static void get_current_time(uuid_time_t *timestamp);
 static UINT16_T true_random(void);
 
 /* uuid_create -- generator a UUID */
-int uuid_create(UUID_T *uuid)
+INT32_T uuid_create(UUID_T *uuid)
 {
      uuid_time_t timestamp, last_time;
      UINT16_T clockseq;

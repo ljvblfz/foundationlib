@@ -30,6 +30,7 @@ static void MDPrint(unsigned char [16]);
         filename - digests file
         (none)   - digests standard input
  */
+#ifdef _DEBUG
 int main(int argc, char *argv[])
 {
     int i;
@@ -55,6 +56,7 @@ int main(int argc, char *argv[])
 
     return (0);
 }
+#endif // _DEBUG
 
 /* Digests a string and prints the result. */
 static void MDString(char *string)

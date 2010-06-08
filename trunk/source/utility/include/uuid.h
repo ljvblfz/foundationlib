@@ -1,5 +1,8 @@
 #include "sysdep.h"
 
+#ifndef UUID_HEAD_FILE
+#define UUID_HEAD_FILE
+
 typedef struct 
 {
     UINT32_T  time_low;
@@ -10,6 +13,7 @@ typedef struct
     UINT8_T   node[6];
 }UUID_T;
 
+#define UUID_STATE_FILE_PATH 
 
 /* uuid_create -- generate a UUID */
 int uuid_create(UUID_T * uuid);
@@ -32,3 +36,4 @@ void uuid_create_md5_from_name(
 */
 int uuid_compare(UUID_T *u1, UUID_T *u2);
 
+#endif

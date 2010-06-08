@@ -1,5 +1,8 @@
 #include "libtype.h"
 
+#ifndef UTILITY_SYSDEP_HEAD_FILE
+#define UTILITY_SYSDEP_HEAD_FILE
+
 #ifdef WINDOWS_OS_32
 #include <windows.h>
 #endif
@@ -37,9 +40,11 @@ typedef unsigned64_t uuid_time_t;
 
 typedef struct 
 {
+    char if_name[32];
     char nodeID[6];
 } uuid_node_t;
 
-void get_ieee_node_identifier(uuid_node_t *node);
+INT32_T get_ieee_node_identifier(uuid_node_t *node);
 void get_system_time(uuid_time_t *uuid_time);
-void get_random_info(char seed[16]);
+
+#endif

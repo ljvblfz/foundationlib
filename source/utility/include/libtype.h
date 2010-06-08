@@ -1,16 +1,4 @@
-/**************************************************************************************
- *  Copyright (c) Artificial Intelligence Infinity.
- *  Filename: libtype.h
- *  Description: this file contains basic types of foundation lib
- *  Author: caoyun
- *  Create:2010-01-25 
- *  Modification history:
- *  2010-01-25, created the file,           caoyun
- *  2010-03-09, modify the file,         chenwangxian
- *  2010-04-28, modify the file,            Ben Shaw
- *
- *
- **************************************************************************************/ 
+
 #ifndef _DATATYPE_H
 #define _DATATYPE_H
 
@@ -19,27 +7,34 @@ extern "C"
 {
 #endif
 
-#ifndef WINDOWS_OS_32
-#define WINDOWS_OS_32
-#endif
-
-#ifndef LINUX_OS
+#ifdef LINUX_OS
 #define LINUX_OS
 #endif
 
-
     /* Especial macro definition */
-    #define AII_FOREVER for(;;)
+#ifndef FOREVER
+#define FOREVER for(;;)
+#endif
 
-    #define AII_NULL    ((void*) 0)
+#ifndef NULL
+#define NULL ((void*) 0)
+#endif
 
-    #define AII_ERROR   -1
+#ifndef ERROR
+#define ERROR   -1
+#endif
 
-    #define AII_OK      0
+#ifndef OK
+#define OK      0
+#endif
 
-    #define AII_TRUE    1
+#ifndef TRUE
+#define TRUE    1
+#endif
 
-    #define AII_FALSE   0
+#ifndef FALSE
+#define FALSE   0
+#endif
     
 #ifndef WAIT_FOREVER
 #define WAIT_FOREVER (-1)
@@ -80,6 +75,8 @@ extern "C"
     typedef unsigned char *     USTRING;
     
     typedef enum {FALSE, TRUE}  BOOL;
+
+#define min(x, y) x > y ? y:x
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,14 @@
 #include "sysdep.h"
 #include "uuid.h"
 
+/* data type for UUID generator persistent state */
+typedef struct 
+{
+    uuid_time_t  ts;       /* saved timestamp */
+    uuid_node_t  node;     /* saved node ID */
+    UINT16_T   cs;       /* saved clock sequence */
+} uuid_state;
+
 /* various forward declarations */
 static INT32_T read_state(UINT16_T *clockseq, uuid_time_t *timestamp, uuid_node_t *node);
 static void write_state(UINT16_T clockseq, uuid_time_t timestamp, uuid_node_t node);
@@ -13,41 +21,94 @@ static void format_uuid_v3or5(UUID_T *uuid, UINT8_T hash[], INT32_T v);
 static void get_current_time(uuid_time_t *timestamp);
 static UINT16_T true_random(void);
 
-/* uuid_create -- generator a UUID */
-INT32_T uuid_create(UUID_T *uuid)
+static uuid_state* global_uuid_state_ptr = NULL;
+
+INT32_T uuid_sys_init(void)
 {
-     uuid_time_t timestamp, last_time;
-     UINT16_T clockseq;
-     uuid_node_t node;
-     uuid_node_t last_node;
-     INT32_T f;
+    FILE* fp = NULL;
+    INT32_T witems;
 
-     /* acquire system-wide lock so we're alone */
-     LOCK;
-     /* get time, node ID, saved state from non-volatile storage */
-     get_current_time(&timestamp);
-     get_ieee_node_identifier(&node);
-     f = read_state(&clockseq, &last_time, &last_node);
+    global_uuid_state_ptr = malloc(sizeof(uuid_state));
+    if (global_uuid_state_ptr == NULL)
+    {
+        return ERROR;
+    }
+    memset(global_uuid_state_ptr, 0x00, sizeof(uuid_state));
+    
+    get_system_time(&time_now);
+    time_now = time_now / UUIDS_PER_TICK;
+    srand((UINT32_T)(((time_now >> 32) ^ time_now) & 0xffffffff));
 
-     /* if no NV state, or if clock went backwards, or node ID
-        changed (e.g., new network card) change clockseq */
-     if (!f || memcmp(&node, &last_node, sizeof node))
-     {
-         clockseq = true_random();
-     }
-     else if (timestamp < last_time)
-     {
-         clockseq++;
-     }
+    global_uuid_state_ptr->cs = 0;
 
-     /* save the state for next time */
-     write_state(clockseq, timestamp, node);
+    fp = fopen(UUID_STATE_FILE_PATH, "wb");
+    if (fp == NULL)
+    {
+        goto ErrExit;
+    }
 
-     UNLOCK;
+    witems = fwrite(global_uuid_state_ptr,sizeof(uuid_state), 1, fp);
+    if (witems != 1)
+    {
+        goto ErrExit;
+    }
+    
+    return OK;
 
-     /* stuff fields into the UUID */
-     format_uuid_v1(uuid, clockseq, timestamp, node);
-     return 1;
+ErrExit:
+    if (global_uuid_state_ptr)
+    {
+        free(global_uuid_state_ptr);
+        global_uuid_state_ptr = NULL;
+    }
+
+    if (fp)
+    {
+        fclose(fp);
+        fp = NULL;
+    }
+
+    return ERROR;
+}
+
+
+/* uuid_create -- generator a UUID */
+INT32_T uuid_create(STRING if_name, UUID_T *uuid)
+{
+    uuid_time_t timestamp, last_time;
+    UINT16_T clockseq;
+    uuid_node_t node;
+    uuid_node_t last_node;
+    INT32_T f;
+
+    /* acquire system-wide lock so we're alone */
+    LOCK;
+    /* get time, node ID, saved state from non-volatile storage */
+    get_current_time(&timestamp);
+    memset(&node,0x00,sizeof(node));
+    memcpy(node.if_name, if_name, min(sizeof(node.if_name)-1,strlen(if_name)));
+    get_ieee_node_identifier(&node);
+    f = read_state(&clockseq, &last_time, &last_node);
+
+    /* if no NV state, or if clock went backwards, or node ID
+       changed (e.g., new network card) change clockseq */
+    if (!f || memcmp(&node, &last_node, sizeof node))
+    {
+        clockseq = true_random();
+    }
+    else if (timestamp < last_time)
+    {
+        clockseq++;
+    }
+
+    /* save the state for next time */
+    write_state(clockseq, timestamp, node);
+
+    UNLOCK;
+
+    /* stuff fields into the UUID */
+    format_uuid_v1(uuid, clockseq, timestamp, node);
+    return 1;
 }
 
 /* format_uuid_v1 -- make a UUID from the timestamp, clockseq, and node ID */
@@ -72,12 +133,7 @@ void format_uuid_v1(
     memcpy(&uuid->node, &node, sizeof uuid->node);
 }
 
-/* data type for UUID generator persistent state */
-typedef struct {
-    uuid_time_t  ts;       /* saved timestamp */
-    uuid_node_t  node;     /* saved node ID */
-    UINT16_T   cs;       /* saved clock sequence */
-} uuid_state;
+
 
 static uuid_state st;
 
@@ -207,7 +263,7 @@ static UINT16_T true_random(void)
 void uuid_create_md5_from_name(
                                UUID_T *uuid, 
                                UUID_T nsid, 
-                               void *name,
+                               STRING name,
                                INT32_T namelen
                                )
 {
@@ -223,7 +279,7 @@ void uuid_create_md5_from_name(
     net_nsid.time_hi_and_version = htons(net_nsid.time_hi_and_version);
 
     MD5Init(&c);
-    MD5Update(&c, &net_nsid, sizeof net_nsid);
+    MD5Update(&c, &net_nsid, sizeof(net_nsid));
     MD5Update(&c, name, namelen);
     MD5Final(hash, &c);
 

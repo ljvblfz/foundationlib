@@ -15,19 +15,8 @@ typedef struct
 
 #define UUID_STATE_FILE_PATH 
 
-/* uuid_create -- generate a UUID */
-int uuid_create(UUID_T * uuid);
-
-/* uuid_create_md5_from_name -- create a version 3 (MD5) UUID using a
-   "name" from a "name space" */
-void uuid_create_md5_from_name(
-    UUID_T *uuid,         /* resulting UUID */
-    UUID_T nsid,          /* UUID of the namespace */
-    void *name,           /* the name from which to generate a UUID */
-    int namelen           /* the length of the name */
-);
-
-
+INT32_T uuid_sys_init(STRING ifname);
+INT32_T uuid_create(UUID_T *uuid);
 /* uuid_compare --  Compare two UUID's "lexically" and return
         -1   u1 is lexically before u2
          0   u1 is equal to u2

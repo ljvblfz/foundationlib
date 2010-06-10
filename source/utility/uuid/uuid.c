@@ -61,8 +61,10 @@ INT32_T uuid_sys_init(STRING ifname)
         return OK;
     }
     
-    
-    
+    if ()
+    {
+        
+    }
     
     ritems = fread(global_uuid_state_ptr, sizeof(uuid_state), 1, fp);
     if (ritems != 1)

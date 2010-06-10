@@ -23,13 +23,18 @@ void puid(UUID_T u)
 }
 
 /* Simple driver for UUID generator */
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     UUID_T u;
     int f;
+    
+    if (uuid_sys_init("eth0") == ERROR)
+    {
+        printf("UUID system initialization error!\n");
+        return ERROR;
+    }
 
     uuid_create(&u);
-    printf("uuid_create(): "); 
     puid(u);
 
     f = uuid_compare(&u, &u);
@@ -37,8 +42,9 @@ void main(int argc, char **argv)
     f = uuid_compare(&u, &NameSpace_DNS);
     printf("uuid_compare(u, NameSpace_DNS): %d\n", f); /* s.b. 1 */
     f = uuid_compare(&NameSpace_DNS, &u);
-    printf("uuid_compare(NameSpace_DNS, u): %d\n", f); /* s.b. -1 */
-    uuid_create_md5_from_name(&u, NameSpace_DNS, "www.widgets.com", 15);
-    printf("uuid_create_md5_from_name(): "); puid(u);
+
+    return OK;
 }
+
+
 

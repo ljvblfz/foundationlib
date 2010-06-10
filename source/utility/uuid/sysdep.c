@@ -19,14 +19,6 @@
 #include "sysdep.h"
 
 static int get_mac(char * interface_name,char * mac ,int len);
-static int get_ipaddr(
-                      char * interface_name, /* [in] */
-                      char * ip,	/* [out] */
-                      int ip_len,		/* [in] */
-                      char* netmask,	/* [out] */
-                      int netmask_len  /* [in] */
-                      );
-
 
 void get_system_time(uuid_time_t *uuid_time)
 {

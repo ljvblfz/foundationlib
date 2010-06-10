@@ -21,10 +21,6 @@
 #define LOCK
 #define UNLOCK
 
-typedef unsigned int    UINT32_T;
-typedef unsigned short  UINT16_T;
-typedef unsigned char   UINT8_T;
-
 /* Set this to what your compiler uses for 64-bit data type */
 #ifdef WINDOWS_OS_32
 #define unsigned64_t unsigned __int64

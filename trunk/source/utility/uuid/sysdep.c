@@ -68,9 +68,9 @@ static int get_mac(char * interface_name,char * mac ,int len)
 		return ERROR;
 	}
 
-	if(len < 18) 
+	if(len < 6) 
 	{
-		printf("The mac need 6 byte !\n");
+		printf("The mac need 6 byte, but len=%d\n",len);
 		return ERROR;
 	}
 
@@ -92,8 +92,8 @@ static int get_mac(char * interface_name,char * mac ,int len)
 
 	ptr =(u_char *)&ifr.ifr_ifru.ifru_hwaddr.sa_data[0]; 
 	close(s);
-	snprintf(mac,len,"%02X:%02X:%02X:%02X:%02X:%02X",ptr[0],ptr[1],ptr[2],ptr[3],
-		ptr[4],ptr[5]);
+    memcpy(mac, ptr, min(len, 6));
+    
 	return OK;
 }
 

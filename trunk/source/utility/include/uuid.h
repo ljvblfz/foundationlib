@@ -13,7 +13,7 @@ typedef struct
     UINT8_T   node[6];
 }UUID_T;
 
-#define UUID_STATE_FILE_PATH 
+#define UUID_STATE_FILE_PATH "uuid.bin"
 
 INT32_T uuid_sys_init(STRING ifname);
 INT32_T uuid_create(UUID_T *uuid);

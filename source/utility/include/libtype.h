@@ -74,7 +74,7 @@ extern "C"
 
     typedef unsigned char *     USTRING;
     
-    typedef enum {FALSE, TRUE}  BOOL;
+    typedef enum {False, True}  BOOL;
 
 #define min(x, y) x > y ? y:x
 

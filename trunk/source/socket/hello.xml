@@ -1,0 +1,33 @@
+﻿<s:Envelope
+	xmlns:a="http://www.w3.org/2005/08/addressing"
+	xmlns:d="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01"
+	xmlns:s="http://www.w3.org/2003/05/soap-envelope" >
+	<s:Header>
+		<a:Action>
+			http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Hello
+		</a:Action>
+		<a:MessageID>
+			urn:uuid:73948edc-3204-4455-bae2-7c7d0ff6c37c
+		</a:MessageID>	
+		<a:To>urn:docs-oasis-open-org:ws-dd:ns:discovery:2009:01</a:To>
+		<d:AppSequence InstanceId="1077004800" MessageNumber="1" />
+	</s:Header>
+	
+	<s:Body>
+		<d:Hello>
+			<a:EndpointReference>
+				<a:Address>
+					urn:uuid:98190dc2-0890-4ef8-ac9a-5940995e6119
+				</a:Address>
+			</a:EndpointReference>
+			<d:XAddrs>
+				192.168.18.55
+			</d:XAddrs>
+			<d:Types>dn:NetworkVideoTransmitter</d:Types>
+			<d:Scopes>
+				onvif://www.onvif.org/type/video_encoder
+			</d:Scopes>
+			<d:MetadataVersion>75965</d:MetadataVersion>
+		</d:Hello>
+	</s:Body>
+</s:Envelope>

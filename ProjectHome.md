@@ -1,0 +1,1 @@
+This project implements a set of universal APIs of common OS type such as windows, unix, Linux and vxWorks. It also provides many useful tools for universal embedded system development and "Image and Video processing".
